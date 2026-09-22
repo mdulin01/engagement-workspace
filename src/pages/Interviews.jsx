@@ -368,6 +368,6 @@ function GuideEditor({ guide }) {
 }
 
 export default function Interviews() {
-  const { isAdmin } = useAuth();
-  return isAdmin ? <AdminView /> : <LeaderView />;
+  const { isTeam } = useAuth();
+  return isTeam ? <AdminView /> : <LeaderView />;
 }

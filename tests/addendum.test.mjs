@@ -18,3 +18,25 @@ test("addendum builds and names the site, parties and key terms", async () => {
   assert.ok(!xml.includes("undefined"));
   assert.ok(!xml.includes("dulinconsulting.app//"));
 });
+
+test("key personnel adds the Section 4 consent, renumbers General, and keeps cost unchanged", async () => {
+  const kp = { name: "Jane Roe", credentials: "MD, MMCi", role: "the AI opportunity assessment (Deliverable 3)", qualifications: "Physician informaticist." };
+  const buf = await addendumToBuffer(buildAddendum({ config, siteUrl: "https://x.example.com", keyPersonnel: kp }));
+  const file = join(mkdtempSync(join(tmpdir(), "amend-kp-")), "a.docx");
+  writeFileSync(file, buf);
+  const xml = execFileSync("unzip", ["-p", file, "word/document.xml"]).toString();
+  for (const s of ["9. Key personnel", "Jane Roe", "MD, MMCi", "Section 4 of the Agreement, Client consents", "Dr. Roe is engaged and paid by Consultant", "10. General"]) {
+    assert.ok(xml.includes(s), `missing: ${s}`);
+  }
+  assert.ok(!xml.includes("8. General"));
+  assert.ok(!xml.includes("undefined"));
+});
+
+test("without key personnel the General section stays at 8", async () => {
+  const buf = await addendumToBuffer(buildAddendum({ config, siteUrl: "https://x.example.com" }));
+  const file = join(mkdtempSync(join(tmpdir(), "amend-plain-")), "a.docx");
+  writeFileSync(file, buf);
+  const xml = execFileSync("unzip", ["-p", file, "word/document.xml"]).toString();
+  assert.ok(xml.includes("8. General"));
+  assert.ok(!xml.includes("Key personnel"));
+});

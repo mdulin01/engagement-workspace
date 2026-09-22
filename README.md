@@ -32,6 +32,7 @@ firestore.rules              role model: owner email is admin; others need invit
 | Role | Sees |
 | --- | --- |
 | admin | everything; edits milestones, deliverables, status, interviews, effort, invites |
+| team | a colleague working the engagement: interviews, surveys, decks, documents; no effort/billing, no admin settings |
 | leader | hub, published status entries, interview counts (no names, links or notes) |
 | participant, vendor | hub (session pages later) |
 
@@ -60,7 +61,9 @@ Record and transcribe in Teams, which saves to the client's SharePoint/OneDrive,
 
 ## Documents
 
-`/documents` lists links to engagement documents (contract, amendments, charter), grouped by category and marked **Leaders** or **Admin only**. The site stores the link, not the file. Leaders query only the entries visible to them, which the rules enforce. Admin can also download **Amendment No. 1**, a draft authorizing use of this workspace (surveys included), generated from `engagement.json` (`npm run addendum` writes it to `out/`). Client counsel should review it before it is signed.
+`/documents` lists links to engagement documents (contract, amendments, charter), grouped by category and marked **Leaders** or **Admin only**. The site stores the link, not the file. Leaders query only the entries visible to them, which the rules enforce. Admin can also download **Amendment No. 1**, a draft authorizing use of this workspace (surveys included), generated from `engagement.json` (`npm run addendum [siteUrl] [keyPersonnel.json]` writes it to `out/`). Client counsel should review it before it is signed.
+
+Naming someone under **Key personnel** on that card adds a Section 9 to the draft: Client's consent under Proposal §4 to a named subcontractor, who is paid by Consultant at no change in cost, with confidentiality, PHI and conflict obligations flowed down, and a `team` account on this site. Those details are stored in `settings/keyPersonnel` in Firestore, not in this public repo.
 
 ## Milestone decks and deliverable shells
 

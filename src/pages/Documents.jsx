@@ -11,17 +11,53 @@ const CATEGORIES = ["Contract", "Amendment", "Charter", "Engagement", "Other"];
 const blank = () => ({ title: "", category: "Contract", url: "", visibility: "leaders", date: today(), note: "" });
 
 // Built on click so the docx library only loads when needed.
-async function downloadAddendum() {
+async function downloadAddendum(keyPersonnel) {
   const { buildAddendum, addendumToBlob, addendumFileName } = await import("../lib/addendum.js");
-  const blob = await addendumToBlob(buildAddendum({ config, siteUrl: window.location.origin }));
-  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: addendumFileName(config) });
+  const blob = await addendumToBlob(buildAddendum({ config, siteUrl: window.location.origin, keyPersonnel }));
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: addendumFileName(config, keyPersonnel) });
   a.click();
   URL.revokeObjectURL(a.href);
 }
 
+// Key personnel live in Firestore, not in the (public) repo.
+const KP_BLANK = { name: "", credentials: "", role: "", qualifications: "" };
+
+function KeyPersonnel({ kp, onSave }) {
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState({ ...KP_BLANK, ...kp });
+  const named = kp?.name;
+  return (
+    <div className="border-t pt-3 mt-3" style={{ borderColor: "var(--line)" }}>
+      <div className="flex items-baseline gap-2 text-sm">
+        <span className="text-slate-500">Key personnel:</span>
+        <span>{named ? `${kp.name}, ${kp.credentials}` : "none — Consultant performs all Services personally (§4)"}</span>
+        <button className="ml-auto text-xs underline" onClick={() => setOpen(!open)}>{open ? "close" : named ? "edit" : "add"}</button>
+      </div>
+      {open && (
+        <form className="mt-2 space-y-2" onSubmit={(e) => { e.preventDefault(); onSave(f); setOpen(false); }}>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <input className="input" placeholder="Name (e.g. Jane Doe)" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+            <input className="input" placeholder="Credentials (e.g. MD, MMCi)" value={f.credentials} onChange={(e) => setF({ ...f, credentials: e.target.value })} />
+          </div>
+          <input className="input" placeholder="Role (e.g. the AI opportunity assessment described in §2.5 and Deliverable 3)" value={f.role} onChange={(e) => setF({ ...f, role: e.target.value })} />
+          <textarea className="input" rows={3} placeholder="Qualifications: a sentence or two from their CV." value={f.qualifications} onChange={(e) => setF({ ...f, qualifications: e.target.value })} />
+          <div className="flex gap-2">
+            <button className="btn btn-primary" type="submit">Save</button>
+            {named && <button className="btn text-red-600" type="button" onClick={() => { onSave(null); setOpen(false); }}>Remove</button>}
+          </div>
+          <p className="text-xs text-slate-500">Stored in this workspace, not in the code repository. Adding a person here adds Section 9 (Key personnel) to the draft, recording Client consent under §4.</p>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function Documents() {
-  const { isAdmin } = useAuth();
-  const { rows, loading, error } = useCollection("documents", { where: isAdmin ? null : ["visibility", "==", "leaders"] });
+  const { isAdmin, isTeam } = useAuth();
+  const { rows, loading, error } = useCollection("documents", { where: isTeam ? null : ["visibility", "==", "leaders"] });
+  const { rows: settings } = useCollection("settings", { enabled: isAdmin });
+  const kp = settings.find((r) => r.id === "keyPersonnel");
+  const keyPersonnel = kp?.name ? { name: kp.name, credentials: kp.credentials, role: kp.role, qualifications: kp.qualifications } : null;
   const [d, setD] = useState(blank);
   const [editing, setEditing] = useState(null);
   const [err, setErr] = useState("");
@@ -66,12 +102,15 @@ export default function Documents() {
           </ul>
         </div>
         {isAdmin && (
-          <div className="card flex flex-wrap items-center gap-3">
+          <div className="card flex flex-wrap items-center gap-x-3 gap-y-1">
             <div className="flex-1 min-w-64">
-              <div className="font-medium" style={{ color: "var(--brand)" }}>Amendment No. 1: Use of the Engagement Workspace</div>
+              <div className="font-medium" style={{ color: "var(--brand)" }}>Amendment No. 1: {keyPersonnel ? "Engagement Workspace and Key Personnel" : "Use of the Engagement Workspace"}</div>
               <p className="text-sm text-slate-500">Draft generated from this engagement's settings. Have Client counsel review it, get it signed, store the signed copy, then add its link above as an Amendment.</p>
             </div>
-            <button className="btn btn-primary" onClick={downloadAddendum}>⤓ Download draft</button>
+            <button className="btn btn-primary" onClick={() => downloadAddendum(keyPersonnel)}>⤓ Download draft</button>
+            <div className="basis-full">
+              <KeyPersonnel kp={kp} onSave={(f) => save("settings", "keyPersonnel", f || { ...KP_BLANK })} />
+            </div>
           </div>
         )}
       </div>
