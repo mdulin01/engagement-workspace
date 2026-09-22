@@ -1,0 +1,75 @@
+{
+  "_comment": "One deck per milestone id. This repo is public: keep structure and prompts here, never findings. Text typed in the deck editor is saved to Firestore (admin only). Live slide types: phases, milestones, deliverables, interviews, themes, upcoming, team.",
+  "kickoff": {
+    "title": "Kickoff and Charter Confirmation",
+    "slides": [
+      { "id": "title", "type": "title" },
+      { "id": "agenda", "type": "bullets", "title": "Agenda", "bullets": ["Purpose and outcomes", "Scope and deliverables", "Timeline and phases", "Roles and governance", "Stakeholder interview plan", "Data handling", "Decisions needed today"] },
+      { "id": "purpose", "type": "bullets", "title": "Purpose and outcomes", "bullets": ["[Why the department is investing in data modernization now]", "[The three or four outcomes the sponsor needs by month six]", "[What success looks like for leaders and for staff]"] },
+      { "id": "scope", "type": "deliverables", "title": "Scope: eight deliverables" },
+      { "id": "phases", "type": "phases", "title": "Timeline and phases" },
+      { "id": "milestones", "type": "milestones", "title": "Milestones" },
+      { "id": "team", "type": "team", "title": "Roles and governance", "bullets": ["Biweekly check-ins with the day-to-day lead", "Monthly written status summary", "[Escalation path and decision rights]"] },
+      { "id": "interviews", "type": "interviews", "title": "Stakeholder interview plan" },
+      { "id": "handling", "type": "bullets", "title": "Data handling", "bullets": ["No PHI and no client confidential documents in the engagement workspace", "Interview notes stay in FCBOH SharePoint; the workspace holds links only", "Leaders see interview counts and themes, never who said what", "[Confirm who may sign in to the workspace]"] },
+      { "id": "decisions", "type": "discussion", "title": "Decisions needed today", "bullets": ["Confirm the charter and scope", "Confirm interview list and scheduling contact", "Confirm document access and SharePoint location", "[Other]"] },
+      { "id": "next", "type": "upcoming", "title": "Next steps" }
+    ]
+  },
+  "interim": {
+    "title": "Interim Findings Readout",
+    "slides": [
+      { "id": "title", "type": "title" },
+      { "id": "agenda", "type": "bullets", "title": "Agenda", "bullets": ["Where we are", "What we are hearing", "Early observations", "Open questions", "Next steps"] },
+      { "id": "progress", "type": "interviews", "title": "Where we are: interviews" },
+      { "id": "themes", "type": "themes", "title": "What we are hearing", "bullets": ["[One-line takeaway for the top two or three themes]"] },
+      { "id": "inventory", "type": "bullets", "title": "Systems and data inventory", "bullets": ["[Systems reviewed to date]", "[Contracts and export rights reviewed]", "[Gaps in what we have been able to see]"] },
+      { "id": "observations", "type": "bullets", "title": "Early observations", "bullets": ["[Observation 1: pattern, not anecdote]", "[Observation 2]", "[Observation 3]"] },
+      { "id": "questions", "type": "discussion", "title": "Open questions for leadership", "bullets": ["[Question where leadership input changes the analysis]", "[Access or scheduling blockers]"] },
+      { "id": "next", "type": "upcoming", "title": "Next steps" }
+    ]
+  },
+  "day90": {
+    "title": "Day 90 Executive Briefing",
+    "slides": [
+      { "id": "title", "type": "title" },
+      { "id": "agenda", "type": "bullets", "title": "Agenda", "bullets": ["What we did", "What we found", "EMR data access", "AI opportunities", "Priority recommendations", "Decisions requested", "What happens next"] },
+      { "id": "approach", "type": "interviews", "title": "What we did" },
+      { "id": "findings", "type": "bullets", "title": "Current state: key findings", "bullets": ["[Finding 1]", "[Finding 2]", "[Finding 3]", "[Finding 4]"] },
+      { "id": "maturity", "type": "bullets", "title": "Capability maturity", "bullets": ["[Overall maturity level and how it was scored]", "[Strongest domain]", "[Weakest domain and why it matters]"] },
+      { "id": "emr", "type": "bullets", "title": "EMR data access (VHN)", "bullets": ["[What data the department can get today, and how]", "[What the contract and certification allow]", "[Recommended access path]"] },
+      { "id": "ai", "type": "bullets", "title": "AI opportunities", "bullets": ["[Top use case: value, feasibility, risk]", "[Second use case]", "[Readiness gaps to close first]"] },
+      { "id": "recs", "type": "bullets", "title": "Priority recommendations", "bullets": ["[Recommendation 1]", "[Recommendation 2]", "[Recommendation 3]"] },
+      { "id": "status", "type": "deliverables", "title": "Day 90 deliverables", "numbers": [1, 2, 3, 4] },
+      { "id": "decisions", "type": "discussion", "title": "Decisions requested", "bullets": ["[Decision 1]", "[Decision 2]"] },
+      { "id": "phases", "type": "phases", "title": "What happens next" }
+    ]
+  },
+  "draftStrategy": {
+    "title": "Draft Strategy Working Session",
+    "slides": [
+      { "id": "title", "type": "title" },
+      { "id": "purpose", "type": "bullets", "title": "Purpose of this session", "bullets": ["React to the draft strategy before it is finalized", "Test the roadmap against capacity and funding", "Agree what changes before the final drafts"] },
+      { "id": "architecture", "type": "bullets", "title": "Target-state architecture", "bullets": ["[Core components and how data moves between them]", "[What changes from today]"] },
+      { "id": "governance", "type": "bullets", "title": "Governance framework", "bullets": ["[Decision bodies and their charters]", "[Data owner and steward roles]", "[Priority policies]"] },
+      { "id": "roadmap", "type": "bullets", "title": "Roadmap", "bullets": ["[0–6 months]", "[6–18 months]", "[18–36 months]"] },
+      { "id": "org", "type": "bullets", "title": "Organization and staffing", "bullets": ["[Roles to create or redefine]", "[Build, buy or partner]"] },
+      { "id": "measures", "type": "bullets", "title": "Clinical operations measurement", "bullets": ["[Proposed measure set]", "[Data sources and reporting cadence]"] },
+      { "id": "cha", "type": "bullets", "title": "CHA and accreditation", "bullets": ["[Mapping to accreditation standards]", "[Gaps to close]"] },
+      { "id": "discussion", "type": "discussion", "title": "Discussion", "bullets": ["What is missing or wrong?", "What is not feasible in this timeframe?", "Who needs to see this before it is final?"] },
+      { "id": "next", "type": "upcoming", "title": "Path to final" }
+    ]
+  },
+  "transition": {
+    "title": "Transition Briefing",
+    "slides": [
+      { "id": "title", "type": "title" },
+      { "id": "delivered", "type": "deliverables", "title": "What was delivered" },
+      { "id": "outcomes", "type": "bullets", "title": "Outcomes", "bullets": ["[What changed during the engagement]", "[Decisions made]"] },
+      { "id": "first90", "type": "bullets", "title": "The first 90 days after handoff", "bullets": ["[Action, owner, date]", "[Action, owner, date]", "[Action, owner, date]"] },
+      { "id": "ownership", "type": "bullets", "title": "Ownership and handoff", "bullets": ["[Who owns the roadmap]", "[Who chairs governance]", "[Where the artifacts live in SharePoint]"] },
+      { "id": "risks", "type": "bullets", "title": "Risks to watch", "bullets": ["[Risk and mitigation]", "[Risk and mitigation]"] },
+      { "id": "close", "type": "discussion", "title": "Thank you", "bullets": ["Questions and discussion"] }
+    ]
+  }
+}

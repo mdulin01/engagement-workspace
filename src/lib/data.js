@@ -41,6 +41,7 @@ const demo = {
       { id: "i3", name: "Example IT Manager", title: "IT Manager", group: "it", guideId: "data", status: "invited", scheduledAt: "", notesUrl: "", themes: [] },
     ],
     interviewSummary: [],
+    presentations: [],
   },
   listeners: new Map(),
   emit(name) {

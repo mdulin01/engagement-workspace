@@ -1,0 +1,112 @@
+{
+  "_comment": "Section outlines for deliverable shell documents, keyed by deliverable number. This repo is public: structure and guidance only. The filled-in documents live in the client's SharePoint.",
+  "1": {
+    "purpose": "Describe how the department collects, manages, uses and governs data today, and where the gaps are.",
+    "sections": [
+      { "heading": "Executive summary", "guidance": "One page. The five or six findings a leader must know, each with its implication." },
+      { "heading": "Background and scope", "guidance": "Why the assessment was done, what was in and out of scope, the period covered." },
+      { "heading": "Approach", "guidance": "Interviews by stakeholder group (counts, not names), documents reviewed, systems inventoried, maturity instrument used." },
+      { "heading": "Organizational context", "guidance": "Structure, programs and services that generate or depend on data." },
+      { "heading": "Systems and data inventory", "guidance": "Each system: purpose, owner, vendor, data held, interfaces, export capability. Full table in the appendix." },
+      { "heading": "Data flows and reporting", "guidance": "How data moves from collection to report, where it is re-entered or reconciled, reporting burden." },
+      { "heading": "Governance and data ownership", "guidance": "Who decides what today, formally and in practice. Policies in place and missing." },
+      { "heading": "Workforce and capability", "guidance": "Skills, roles and capacity for data work." },
+      { "heading": "Capability maturity assessment", "guidance": "Scores by domain with the evidence behind each." },
+      { "heading": "Gap analysis", "guidance": "Current state against the needs leaders described." },
+      { "heading": "Implications for the strategy phase", "guidance": "What the findings mean for Deliverables 5 to 7." },
+      { "heading": "Appendices", "guidance": "A. Interviews by stakeholder group (de-identified). B. Systems inventory. C. Maturity scoring detail. D. Documents reviewed." }
+    ]
+  },
+  "2": {
+    "purpose": "Assess what EMR data the department can access, under what terms, and the best path to reliable access.",
+    "sections": [
+      { "heading": "Executive summary", "guidance": "Current access, what the contract allows, the recommended path." },
+      { "heading": "Background and questions", "guidance": "The EMR in use, why access matters, the questions this assessment answers." },
+      { "heading": "Current data access", "guidance": "Reports, extracts and interfaces in use today; who runs them; how long they take." },
+      { "heading": "Contract and certification review", "guidance": "Data ownership and export rights in the contract; certification status and standards-based export (e.g. FHIR, bulk export)." },
+      { "heading": "Vendor conversations", "guidance": "What the vendor offers today and on its roadmap, and at what cost." },
+      { "heading": "Access options", "guidance": "Each option: what it provides, effort, cost, dependencies, risks." },
+      { "heading": "Data quality and completeness", "guidance": "Known issues in the fields that matter most for reporting." },
+      { "heading": "Privacy and security considerations", "guidance": "Requirements any access path must meet." },
+      { "heading": "Recommendation and next steps", "guidance": "Recommended option, sequence and owners." },
+      { "heading": "Appendices", "guidance": "A. Contract clauses reviewed. B. Vendor conversation log. C. Option comparison table." }
+    ]
+  },
+  "3": {
+    "purpose": "Identify and screen AI use cases that fit the department's needs, data and risk tolerance.",
+    "sections": [
+      { "heading": "Executive summary", "guidance": "Priority use cases and the readiness steps that come first." },
+      { "heading": "Approach and screening criteria", "guidance": "How use cases were gathered and scored: value, feasibility, data readiness, risk." },
+      { "heading": "Readiness", "guidance": "Data, governance, workforce and technology readiness for AI." },
+      { "heading": "Use-case inventory", "guidance": "All candidates considered, one line each." },
+      { "heading": "Screening results", "guidance": "Scores and the value/feasibility view." },
+      { "heading": "Priority use-case profiles", "guidance": "For each: problem, users, data needed, approach, benefits, risks, rough cost, first step." },
+      { "heading": "Risk and governance guardrails", "guidance": "Privacy, equity, accuracy, human oversight, procurement." },
+      { "heading": "Recommendations", "guidance": "Sequence and prerequisites." },
+      { "heading": "Appendices", "guidance": "A. Scoring detail. B. Use cases not advanced and why." }
+    ]
+  },
+  "4": {
+    "purpose": "Brief leadership on the Day 90 findings and the decisions needed to move into the strategy phase.",
+    "sections": [
+      { "heading": "Purpose", "guidance": "One paragraph. The on-site briefing itself uses the Day 90 deck in the engagement workspace." },
+      { "heading": "Key findings", "guidance": "The headline from each of Deliverables 1 to 3." },
+      { "heading": "Priority recommendations", "guidance": "Three to five, each with its rationale." },
+      { "heading": "Decisions requested", "guidance": "What leadership needs to decide, by when." },
+      { "heading": "What happens next", "guidance": "The strategy phase and its milestones." },
+      { "heading": "Attachments", "guidance": "Deliverables 1 to 3." }
+    ]
+  },
+  "5": {
+    "purpose": "Set the target state for the department's data, how it will be governed, and the roadmap to get there.",
+    "sections": [
+      { "heading": "Executive summary", "guidance": "The vision, the three or four big moves, the roadmap on one page." },
+      { "heading": "Vision and guiding principles", "guidance": "What the department's data should enable, and the principles that constrain choices." },
+      { "heading": "Target-state architecture", "guidance": "Components, integration and data flow; what changes from today." },
+      { "heading": "Data governance framework", "guidance": "Decision bodies and charters, owner and steward roles, policies, standards, issue escalation." },
+      { "heading": "Data management", "guidance": "Quality, metadata, security, privacy, retention." },
+      { "heading": "Roadmap", "guidance": "Initiatives by horizon (0–6, 6–18, 18–36 months) with dependencies and owners." },
+      { "heading": "Resourcing and funding", "guidance": "Staff, contracts and funding sources for each horizon." },
+      { "heading": "Risks and mitigations", "guidance": "What could stall the roadmap." },
+      { "heading": "Measures of progress", "guidance": "How leadership will know the strategy is working." },
+      { "heading": "Appendices", "guidance": "A. RACI. B. Draft governance charter. C. Policy templates. D. Initiative detail." }
+    ]
+  },
+  "6": {
+    "purpose": "Define the measures the department will use to manage clinical operations, and how they will be produced.",
+    "sections": [
+      { "heading": "Purpose and scope", "guidance": "Which services and decisions the measures support." },
+      { "heading": "Measurement framework", "guidance": "Domains (e.g. access, quality, efficiency, equity) and how measures map to them." },
+      { "heading": "Measure set", "guidance": "Table: measure, definition, numerator, denominator, source, frequency, owner." },
+      { "heading": "Data sources and feasibility", "guidance": "Whether each measure can be produced today and what it depends on." },
+      { "heading": "Reporting", "guidance": "Audiences, cadence, format." },
+      { "heading": "Baselines and targets", "guidance": "Where known; how targets will be set where not." },
+      { "heading": "Implementation plan", "guidance": "Sequence, owners, dependencies on Deliverable 5." }
+    ]
+  },
+  "7": {
+    "purpose": "Assess readiness to produce the Community Health Assessment and to meet accreditation data requirements.",
+    "sections": [
+      { "heading": "Executive summary", "guidance": "Readiness today and the priority gaps." },
+      { "heading": "Current CHA process", "guidance": "How the last assessment was produced, data sources used, partners, effort." },
+      { "heading": "Data sources and gaps", "guidance": "What is available, at what geography and timeliness, and what is missing." },
+      { "heading": "Accreditation mapping", "guidance": "Crosswalk of relevant accreditation standards to current evidence and data." },
+      { "heading": "Readiness assessment", "guidance": "Met, partly met, not met, with evidence." },
+      { "heading": "Recommendations", "guidance": "Actions to close gaps, tied to the roadmap in Deliverable 5." },
+      { "heading": "Timeline", "guidance": "Against the next CHA cycle and accreditation dates." }
+    ]
+  },
+  "8": {
+    "purpose": "Hand off the engagement's work so the department can carry it forward.",
+    "sections": [
+      { "heading": "Engagement summary", "guidance": "What was done, when, with whom (by group)." },
+      { "heading": "Deliverables index", "guidance": "Each deliverable, its final date and SharePoint location." },
+      { "heading": "Status of recommendations", "guidance": "Adopted, in progress, deferred, declined." },
+      { "heading": "Ownership and handoff", "guidance": "Who owns each workstream going forward (RACI)." },
+      { "heading": "The first 90 days after handoff", "guidance": "Actions, owners, dates." },
+      { "heading": "Open risks and issues", "guidance": "With owners." },
+      { "heading": "Knowledge transfer", "guidance": "Sessions held, materials provided." },
+      { "heading": "Appendices", "guidance": "A. Artifact inventory and locations. B. Contacts." }
+    ]
+  }
+}

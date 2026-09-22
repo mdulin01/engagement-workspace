@@ -2,6 +2,19 @@ import { useEngagement } from "../lib/engagement.js";
 import { useCollection, save } from "../lib/data.js";
 import { useAuth } from "../lib/auth.jsx";
 import { fmt, daysBetween } from "../lib/dates.js";
+import { Link } from "react-router-dom";
+import decks from "../config/presentations.json";
+
+// Built on click so the docx library only loads when someone needs a shell.
+async function downloadShell(config, deliverable) {
+  const [{ buildShell, shellToBlob, shellFileName }, { default: shells }] = await Promise.all([
+    import("../lib/shell.js"), import("../config/shells.json"),
+  ]);
+  const blob = await shellToBlob(buildShell({ config, deliverable, outline: shells[deliverable.number] }));
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: shellFileName(config, deliverable) });
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
 
 function Stat({ label, value, sub }) {
   return (
@@ -82,6 +95,7 @@ export default function Hub() {
                 )}
                 <span className={`flex-1 ${m.done ? "line-through text-slate-400" : ""}`}>{m.name}</span>
                 <span className="text-slate-500 text-xs">{m.week ? `wk ${m.week}` : `day ${m.day}`} · {fmt(m.date)}</span>
+                {isAdmin && decks[m.id] && <Link to={`/present/${m.id}`} className="btn text-xs py-0.5" title={`Open the ${decks[m.id].title} deck`}>▶ Present</Link>}
               </li>
             ))}
           </ul>
@@ -90,7 +104,7 @@ export default function Hub() {
         <div className="card">
           <div className="label">Deliverables (Proposal §3)</div>
           <table className="w-full text-sm">
-            <thead><tr className="text-left text-xs text-slate-500"><th className="py-1">#</th><th>Deliverable</th><th>Due</th><th>Status</th></tr></thead>
+            <thead><tr className="text-left text-xs text-slate-500"><th className="py-1">#</th><th>Deliverable</th><th>Due</th><th>Status</th>{isAdmin && <th />}</tr></thead>
             <tbody className="divide-y divide-slate-100">
               {deliverables.map((d) => (
                 <tr key={d.number}>
@@ -106,6 +120,11 @@ export default function Hub() {
                       <span className={`pill ${d.status === "Final" ? "bg-green-100 text-green-800" : d.status === "Not started" ? "bg-slate-100 text-slate-600" : "bg-sky-100 text-sky-800"}`}>{d.status}</span>
                     )}
                   </td>
+                  {isAdmin && (
+                    <td className="py-2 pl-2">
+                      <button className="text-xs underline whitespace-nowrap" title="Download a Word shell for this deliverable" onClick={() => downloadShell(eng.config, d)}>⤓ Shell</button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
