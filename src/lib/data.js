@@ -26,6 +26,21 @@ const demo = {
     ],
     expenses: [{ id: "x1", date: addDays(today(), -2), amount: 412.5, category: "Airfare", note: "GSO–ATL" }],
     aiLog: [],
+    interviewGuides: [
+      { id: "leadership", name: "Leadership", questions: "1. What decisions do you most need data for that you cannot make well today?\n2. Who owns data decisions today?" },
+      { id: "data", name: "Data, IT and surveillance", questions: "1. Which systems do you pull data from, and how do they connect?\n2. What manual extracts do you rely on?" },
+    ],
+    interviewThemes: [
+      { id: "th1", label: "Manual reporting burden" },
+      { id: "th2", label: "EMR data access" },
+      { id: "th3", label: "Data quality" },
+    ],
+    interviews: [
+      { id: "i1", name: "Example Director", title: "District Health Director", group: "exec", guideId: "leadership", status: "completed", scheduledAt: `${addDays(today(), -4)}T10:00`, notesUrl: "https://example.sharepoint.com/:w:/s/engagement/notes-i1", themes: ["th2", "th3"] },
+      { id: "i2", name: "Example Epidemiologist", title: "Lead Epidemiologist", group: "epi", guideId: "data", status: "scheduled", scheduledAt: `${addDays(today(), 3)}T14:00`, notesUrl: "", themes: [] },
+      { id: "i3", name: "Example IT Manager", title: "IT Manager", group: "it", guideId: "data", status: "invited", scheduledAt: "", notesUrl: "", themes: [] },
+    ],
+    interviewSummary: [],
   },
   listeners: new Map(),
   emit(name) {

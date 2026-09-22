@@ -37,5 +37,37 @@
     { "number": 7, "name": "Community Health Assessment and Accreditation Readiness", "due": "month6" },
     { "number": 8, "name": "Transition Briefing and Handoff", "due": "month6" }
   ],
-  "deliverableStatuses": ["Not started", "In progress", "Draft to client", "In client review", "Final"]
+  "deliverableStatuses": ["Not started", "In progress", "Draft to client", "In client review", "Final"],
+  "interviews": {
+    "notesLink": { "label": "SharePoint", "hostSuffix": ".sharepoint.com" },
+    "groups": [
+      { "id": "exec", "name": "Executive leadership", "target": 2 },
+      { "id": "clinical", "name": "Clinical services", "target": 3 },
+      { "id": "epi", "name": "Epidemiology and surveillance", "target": 3 },
+      { "id": "it", "name": "IT and data systems", "target": 2 },
+      { "id": "programs", "name": "Community health programs", "target": 2 },
+      { "id": "admin", "name": "Finance and administration", "target": 1 },
+      { "id": "external", "name": "External partners and vendors", "target": 1 }
+    ],
+    "starterGuides": [
+      { "id": "leadership", "name": "Leadership", "questions": "1. What decisions do you most need data for that you cannot make well today?\n2. Where does the department's data strategy stand relative to its priorities?\n3. Who owns data decisions today, formally and in practice?\n4. What would success look like at the end of this engagement?\n5. What has been tried before, and why did it stall?" },
+      { "id": "clinical", "name": "Clinical and program staff", "questions": "1. Walk me through how you document and report on a typical week of work.\n2. Where do you re-enter or reconcile the same data more than once?\n3. What reports do you produce, for whom, and how long do they take?\n4. What data do you wish you had at the point of care or service?\n5. What would you stop doing tomorrow if a system did it for you?" },
+      { "id": "data", "name": "Data, IT and surveillance", "questions": "1. Which systems do you administer or pull data from, and how do they connect?\n2. What are the manual extracts, spreadsheets or workarounds you rely on?\n3. Where are data quality problems caught, and by whom?\n4. What do vendor contracts allow for data export and access?\n5. What skills or staffing gaps limit what the team can take on?" },
+      { "id": "partner", "name": "External partner or vendor", "questions": "1. What data do you exchange with the department, and how?\n2. What slows that exchange down or makes it unreliable?\n3. What standards or interfaces do you support today and on your roadmap?\n4. What would a better working relationship on data look like?" }
+    ],
+    "starterThemes": [
+      "Manual reporting burden",
+      "Duplicate data entry",
+      "EMR data access",
+      "Data quality",
+      "Governance and ownership unclear",
+      "Workforce and skills",
+      "Vendor dependence",
+      "Interoperability",
+      "Timeliness of data",
+      "AI interest",
+      "AI concerns",
+      "Leadership support"
+    ]
+  }
 }

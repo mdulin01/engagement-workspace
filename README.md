@@ -17,7 +17,8 @@ src/lib/firebase.js          init from VITE_FB_CONFIG; DEMO mode when unset
 src/lib/auth.jsx             email-link + Google sign-in, invite-based roles
 src/lib/data.js              Firestore or in-memory store; useCollection / save / remove
 src/lib/engagement.js        config + settings override → computed dates
-src/pages/                   Hub, StatusLog, Effort, Admin, SignIn, NoAccess
+src/lib/interviews.js        interview tracker: notes-link check, leader summary (tested)
+src/pages/                   Hub, StatusLog, Interviews, Effort, Admin, SignIn, NoAccess
 firestore.rules              role model: owner email is admin; others need invites/{email}
 ```
 
@@ -25,17 +26,25 @@ firestore.rules              role model: owner email is admin; others need invit
 
 | Role | Sees |
 | --- | --- |
-| admin | everything; edits milestones, deliverables, status, effort, invites |
-| leader | hub, published status entries |
+| admin | everything; edits milestones, deliverables, status, interviews, effort, invites |
+| leader | hub, published status entries, interview counts (no names, links or notes) |
 | participant, vendor | hub (session pages later) |
 
 A person signs in with an emailed link. On first sign-in the client copies the role from `invites/{email}` into `users/{uid}`; the security rules verify the two match, so the client cannot grant itself a role.
+
+## Interview tracker
+
+`/interviews`. Admin tracks each interview (name, role, stakeholder group, guide, scheduling state, notes link, theme tags) and edits the guides and theme list. Groups, targets and starter guides/themes are in `engagement.json` under `interviews`.
+
+- **Notes are never stored here.** The rules allow a fixed set of fields with no free-text body, and `notesUrl` must be an `https://<tenant>.sharepoint.com/...` link (the host is in `firestore.rules` and in `interviews.notesLink`; change both for a client that uses a different system).
+- **Leaders see counts only.** They cannot read `interviews`. The admin page writes `interviewSummary/current` (counts by status and group, theme counts across completed interviews) whenever the tracker changes, and leaders read only that doc. Themes are never broken out by group, so a one-person group cannot be tied to what was said.
 
 ## Commands
 
 ```zsh
 npm run dev
 npm test
+npm run test:rules   # Firestore rules against the emulator; needs Java (brew install openjdk)
 npm run lint
 npm run build
 ```
