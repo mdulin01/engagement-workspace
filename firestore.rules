@@ -15,8 +15,10 @@ service cloud.firestore {
     function hasUserDoc() { return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)); }
     function role() { return isOwner() ? 'admin' : (hasUserDoc() ? userDoc().data.role : 'none'); }
     function isAdmin() { return role() == 'admin'; }
-    function isLeader() { return role() == 'leader' || isAdmin(); }
-    function isMember() { return role() in ['admin', 'leader', 'participant', 'vendor']; }
+    // team: a colleague working the engagement (no billing, no settings)
+    function isTeam() { return role() in ['admin', 'team']; }
+    function isLeader() { return role() in ['admin', 'team', 'leader']; }
+    function isMember() { return role() in ['admin', 'team', 'leader', 'participant', 'vendor']; }
     function inviteFor(e) { return get(/databases/$(database)/documents/invites/$(e)); }
     function hasInvite(e) { return exists(/databases/$(database)/documents/invites/$(e)); }
 
@@ -57,7 +59,7 @@ service cloud.firestore {
 
     // ---- status log: admin sees all; leaders see published entries -----
     match /statusLog/{id} {
-      allow read: if isAdmin() || (isLeader() && resource.data.published == true);
+      allow read: if isTeam() || (isLeader() && resource.data.published == true);
       allow write: if isAdmin();
     }
 
@@ -95,27 +97,27 @@ service cloud.firestore {
         && d.get('themes', []) is list && d.get('themes', []).size() <= 12;
     }
     match /interviews/{id} {
-      allow read, delete: if isAdmin();
-      allow create, update: if isAdmin() && validInterview(request.resource.data);
+      allow read, delete: if isTeam();
+      allow create, update: if isTeam() && validInterview(request.resource.data);
     }
     match /interviewGuides/{id} {
-      allow read, delete: if isAdmin();
-      allow create, update: if isAdmin()
+      allow read, delete: if isTeam();
+      allow create, update: if isTeam()
         && request.resource.data.keys().hasOnly(['name', 'questions', 'updatedAt'])
         && request.resource.data.name is string && request.resource.data.name.size() <= 80
         && request.resource.data.questions is string && request.resource.data.questions.size() <= 8000;
     }
     // Theme labels are short tags from a fixed list, never quotes.
     match /interviewThemes/{id} {
-      allow read, delete: if isAdmin();
-      allow create, update: if isAdmin()
+      allow read, delete: if isTeam();
+      allow create, update: if isTeam()
         && request.resource.data.keys().hasOnly(['label', 'updatedAt'])
         && request.resource.data.label is string && request.resource.data.label.size() <= 40;
     }
     // Counts only, recomputed by the admin client whenever interviews change.
     match /interviewSummary/{id} {
       allow read: if isLeader();
-      allow write: if isAdmin()
+      allow write: if isTeam()
         && request.resource.data.keys().hasOnly(['target', 'active', 'byStatus', 'byGroup', 'themes', 'survey', 'updatedAt']);
     }
 
@@ -126,8 +128,8 @@ service cloud.firestore {
     // summary. Field ids mirror src/config/survey.json.
     match /surveyInvites/{token} {
       allow get: if true;
-      allow list, delete: if isAdmin();
-      allow create: if isAdmin() && request.resource.data.keys().hasOnly(['interviewId', 'updatedAt'])
+      allow list, delete: if isTeam();
+      allow create: if isTeam() && request.resource.data.keys().hasOnly(['interviewId', 'updatedAt'])
         && request.resource.data.interviewId is string;
     }
     function shortText(m, k, max) { return m.get(k, '') is string && m.get(k, '').size() <= max; }
@@ -156,15 +158,16 @@ service cloud.firestore {
         && shortText(t, 'sentinel', 600) && shortText(t, 'useCases', 600) && shortText(t, 'worksWell', 600) && shortText(t, 'priorities', 600);
     }
     match /surveyResponses/{token} {
-      allow read, delete: if isAdmin();
+      allow read: if isTeam();
+      allow delete: if isAdmin();
       // create only: a submitted survey cannot be overwritten, even by its link
       allow create: if exists(/databases/$(database)/documents/surveyInvites/$(token)) && validResponse(request.resource.data);
     }
 
     // ---- milestone decks: slide text typed in the deck editor -----------
     match /presentations/{deckId} {
-      allow read, delete: if isAdmin();
-      allow create, update: if isAdmin() && request.resource.data.keys().hasOnly(['slides', 'updatedAt'])
+      allow read, delete: if isTeam();
+      allow create, update: if isTeam() && request.resource.data.keys().hasOnly(['slides', 'updatedAt'])
         && request.resource.data.slides is map;
     }
 
@@ -172,7 +175,7 @@ service cloud.firestore {
     // Links only; files stay where they are stored (SharePoint, Drive).
     // Leaders see entries marked 'leaders' and must query with that filter.
     match /documents/{id} {
-      allow read: if isAdmin() || (isLeader() && resource.data.visibility == 'leaders');
+      allow read: if isTeam() || (isLeader() && resource.data.visibility == 'leaders');
       allow delete: if isAdmin();
       allow create, update: if isAdmin()
         && request.resource.data.keys().hasOnly(['title', 'category', 'url', 'visibility', 'date', 'note', 'updatedAt'])

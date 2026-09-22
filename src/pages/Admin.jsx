@@ -3,7 +3,7 @@ import { useCollection, save, remove } from "../lib/data.js";
 import { useEngagement } from "../lib/engagement.js";
 import { fmt } from "../lib/dates.js";
 
-const ROLES = ["leader", "participant", "vendor", "admin"];
+const ROLES = ["leader", "team", "participant", "vendor", "admin"];
 
 export default function Admin() {
   const eng = useEngagement();
@@ -56,7 +56,7 @@ export default function Admin() {
             );
           })}
         </ul>
-        <p className="text-xs text-slate-500">Roles: <b>leader</b> sees the hub and published status; <b>participant</b> and <b>vendor</b> see the hub only (session pages come later); <b>admin</b> is you.</p>
+        <p className="text-xs text-slate-500">Roles: <b>team</b> is a colleague working the engagement (everything but effort and admin); <b>leader</b> sees the hub and published status; <b>participant</b> and <b>vendor</b> see the hub only (session pages come later); <b>admin</b> is you.</p>
       </section>
     </div>
   );

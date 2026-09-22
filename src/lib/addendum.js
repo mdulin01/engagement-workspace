@@ -22,13 +22,17 @@ const sigCell = (lines) => new TableCell({
   children: lines.map((l) => p(l)),
 });
 
-export const addendumFileName = (config) => `${config.clientShort}-Amendment-Engagement-Workspace-DRAFT.docx`;
+export const addendumFileName = (config, keyPersonnel = null) =>
+  `${config.clientShort}-Amendment-${keyPersonnel ? "Workspace-and-Key-Personnel" : "Engagement-Workspace"}-DRAFT.docx`;
 
 /**
- * @param {{config: object, siteUrl: string}} args
- * config: engagement.json. siteUrl: the workspace address, e.g. https://fcboh.dulinconsulting.app
+ * @param {{config: object, siteUrl: string, keyPersonnel?: {name, credentials, role, qualifications}}} args
+ * config: engagement.json. siteUrl: the workspace address. keyPersonnel: an
+ * additional person whose participation Client must consent to under Section 4.
  */
-export function buildAddendum({ config, siteUrl }) {
+export function buildAddendum({ config, siteUrl, keyPersonnel = null }) {
+  const kp = keyPersonnel;
+  const last = kp ? kp.name.split(" ").slice(-1)[0] : "";
   const client = config.client;
   const host = siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
   const consultant = config.consultant;
@@ -37,7 +41,7 @@ export function buildAddendum({ config, siteUrl }) {
   const children = [
     p(new TextRun({ text: "DRAFT FOR REVIEW BY CLIENT COUNSEL · NOT LEGAL ADVICE", bold: true, color: "B45309", size: 18 }), { alignment: AlignmentType.CENTER }),
     new Paragraph({ heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER, spacing: { before: 200, after: 80 }, children: [new TextRun("Amendment No. 1")] }),
-    p(new TextRun({ text: "Use of the Engagement Workspace", size: 28 }), { alignment: AlignmentType.CENTER }),
+    p(new TextRun({ text: kp ? "Engagement Workspace and Key Personnel" : "Use of the Engagement Workspace", size: 28 }), { alignment: AlignmentType.CENTER }),
     p(new TextRun({ text: config.title, color: GREY }), { alignment: AlignmentType.CENTER, spacing: { after: 360 } }),
 
     p([`This Amendment No. 1 (the "Amendment") is entered into as of ${BLANK} (the "Amendment Date") by and between the `, b(client), ` ("Client") and `, b(`${consultant}, individually`), ` ("Consultant"), and amends the services agreement between the parties dated ${BLANK}, which incorporates Consultant's proposal for the ${config.title} engagement (together, the "Agreement"). Capitalized terms not defined here have the meanings given in the Agreement.`]),
@@ -46,6 +50,7 @@ export function buildAddendum({ config, siteUrl }) {
     p("A. Section 8 of the Agreement requires any change to be documented in a written amendment signed by both parties."),
     p("B. Section 9.2 of the Agreement provides that Consultant will not store PHI or Client confidential data on personal devices or personal cloud accounts, and that work involving identifiable data will be performed within Client's environment."),
     p("C. To manage the engagement efficiently, Consultant operates a secure, invitation-only website dedicated to this engagement, and the parties wish to authorize its use for the Term and to set out what information it may hold and how that information is protected."),
+    ...(kp ? [p("D. Section 4 of the Agreement provides that all Services be performed personally by Consultant, and that Consultant not subcontract any portion of the Services without Client's prior written consent. The parties wish to record Client's consent to the participation of the person named in Section 9.")] : []),
 
     h("1. Definitions"),
     item("1.1", `"Workspace" means the website at https://${host}, and any successor address Consultant gives Client in writing, together with the hosting, authentication and database services that support it.`),
@@ -85,10 +90,21 @@ export function buildAddendum({ config, siteUrl }) {
     item("7.1", "Consultant acknowledges that Workspace Data may be subject to the Georgia Open Records Act and will cooperate with records requests as directed by Client, consistent with Section 9.3."),
     item("7.2", "Within thirty (30) days after expiration or termination of the Agreement, Consultant will, at Client's direction, deliver an export of Workspace Data to Client in a common electronic format, then delete Workspace Data from the Workspace and the Service Providers, and confirm the deletion to Client in writing. Consultant may retain the Agreement, this Amendment, and its own invoicing and effort records."),
 
-    h("8. General"),
-    item("8.1", "This Amendment is effective on the Amendment Date and ends with the Agreement, except that Section 7.2 survives until it is performed."),
-    item("8.2", "This Amendment does not change the scope of Services, the Deliverables, the level of effort, or compensation. The Workspace is provided at no additional cost to Client."),
-    item("8.3", "Except as stated in this Amendment, the Agreement remains in full force and effect. If this Amendment and the Agreement conflict regarding the Workspace, this Amendment controls."),
+    ...(kp ? [
+      h("9. Key personnel"),
+      item("9.1 Consent.", `Under Section 4 of the Agreement, Client consents to the participation of ${kp.name}, ${kp.credentials}, as a subcontractor to Consultant performing ${kp.role} under Consultant's direction and supervision.`),
+      item("9.2 Qualifications.", `${kp.qualifications} A curriculum vitae has been provided to Client.`),
+      item("9.3 Responsibility.", `Consultant remains fully responsible for all Services and Deliverables, including any portion performed by Dr. ${last}, and remains Client's single point of contact and accountability. Section 4 otherwise continues to apply, and no further subcontracting or assignment is authorized.`),
+      item("9.4 No change in cost.", `Dr. ${last} is engaged and paid by Consultant. This Amendment does not change the compensation, Consulting Days, or reimbursable expenses payable by Client under the Agreement, and Client has no payment obligation to Dr. ${last}.`),
+      item("9.5 Flow-down.", `Before performing any Services, Dr. ${last} will enter into a written agreement with Consultant binding him to confidentiality, data-handling and PHI obligations no less protective than Section 9.2 of the Agreement and this Amendment, to the independence and conflict-of-interest obligations of Section 9.4, and to Client policies and any HIPAA arrangement elected under Section 9.2. Dr. ${last} will provide a written conflict-of-interest disclosure to Client before performing any Services.`),
+      item("9.6 Workspace access.", `Dr. ${last} may be given a "team" account in the Workspace, which reaches engagement management, interview and survey information and briefing materials, and excludes Consultant's billing records and administrative settings.`),
+      item("9.7 Changes.", `Consultant will not add or replace key personnel without Client's prior written consent. Client may request in writing that Dr. ${last} be removed from the engagement, and Consultant will comply promptly, then perform the affected Services personally or propose a replacement for Client's consent.`),
+    ] : []),
+
+    h(kp ? "10. General" : "8. General"),
+    item(kp ? "10.1" : "8.1", "This Amendment is effective on the Amendment Date and ends with the Agreement, except that Section 7.2 survives until it is performed."),
+    item(kp ? "10.2" : "8.2", `This Amendment does not change the scope of Services, the Deliverables, the level of effort, or compensation. The Workspace${kp ? " and the participation of the person named in Section 9 are" : " is"} provided at no additional cost to Client.`),
+    item(kp ? "10.3" : "8.3", "Except as stated in this Amendment, the Agreement remains in full force and effect. If this Amendment and the Agreement conflict, this Amendment controls."),
 
     p("The parties have signed this Amendment as of the Amendment Date.", { spacing: { before: 360, after: 240 } }),
     new Table({
@@ -107,7 +123,7 @@ export function buildAddendum({ config, siteUrl }) {
 
   return new Document({
     creator: consultant,
-    title: `${config.clientShort} Amendment No. 1 — Engagement Workspace (draft)`,
+    title: `${config.clientShort} Amendment No. 1 — ${kp ? "Workspace and Key Personnel" : "Engagement Workspace"} (draft)`,
     styles: { default: { document: { run: { font: "Calibri", size: 22 } } } },
     sections: [{
       footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ children: [`${config.clientShort} · Amendment No. 1 · DRAFT · Page `, PageNumber.CURRENT, " of ", PageNumber.TOTAL_PAGES], size: 16, color: GREY })] })] }) },

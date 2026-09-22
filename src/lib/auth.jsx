@@ -67,7 +67,9 @@ export function AuthProvider({ children }) {
     ...state,
     demo: DEMO,
     isAdmin: state.role === "admin",
-    isLeader: state.role === "leader" || state.role === "admin",
+    // team = a colleague working the engagement: everything but billing and settings
+    isTeam: ["admin", "team"].includes(state.role),
+    isLeader: ["admin", "team", "leader"].includes(state.role),
     async sendLink(email) {
       const clean = email.trim().toLowerCase();
       await sendSignInLinkToEmail(auth, clean, { url: `${window.location.origin}/signin`, handleCodeInApp: true });
