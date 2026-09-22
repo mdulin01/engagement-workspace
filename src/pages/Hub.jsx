@@ -16,12 +16,13 @@ async function downloadShell(config, deliverable) {
   URL.revokeObjectURL(a.href);
 }
 
-function Stat({ label, value, sub }) {
+function Stat({ label, value, sub, tone }) {
   return (
-    <div className="card">
+    <div className="card relative overflow-hidden">
+      {tone && <div className="absolute inset-y-0 left-0 w-1" style={{ background: tone }} />}
       <div className="label">{label}</div>
-      <div className="text-2xl font-semibold">{value}</div>
-      {sub && <div className="text-xs text-slate-500 mt-1">{sub}</div>}
+      <div className="font-display text-[28px] leading-tight" style={{ color: tone || "var(--brand)" }}>{value}</div>
+      {sub && <div className="text-xs text-slate-500 mt-1.5">{sub}</div>}
     </div>
   );
 }
@@ -77,7 +78,7 @@ export default function Hub() {
         <Stat label="Engagement week" value={eng.week < 1 ? "Pre-start" : `Week ${eng.week}`} sub={`Effective ${fmt(eng.effectiveDate)} → ends ${fmt(eng.endDate)}`} />
         <Stat label="Current phase" value={eng.currentPhases.map((p) => p.name).join(" / ") || (eng.week < 1 ? "Not started" : "Complete")} />
         <Stat label="Next milestone" value={next ? `${daysBetween(eng.today, next.date)} days` : "—"} sub={next ? `${next.name} · ${fmt(next.date)}` : ""} />
-        <Stat label="Timeline" value={atRisk ? "At risk" : "On track"} sub={atRisk ? `${overdueMs.length} milestone(s), ${overdueDl.length} deliverable(s) past due` : "Nothing past due"} />
+        <Stat label="Timeline" tone={atRisk ? "var(--gold)" : "var(--accent)"} value={atRisk ? "At risk" : "On track"} sub={atRisk ? `${overdueMs.length} milestone(s), ${overdueDl.length} deliverable(s) past due` : "Nothing past due"} />
       </div>
 
       <PhaseBar phases={eng.config.phases} week={eng.week} termWeeks={eng.config.termWeeks} />
@@ -113,7 +114,7 @@ export default function Hub() {
                   <td className="py-2 pr-2 text-xs text-slate-500 whitespace-nowrap">{fmt(d.dueDate)}</td>
                   <td className="py-2">
                     {isAdmin ? (
-                      <select className="input" value={d.status} onChange={(e) => save("deliverables", String(d.number), { status: e.target.value })}>
+                      <select className="input w-auto" value={d.status} onChange={(e) => save("deliverables", String(d.number), { status: e.target.value })}>
                         {eng.config.deliverableStatuses.map((s) => <option key={s}>{s}</option>)}
                       </select>
                     ) : (

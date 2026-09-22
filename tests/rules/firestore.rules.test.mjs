@@ -105,3 +105,43 @@ test("deck text is admin-only", async () => {
   await assertFails(setDoc(doc(leader(), "presentations/day90"), { slides: {} }));
   await assertFails(setDoc(doc(owner(), "presentations/day90"), { slides: {}, attachment: "..." }));
 });
+
+// ---- pre-interview survey ------------------------------------------------
+const anon = () => env.unauthenticatedContext().firestore();
+const answer = (extra = {}) => ({
+  profile: { title: "Nurse Manager", unit: "Clinic A", group: "clinical", tenureOrg: "3–5 years", tenureRole: "1–3 years" },
+  systems: ["VHN (clinical EMR)"], systemsOther: "", hours: { entry: 4, reconcile: 2, reports: 1.5 },
+  ratings: { access: 2, trust: 3, timely: 0, burden: 1, tools: 2, skills: 4, ownership: 1 },
+  ai: { aiInterest: 4, aiConcern: 3 }, text: { fixOne: "Fewer duplicate forms", reportsMade: "", success: "" },
+  updatedAt: serverTimestamp(), ...extra,
+});
+
+test("survey: link holder submits once without signing in", async () => {
+  await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), "surveyInvites/tok123"), { interviewId: "i1" }));
+  await assertSucceeds(getDoc(doc(anon(), "surveyInvites/tok123")));
+  await assertSucceeds(setDoc(doc(anon(), "surveyResponses/tok123"), answer()));
+  await assertFails(setDoc(doc(anon(), "surveyResponses/tok123"), answer()));
+  await assertFails(getDoc(doc(anon(), "surveyResponses/tok123")));
+  await assertFails(getDoc(doc(leader(), "surveyResponses/tok123")));
+  await assertSucceeds(getDoc(doc(owner(), "surveyResponses/tok123")));
+});
+
+test("survey: no invite, no submission; invites cannot be listed or forged", async () => {
+  await assertFails(setDoc(doc(anon(), "surveyResponses/guess"), answer()));
+  await assertFails(setDoc(doc(anon(), "surveyInvites/mine"), { interviewId: "x" }));
+  const { getDocs, collection } = await import("firebase/firestore");
+  await assertFails(getDocs(collection(anon(), "surveyInvites")));
+});
+
+test("survey: bad shapes are rejected", async () => {
+  await env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), "surveyInvites/t2"), { interviewId: "i1" }));
+  await assertFails(setDoc(doc(anon(), "surveyResponses/t2"), answer({ ratings: { access: 9 } })));
+  await assertFails(setDoc(doc(anon(), "surveyResponses/t2"), answer({ text: { fixOne: "x".repeat(601) } })));
+  await assertFails(setDoc(doc(anon(), "surveyResponses/t2"), answer({ patientName: "x" })));
+  await assertFails(setDoc(doc(anon(), "surveyResponses/t2"), answer({ hours: { entry: 500 } })));
+});
+
+test("interviews accept a SharePoint recording link only", async () => {
+  await assertSucceeds(setDoc(doc(owner(), "interviews/r1"), interview({ recordingUrl: "https://fulton-my.sharepoint.com/:v:/p/x/abc", recordingConsent: true })));
+  await assertFails(setDoc(doc(owner(), "interviews/r2"), interview({ recordingUrl: "https://example.com/audio.m4a" })));
+});

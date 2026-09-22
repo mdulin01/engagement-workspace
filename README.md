@@ -14,6 +14,7 @@ React 18 · Vite · Tailwind v4 · Firebase (Auth email-link, Firestore, Storage
 src/config/engagement.json   client, dates, phases, milestones, deliverables (edit per client)
 src/config/presentations.json  milestone deck structure (prompts only; repo is public)
 src/config/shells.json       deliverable shell outlines
+src/config/survey.json       pre-interview survey questions
 src/lib/dates.js             pure timeline math (tested in tests/)
 src/lib/firebase.js          init from VITE_FB_CONFIG; DEMO mode when unset
 src/lib/auth.jsx             email-link + Google sign-in, invite-based roles
@@ -21,7 +22,7 @@ src/lib/data.js              Firestore or in-memory store; useCollection / save 
 src/lib/engagement.js        config + settings override → computed dates
 src/lib/interviews.js        interview tracker: notes-link check, leader summary (tested)
 src/lib/shell.js             deliverable shell .docx builder (tested)
-src/pages/                   Hub, StatusLog, Interviews, Present, Effort, Admin, SignIn, NoAccess
+src/pages/                   Hub, StatusLog, Interviews, Present, Survey, Effort, Admin, SignIn, NoAccess
 firestore.rules              role model: owner email is admin; others need invites/{email}
 ```
 
@@ -41,6 +42,18 @@ A person signs in with an emailed link. On first sign-in the client copies the r
 
 - **Notes are never stored here.** The rules allow a fixed set of fields with no free-text body, and `notesUrl` must be an `https://<tenant>.sharepoint.com/...` link (the host is in `firestore.rules` and in `interviews.notesLink`; change both for a client that uses a different system).
 - **Leaders see counts only.** They cannot read `interviews`. The admin page writes `interviewSummary/current` (counts by status and group, theme counts across completed interviews) whenever the tracker changes, and leaders read only that doc. Themes are never broken out by group, so a one-person group cannot be tied to what was said.
+
+### Pre-interview survey
+
+**Send survey** on an interview copies a private link (`/survey/<token>`, 128-bit token) to paste into your email. The interviewee answers without signing in: profile, tenure, systems used, hours a week on data work, seven 1–5 ratings, two AI ratings and three short free-text answers (600 characters each). The rules allow one submission per link and no changes after that.
+
+- **Admin** sees **Survey ✓ · prep** on the interview. The prep panel shows the answers, marks ratings of 1–2 and 10+ hours a week, suggests the probe questions from `survey.json` for those areas, and can fill in the tracker's title and group from the survey.
+- **Leaders** see only averages ("Baseline"), and only once `minForAverages` (3) people have responded. The ratings follow the capability maturity domains, so sending the same questions after implementation shows what changed.
+- Survey free text **is** stored on this site (admin only). The survey asks people not to include patient or client information.
+
+### Recording
+
+Record and transcribe in Teams, which saves to the client's SharePoint/OneDrive, after the interviewee agrees. Paste the link into the interview and tick the consent box. The rules only accept `*.sharepoint.com` links for recordings, as they do for notes. Audio and transcripts are never stored here.
 
 ## Milestone decks and deliverable shells
 

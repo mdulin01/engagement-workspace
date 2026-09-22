@@ -30,7 +30,7 @@ function Frame({ title, children, footer }) {
     <div className="flex h-full flex-col bg-white">
       <div className="h-3" style={{ background: "var(--brand)" }} />
       <div className="px-20 pt-14 pb-6">
-        <h2 className="text-[44px] font-semibold" style={{ color: "var(--brand)" }}>{title}</h2>
+        <h2 className="text-[46px] font-medium" style={{ color: "var(--brand)" }}>{title}</h2>
       </div>
       <div className="flex-1 overflow-hidden px-20">{children}</div>
       <div className="flex justify-between px-20 py-6 text-[16px] text-slate-400">{footer}</div>
@@ -44,11 +44,12 @@ function SlideBody({ slide, ctx }) {
   switch (slide.type) {
     case "title":
       return (
-        <div className="flex h-full flex-col justify-center px-24 text-white" style={{ background: "var(--brand)" }}>
-          <div className="text-[24px] uppercase tracking-widest text-white/70">{cfg.client}</div>
-          <h1 className="mt-4 text-[64px] font-semibold leading-tight">{deck.title}</h1>
-          <div className="mt-3 text-[28px] text-white/85">{cfg.title}</div>
-          <div className="mt-16 text-[22px] text-white/80">{cfg.consultant} · {milestone ? fmt(milestone.date) : ""}</div>
+        <div className="masthead flex h-full flex-col justify-center px-24 text-white">
+          <div className="relative z-10 text-[22px] uppercase tracking-[0.2em] text-white/60">{cfg.client}</div>
+          <h1 className="relative z-10 mt-4 text-[68px] font-medium leading-tight">{deck.title}</h1>
+          <div className="relative z-10 mt-3 text-[28px] text-white/80">{cfg.title}</div>
+          <div className="relative z-10 mt-16 h-1 w-24 rounded-full bg-teal-300" />
+          <div className="relative z-10 mt-5 text-[22px] text-white/75">{cfg.consultant} · {milestone ? fmt(milestone.date) : ""}</div>
         </div>
       );
     case "deliverables": {

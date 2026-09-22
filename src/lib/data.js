@@ -2,7 +2,7 @@
 // Every collection is a flat list of {id, ...fields}. Pages subscribe with useCollection.
 import { useEffect, useState } from "react";
 import {
-  collection, doc, onSnapshot, setDoc, deleteDoc, serverTimestamp, query, orderBy as fsOrderBy,
+  collection, doc, onSnapshot, setDoc, getDoc, deleteDoc, serverTimestamp, query, orderBy as fsOrderBy,
 } from "firebase/firestore";
 import { db, DEMO } from "./firebase.js";
 import { today, addDays } from "./dates.js";
@@ -42,6 +42,16 @@ const demo = {
     ],
     interviewSummary: [],
     presentations: [],
+    surveyInvites: [{ id: "demo-survey", interviewId: "i2" }, { id: "demo-done", interviewId: "i1" }],
+    surveyResponses: [{
+      id: "demo-done",
+      profile: { title: "District Health Director", unit: "Executive office", group: "exec", tenureOrg: "5–10 years", tenureRole: "3–5 years" },
+      systems: ["VHN (clinical EMR)", "Excel or Access"], systemsOther: "",
+      hours: { entry: 1, reconcile: 3, reports: 8 },
+      ratings: { access: 2, trust: 3, timely: 1, burden: 2, tools: 3, skills: 4, ownership: 2 },
+      ai: { aiInterest: 4, aiConcern: 3 },
+      text: { fixOne: "Example: one place to see program numbers without asking three people.", reportsMade: "Example: monthly board report.", success: "Example: a roadmap the board will fund." },
+    }],
   },
   listeners: new Map(),
   emit(name) {
@@ -91,6 +101,13 @@ export function useCollection(name, { orderBy = null, enabled = true } = {}) {
     );
   }, [name, enabled, orderBy?.field, orderBy?.dir]);
   return state;
+}
+
+/** Read one document once, or null. For pages that cannot list a collection (e.g. the survey link). */
+export async function getOne(name, id) {
+  if (DEMO) return (demo.data[name] || []).find((r) => r.id === id) || null;
+  const snap = await getDoc(doc(db, name, id));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
 /** Create or merge a document. */

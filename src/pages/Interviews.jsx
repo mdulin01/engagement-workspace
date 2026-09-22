@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useCollection, save, remove, newId } from "../lib/data.js";
 import { useAuth } from "../lib/auth.jsx";
 import { useEngagement } from "../lib/engagement.js";
-import { STATUSES, THEME_MAX, normalizeNotesUrl, summarize, sameSummary } from "../lib/interviews.js";
+import { STATUSES, THEME_MAX, normalizeNotesUrl, summarize, sameSummary, prepFlags, surveyToken } from "../lib/interviews.js";
+import survey from "../config/survey.json";
 
 const STATUS_PILL = {
   identified: "bg-slate-100 text-slate-600",
@@ -48,6 +49,72 @@ function Summary({ s }) {
         )}
         <p className="text-xs text-slate-500 mt-2">Counts only. Themes are not broken out by group or person.</p>
       </div>
+      <Baseline b={s.survey} />
+    </div>
+  );
+}
+
+// De-identified pre-interview survey averages (the baseline for measuring change).
+function Baseline({ b }) {
+  if (!b || !b.n) return null;
+  return (
+    <div className="card lg:col-span-3">
+      <div className="label">Baseline · pre-interview survey · {b.n} response{b.n === 1 ? "" : "s"}</div>
+      {!b.domains ? (
+        <p className="text-sm text-slate-500">Averages appear once {survey.minForAverages} people have responded.</p>
+      ) : (
+        <div className="grid gap-x-10 gap-y-2 md:grid-cols-2 mt-2">
+          {[...b.domains, ...b.ai].map((d) => (
+            <div key={d.id} className="text-sm">
+              <div className="flex justify-between gap-4"><span>{d.label}</span><span className="num font-medium">{d.mean ?? "—"}</span></div>
+              <div className="h-1.5 rounded-full bg-slate-100 mt-1"><div className="h-1.5 rounded-full" style={{ width: `${((d.mean || 0) / 5) * 100}%`, background: d.id === "aiConcern" ? "var(--gold)" : "var(--accent)" }} /></div>
+            </div>
+          ))}
+          <div className="text-sm md:col-span-2 pt-1 text-slate-600">Average hours a week on data entry, reconciling and reports: <b className="num">{b.hoursPerWeek}</b></div>
+        </div>
+      )}
+      <p className="text-xs text-slate-500 mt-3">1 = strongly disagree, 5 = strongly agree. Averages only; individual answers are never shown here. Rerun the same questions after implementation to measure change.</p>
+    </div>
+  );
+}
+
+// Admin-only interview prep from the survey: flags what to spend time on.
+function Prep({ r, response, onFill }) {
+  const f = prepFlags(response, survey);
+  const p = response.profile || {};
+  return (
+    <div className="mt-2 rounded-xl p-4 text-sm space-y-3" style={{ background: "var(--accent-soft)" }}>
+      <div className="flex flex-wrap gap-x-6 gap-y-1">
+        <span><span className="text-slate-500">Title</span> {p.title || "—"}</span>
+        <span><span className="text-slate-500">Unit</span> {p.unit || "—"}</span>
+        <span><span className="text-slate-500">At org</span> {p.tenureOrg || "—"}</span>
+        <span><span className="text-slate-500">In role</span> {p.tenureRole || "—"}</span>
+        {(p.title && p.title !== r.title) || (p.group && p.group !== r.group) ? <button className="underline" onClick={onFill}>Fill tracker from survey</button> : null}
+      </div>
+      <div><span className="text-slate-500">Systems</span> {[...(response.systems || []), response.systemsOther].filter(Boolean).join(", ") || "—"}</div>
+      <div className="grid gap-x-8 gap-y-1 md:grid-cols-2">
+        {survey.domains.map((d) => {
+          const v = response.ratings?.[d.id];
+          return (
+            <div key={d.id} className="flex justify-between gap-3">
+              <span className={f.low.includes(d) ? "font-medium" : "text-slate-600"}>{d.label}</span>
+              <span className="num" style={{ color: [1, 2].includes(v) ? "var(--gold)" : undefined }}>{v ? v : "?"}</span>
+            </div>
+          );
+        })}
+        {survey.ai.map((d) => <div key={d.id} className="flex justify-between gap-3 text-slate-600"><span>{d.label}</span><span className="num">{response.ai?.[d.id] || "?"}</span></div>)}
+      </div>
+      <div><span className="text-slate-500">Hours a week on data work</span> <b className="num" style={{ color: f.heavy ? "var(--gold)" : undefined }}>{f.hours}</b></div>
+      {survey.text.map((t) => response.text?.[t.id] ? <div key={t.id}><div className="text-slate-500">{t.label}</div><div className="italic">“{response.text[t.id]}”</div></div> : null)}
+      {(f.low.length > 0 || f.heavy) && (
+        <div>
+          <div className="label !mb-1">Spend time on</div>
+          <ul className="list-disc pl-5 space-y-0.5">
+            {f.low.map((d) => <li key={d.id}>{d.probe}</li>)}
+            {f.heavy && <li>They report {f.hours} hours a week on data work. Which tasks, and what would remove them?</li>}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
@@ -60,7 +127,7 @@ function LeaderView() {
 }
 
 // ------------------------------------------------------------- admin view
-const blank = (group) => ({ name: "", title: "", group, guideId: "", status: "identified", scheduledAt: "", notesUrl: "", themes: [] });
+const blank = (group) => ({ name: "", title: "", group, guideId: "", status: "identified", scheduledAt: "", notesUrl: "", recordingUrl: "", recordingConsent: false, themes: [] });
 
 function AdminView() {
   const cfg = useEngagement().config.interviews;
@@ -68,7 +135,9 @@ function AdminView() {
   const { rows: guides, loading: l2 } = useCollection("interviewGuides");
   const { rows: themes, loading: l3 } = useCollection("interviewThemes");
   const { rows: summaries, loading: l4 } = useCollection("interviewSummary");
-  const loading = l1 || l2 || l3 || l4;
+  const { rows: invites, loading: l5 } = useCollection("surveyInvites");
+  const { rows: responses, loading: l6 } = useCollection("surveyResponses");
+  const loading = l1 || l2 || l3 || l4 || l5 || l6;
   const current = summaries.find((r) => r.id === "current");
 
   const [draft, setDraft] = useState(blank(cfg.groups[0].id));
@@ -76,9 +145,11 @@ function AdminView() {
   const [urlError, setUrlError] = useState("");
   const [openGuide, setOpenGuide] = useState(null);
   const [newTheme, setNewTheme] = useState("");
+  const [openPrep, setOpenPrep] = useState(null);
+  const [copied, setCopied] = useState(null);
 
   // Keep the leader-visible counts in step with the tracker.
-  const next = summarize(interviews, themes, cfg.groups);
+  const next = summarize(interviews, themes, cfg.groups, responses, survey);
   useEffect(() => {
     if (!loading && !sameSummary(next, current)) save("interviewSummary", "current", next);
   });
@@ -86,12 +157,13 @@ function AdminView() {
   async function submit(e) {
     e.preventDefault();
     const notesUrl = normalizeNotesUrl(draft.notesUrl, cfg.notesLink.hostSuffix);
-    if (notesUrl === null) {
-      setUrlError(`Must be an https link to ${cfg.notesLink.label} (*${cfg.notesLink.hostSuffix}). Paste the link, not the notes.`);
+    const recordingUrl = normalizeNotesUrl(draft.recordingUrl, cfg.notesLink.hostSuffix);
+    if (notesUrl === null || recordingUrl === null) {
+      setUrlError(`Links must be https links to ${cfg.notesLink.label} (*${cfg.notesLink.hostSuffix}). Paste the link, not the content.`);
       return;
     }
     setUrlError("");
-    await save("interviews", editing || newId(), { ...draft, name: draft.name.trim(), title: draft.title.trim(), notesUrl });
+    await save("interviews", editing || newId(), { ...draft, name: draft.name.trim(), title: draft.title.trim(), notesUrl, recordingUrl });
     setDraft(blank(draft.group));
     setEditing(null);
   }
@@ -113,6 +185,21 @@ function AdminView() {
       ...cfg.starterThemes.filter((t) => !themes.some((x) => x.label === t)).map((t) => save("interviewThemes", newId(), { label: t })),
     ]);
   }
+
+  async function surveyLink(r) {
+    let inv = invites.find((i) => i.interviewId === r.id);
+    if (!inv) {
+      inv = { id: surveyToken() };
+      await save("surveyInvites", inv.id, { interviewId: r.id });
+    }
+    const url = `${window.location.origin}/survey/${inv.id}`;
+    try { await navigator.clipboard.writeText(url); setCopied(r.id); } catch { window.prompt("Copy the survey link", url); }
+  }
+
+  const surveyFor = (r) => {
+    const inv = invites.find((i) => i.interviewId === r.id);
+    return { inv, response: inv && responses.find((x) => x.id === inv.id) };
+  };
 
   const guideName = (id) => guides.find((g) => g.id === id)?.name || "—";
   const themeLabel = (id) => themes.find((t) => t.id === id)?.label;
@@ -141,6 +228,11 @@ function AdminView() {
             <input type="datetime-local" className="input" value={draft.scheduledAt} onChange={(e) => setDraft({ ...draft, scheduledAt: e.target.value })} />
           </div>
           <input className="input" placeholder={`Link to notes in ${cfg.notesLink.label}`} value={draft.notesUrl} onChange={(e) => setDraft({ ...draft, notesUrl: e.target.value })} />
+          <input className="input" placeholder={`Teams recording / transcript link (${cfg.notesLink.label})`} value={draft.recordingUrl} onChange={(e) => setDraft({ ...draft, recordingUrl: e.target.value })} />
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={draft.recordingConsent} onChange={(e) => setDraft({ ...draft, recordingConsent: e.target.checked })} />
+            Interviewee agreed to recording
+          </label>
           {urlError && <p className="text-xs text-red-600">{urlError}</p>}
           <div>
             <div className="label mt-2">Theme tags</div>
@@ -158,7 +250,7 @@ function AdminView() {
             <button className="btn btn-primary" type="submit">{editing ? "Save" : "Add"}</button>
             {editing && <button className="btn" type="button" onClick={() => { setEditing(null); setDraft(blank(draft.group)); setUrlError(""); }}>Cancel</button>}
           </div>
-          <p className="text-xs text-slate-500">Notes stay in {cfg.notesLink.label}. This site holds the link, scheduling state and theme tags only.</p>
+          <p className="text-xs text-slate-500">Notes and recordings stay in {cfg.notesLink.label}. Record and transcribe in Teams after the interviewee agrees, then paste the link here.</p>
         </form>
 
         <div className="card lg:col-span-2 overflow-x-auto">
@@ -186,8 +278,22 @@ function AdminView() {
                       {r.notesUrl
                         ? <a className="text-xs underline" href={r.notesUrl} target="_blank" rel="noopener noreferrer">Notes ↗</a>
                         : <span className="text-xs text-slate-400">no notes link</span>}
+                      {r.recordingUrl && <a className="text-xs underline" href={r.recordingUrl} target="_blank" rel="noopener noreferrer" title={r.recordingConsent ? "Consent recorded" : "Consent not recorded"}>Recording ↗{r.recordingConsent ? "" : " ⚠"}</a>}
+                      {(() => {
+                        const { inv, response } = surveyFor(r);
+                        if (response) return <button className="pill" style={{ background: "var(--accent-soft)", color: "var(--accent)" }} onClick={() => setOpenPrep(openPrep === r.id ? null : r.id)}>Survey ✓ · {openPrep === r.id ? "hide prep" : "prep"}</button>;
+                        return <button className="text-xs underline" onClick={() => surveyLink(r)}>{copied === r.id ? "Link copied" : inv ? "Survey sent · copy link" : "Send survey"}</button>;
+                      })()}
                       <button className="text-xs underline" onClick={() => edit(r)}>Edit</button>
                       <button className="text-xs underline text-red-600" onClick={() => { if (window.confirm(`Delete ${r.name}?`)) remove("interviews", r.id); }}>Delete</button>
+                      {openPrep === r.id && surveyFor(r).response && (
+                        <div className="basis-full">
+                          <Prep r={r} response={surveyFor(r).response} onFill={() => save("interviews", r.id, {
+                            title: surveyFor(r).response.profile?.title || r.title,
+                            group: surveyFor(r).response.profile?.group || r.group,
+                          })} />
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>

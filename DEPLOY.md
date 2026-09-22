@@ -63,7 +63,8 @@ With no `.env.local` the app runs in **DEMO** mode (in-memory sample data, no si
 2. **Admin → Invite access**: add Dr. Hrapcak and Dr. Plescia as `leader` only after FCBOH confirms staff may sign in to an external site (see the plan's open items).
 3. **Effort**: log hours from day one. The monthly table is the invoice.
 4. **Status**: one entry per biweekly check-in; tick "Visible to leaders" for anything they should see.
-5. **Interviews**: click **Load starters** once, then adjust the guides and themes. Keep the notes in SharePoint and paste the link. If FCBOH's tenant is known, narrow the `notesUrl` pattern in `firestore.rules` from any `*.sharepoint.com` to that tenant and redeploy the rules.
+5. **Surveys and recording**: before sending the first survey link, confirm FCBOH is fine with staff answering a survey on an external site (it's the same open item as sign-in access). Confirm Teams recording and transcription are allowed in their tenant, and how consent should be captured.
+6. **Interviews**: click **Load starters** once, then adjust the guides and themes. Keep the notes in SharePoint and paste the link. If FCBOH's tenant is known, narrow the `notesUrl` pattern in `firestore.rules` from any `*.sharepoint.com` to that tenant and redeploy the rules.
 
 ## What is not built yet (in order of need)
 

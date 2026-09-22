@@ -79,7 +79,7 @@ service cloud.firestore {
     // them, and notesUrl must be an https SharePoint link. Keep the host in
     // sync with interviews.notesLink.hostSuffix in src/config/engagement.json.
     function validInterview(d) {
-      return d.keys().hasOnly(['name', 'title', 'group', 'guideId', 'status', 'scheduledAt', 'notesUrl', 'themes', 'updatedAt'])
+      return d.keys().hasOnly(['name', 'title', 'group', 'guideId', 'status', 'scheduledAt', 'notesUrl', 'recordingUrl', 'recordingConsent', 'themes', 'updatedAt'])
         && d.name is string && d.name.size() <= 120
         && d.get('title', '') is string && d.get('title', '').size() <= 120
         && d.group is string && d.group.size() <= 40
@@ -88,6 +88,10 @@ service cloud.firestore {
         && d.get('scheduledAt', '') is string && d.get('scheduledAt', '').size() <= 16
         && d.get('notesUrl', '') is string && d.get('notesUrl', '').size() <= 2000
         && (d.get('notesUrl', '') == '' || d.get('notesUrl', '').matches('https://[a-z0-9-]+[.]sharepoint[.]com/.+'))
+        // Teams recordings and transcripts are saved to SharePoint/OneDrive.
+        && d.get('recordingUrl', '') is string && d.get('recordingUrl', '').size() <= 2000
+        && (d.get('recordingUrl', '') == '' || d.get('recordingUrl', '').matches('https://[a-z0-9-]+[.]sharepoint[.]com/.+'))
+        && d.get('recordingConsent', false) is bool
         && d.get('themes', []) is list && d.get('themes', []).size() <= 12;
     }
     match /interviews/{id} {
@@ -112,7 +116,48 @@ service cloud.firestore {
     match /interviewSummary/{id} {
       allow read: if isLeader();
       allow write: if isAdmin()
-        && request.resource.data.keys().hasOnly(['target', 'active', 'byStatus', 'byGroup', 'themes', 'updatedAt']);
+        && request.resource.data.keys().hasOnly(['target', 'active', 'byStatus', 'byGroup', 'themes', 'survey', 'updatedAt']);
+    }
+
+    // ---- pre-interview survey ------------------------------------------
+    // Admin creates an invite with an unguessable id and sends the link.
+    // Anyone holding the link can read that one invite and submit once, with
+    // no sign-in. Responses are admin only; leaders get averages via the
+    // summary. Field ids mirror src/config/survey.json.
+    match /surveyInvites/{token} {
+      allow get: if true;
+      allow list, delete: if isAdmin();
+      allow create: if isAdmin() && request.resource.data.keys().hasOnly(['interviewId', 'updatedAt'])
+        && request.resource.data.interviewId is string;
+    }
+    function shortText(m, k, max) { return m.get(k, '') is string && m.get(k, '').size() <= max; }
+    function rating(m, k) { return m.get(k, 0) is int && m.get(k, 0) >= 0 && m.get(k, 0) <= 5; }
+    function hours(m, k) { return (m.get(k, 0) is int || m.get(k, 0) is float) && m.get(k, 0) >= 0 && m.get(k, 0) <= 80; }
+    function validResponse(d) {
+      let p = d.get('profile', {});
+      let r = d.get('ratings', {});
+      let a = d.get('ai', {});
+      let h = d.get('hours', {});
+      let t = d.get('text', {});
+      return d.keys().hasOnly(['profile', 'systems', 'systemsOther', 'hours', 'ratings', 'ai', 'text', 'updatedAt'])
+        && p.keys().hasOnly(['title', 'unit', 'group', 'tenureOrg', 'tenureRole'])
+        && shortText(p, 'title', 120) && shortText(p, 'unit', 120) && shortText(p, 'group', 40)
+        && shortText(p, 'tenureOrg', 40) && shortText(p, 'tenureRole', 40)
+        && d.get('systems', []) is list && d.get('systems', []).size() <= 12
+        && shortText(d, 'systemsOther', 200)
+        && h.keys().hasOnly(['entry', 'reconcile', 'reports'])
+        && hours(h, 'entry') && hours(h, 'reconcile') && hours(h, 'reports')
+        && r.keys().hasOnly(['access', 'trust', 'timely', 'burden', 'tools', 'skills', 'ownership'])
+        && rating(r, 'access') && rating(r, 'trust') && rating(r, 'timely') && rating(r, 'burden')
+        && rating(r, 'tools') && rating(r, 'skills') && rating(r, 'ownership')
+        && a.keys().hasOnly(['aiInterest', 'aiConcern']) && rating(a, 'aiInterest') && rating(a, 'aiConcern')
+        && t.keys().hasOnly(['fixOne', 'reportsMade', 'success'])
+        && shortText(t, 'fixOne', 600) && shortText(t, 'reportsMade', 600) && shortText(t, 'success', 600);
+    }
+    match /surveyResponses/{token} {
+      allow read, delete: if isAdmin();
+      // create only: a submitted survey cannot be overwritten, even by its link
+      allow create: if exists(/databases/$(database)/documents/surveyInvites/$(token)) && validResponse(request.resource.data);
     }
 
     // ---- milestone decks: slide text typed in the deck editor -----------
