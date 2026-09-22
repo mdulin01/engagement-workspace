@@ -1,13 +1,10 @@
 # Deploy runbook — fcboh.dulinconsulting.app
 
-These steps need your Google account, payment, and DNS, so they are yours. Budget ~30 minutes. Do them in order; each later step needs a value from an earlier one.
+These steps need your Google account and payment details, so they are yours. Budget ~30 minutes. Do them in order; each later step needs a value from an earlier one.
 
-## 1. Register the domain (dulinconsulting.app)
+## 1. Register the domain (dulinconsulting.app) — done
 
-`.app` is on the HSTS preload list, so HTTPS is mandatory. Vercel provides that automatically.
-
-1. Cloudflare → Domain Registration → Register Domains → search `dulinconsulting.app` → check out (registry cost, roughly $15/yr). Porkbun or Namecheap also work.
-2. Leave DNS alone for now; Vercel gives you the record in step 5.
+Registered through Vercel (Pro team), so Vercel also runs its DNS. There are no DNS records to add by hand for any client subdomain. `.app` is on the HSTS preload list, so HTTPS is mandatory. Vercel issues the certificate automatically.
 
 ## 2. Create the Firebase project
 
@@ -57,9 +54,8 @@ With no `.env.local` the app runs in **DEMO** mode (in-memory sample data, no si
 
 ## 5. Point the subdomain at Vercel
 
-1. Vercel → Project → **Settings → Domains** → add `fcboh.dulinconsulting.app`.
-2. Vercel shows a CNAME (`cname.vercel-dns.com`). Add it at Cloudflare → DNS → Records, **proxy off (grey cloud)**, so Vercel can issue the certificate.
-3. When it verifies, go back to Firebase Authentication → Authorized domains and confirm `fcboh.dulinconsulting.app` is listed (step 2.3).
+1. Vercel → Project → **Settings → Domains** → add `fcboh.dulinconsulting.app` (or `vercel domains add fcboh.dulinconsulting.app` from the repo). Because the domain's DNS is on Vercel, the record is created for you and the domain should verify within a minute or two, with the certificate following.
+2. Firebase Authentication → Authorized domains → confirm `fcboh.dulinconsulting.app` is listed (step 2.3). Email sign-in links fail on any domain missing from this list.
 
 ## 6. First use
 
