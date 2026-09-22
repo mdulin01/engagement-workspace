@@ -97,3 +97,11 @@ test("only admin writes the summary, and only count fields", async () => {
   await assertFails(setDoc(doc(owner(), "interviewSummary/current"), { ...s, names: ["Jane Doe"] }));
   await assertFails(setDoc(doc(leader(), "interviewSummary/current"), s));
 });
+
+// ---- milestone decks ---------------------------------------------------
+test("deck text is admin-only", async () => {
+  await assertSucceeds(setDoc(doc(owner(), "presentations/day90"), { slides: { findings: { title: "Findings", bullets: ["x"] } }, updatedAt: serverTimestamp() }));
+  await assertFails(getDoc(doc(leader(), "presentations/day90")));
+  await assertFails(setDoc(doc(leader(), "presentations/day90"), { slides: {} }));
+  await assertFails(setDoc(doc(owner(), "presentations/day90"), { slides: {}, attachment: "..." }));
+});

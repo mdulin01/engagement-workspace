@@ -30,3 +30,13 @@ body {
 .pill {
   @apply inline-block rounded-full px-2 py-0.5 text-xs font-medium;
 }
+
+/* Milestone decks: Print / PDF gives one 16:9 page per slide. */
+@page slide { size: 1280px 720px; margin: 0; }
+.deck-print-page {
+  page: slide;
+  break-after: page;
+  overflow: hidden;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}

@@ -6,6 +6,7 @@ import Hub from "./pages/Hub.jsx";
 import Effort from "./pages/Effort.jsx";
 import StatusLog from "./pages/StatusLog.jsx";
 import Interviews from "./pages/Interviews.jsx";
+import Present from "./pages/Present.jsx";
 import Admin from "./pages/Admin.jsx";
 import NoAccess from "./pages/NoAccess.jsx";
 
@@ -25,6 +26,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/signin" element={<SignIn />} />
+      <Route path="/present/:deckId" element={<Guard need="admin"><Present /></Guard>} />
       <Route element={<Layout />}>
         <Route path="/" element={<Guard need="member"><Hub /></Guard>} />
         <Route path="/status" element={<Guard need="leader"><StatusLog /></Guard>} />

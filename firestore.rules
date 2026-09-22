@@ -115,6 +115,13 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['target', 'active', 'byStatus', 'byGroup', 'themes', 'updatedAt']);
     }
 
+    // ---- milestone decks: slide text typed in the deck editor -----------
+    match /presentations/{deckId} {
+      allow read, delete: if isAdmin();
+      allow create, update: if isAdmin() && request.resource.data.keys().hasOnly(['slides', 'updatedAt'])
+        && request.resource.data.slides is map;
+    }
+
     // Everything else is denied.
     match /{document=**} {
       allow read, write: if false;
