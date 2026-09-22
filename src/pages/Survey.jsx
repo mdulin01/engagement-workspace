@@ -14,7 +14,7 @@ const blank = () => ({
   hours: Object.fromEntries(survey.hours.map((h) => [h.id, 0])),
   ratings: Object.fromEntries(survey.domains.map((d) => [d.id, null])),
   ai: Object.fromEntries(survey.ai.map((d) => [d.id, null])),
-  text: Object.fromEntries(survey.text.map((t) => [t.id, ""])),
+  text: Object.fromEntries([...survey.text, ...survey.prepare].map((t) => [t.id, ""])),
 });
 
 function Section({ n, title, children }) {
@@ -174,6 +174,16 @@ export default function Survey() {
       <Section n="6" title="In your words">
         <p className="text-sm text-slate-500 -mt-2">Optional. A sentence or two is plenty. No patient or client details, please.</p>
         {survey.text.map((t) => (
+          <label key={t.id} className="block text-sm">{t.label}
+            <textarea className="input mt-1" rows={3} maxLength={survey.textMax} value={a.text[t.id]} onChange={(e) => set("text", t.id, e.target.value)} />
+            <span className="text-xs text-slate-400 num">{a.text[t.id].length}/{survey.textMax}</span>
+          </label>
+        ))}
+      </Section>
+
+      <Section n="7" title="Start thinking about">
+        <p className="text-sm text-slate-500 -mt-2">Optional. We’ll talk these through in the interview, so a few words to jog your memory is enough. No patient names or identifying details, please.</p>
+        {survey.prepare.map((t) => (
           <label key={t.id} className="block text-sm">{t.label}
             <textarea className="input mt-1" rows={3} maxLength={survey.textMax} value={a.text[t.id]} onChange={(e) => set("text", t.id, e.target.value)} />
             <span className="text-xs text-slate-400 num">{a.text[t.id].length}/{survey.textMax}</span>

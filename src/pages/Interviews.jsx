@@ -105,7 +105,7 @@ function Prep({ r, response, onFill }) {
         {survey.ai.map((d) => <div key={d.id} className="flex justify-between gap-3 text-slate-600"><span>{d.label}</span><span className="num">{response.ai?.[d.id] || "?"}</span></div>)}
       </div>
       <div><span className="text-slate-500">Hours a week on data work</span> <b className="num" style={{ color: f.heavy ? "var(--gold)" : undefined }}>{f.hours}</b></div>
-      {survey.text.map((t) => response.text?.[t.id] ? <div key={t.id}><div className="text-slate-500">{t.label}</div><div className="italic">“{response.text[t.id]}”</div></div> : null)}
+      {[...survey.text, ...survey.prepare].map((t) => response.text?.[t.id] ? <div key={t.id}><div className="text-slate-500">{t.label}</div><div className="italic">“{response.text[t.id]}”</div></div> : null)}
       {(f.low.length > 0 || f.heavy) && (
         <div>
           <div className="label !mb-1">Spend time on</div>

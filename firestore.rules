@@ -151,8 +151,9 @@ service cloud.firestore {
         && rating(r, 'access') && rating(r, 'trust') && rating(r, 'timely') && rating(r, 'burden')
         && rating(r, 'tools') && rating(r, 'skills') && rating(r, 'ownership')
         && a.keys().hasOnly(['aiInterest', 'aiConcern']) && rating(a, 'aiInterest') && rating(a, 'aiConcern')
-        && t.keys().hasOnly(['fixOne', 'reportsMade', 'success'])
-        && shortText(t, 'fixOne', 600) && shortText(t, 'reportsMade', 600) && shortText(t, 'success', 600);
+        && t.keys().hasOnly(['fixOne', 'reportsMade', 'success', 'sentinel', 'useCases', 'worksWell', 'priorities'])
+        && shortText(t, 'fixOne', 600) && shortText(t, 'reportsMade', 600) && shortText(t, 'success', 600)
+        && shortText(t, 'sentinel', 600) && shortText(t, 'useCases', 600) && shortText(t, 'worksWell', 600) && shortText(t, 'priorities', 600);
     }
     match /surveyResponses/{token} {
       allow read, delete: if isAdmin();
@@ -165,6 +166,22 @@ service cloud.firestore {
       allow read, delete: if isAdmin();
       allow create, update: if isAdmin() && request.resource.data.keys().hasOnly(['slides', 'updatedAt'])
         && request.resource.data.slides is map;
+    }
+
+    // ---- documents: links to engagement documents ---------------------
+    // Links only; files stay where they are stored (SharePoint, Drive).
+    // Leaders see entries marked 'leaders' and must query with that filter.
+    match /documents/{id} {
+      allow read: if isAdmin() || (isLeader() && resource.data.visibility == 'leaders');
+      allow delete: if isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['title', 'category', 'url', 'visibility', 'date', 'note', 'updatedAt'])
+        && request.resource.data.title is string && request.resource.data.title.size() <= 160
+        && request.resource.data.category in ['Contract', 'Amendment', 'Charter', 'Engagement', 'Other']
+        && request.resource.data.url is string && request.resource.data.url.matches('https://.+') && request.resource.data.url.size() <= 2000
+        && request.resource.data.visibility in ['admin', 'leaders']
+        && request.resource.data.get('date', '') is string && request.resource.data.get('date', '').size() <= 10
+        && request.resource.data.get('note', '') is string && request.resource.data.get('note', '').size() <= 300;
     }
 
     // Everything else is denied.

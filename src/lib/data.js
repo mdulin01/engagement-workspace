@@ -2,7 +2,7 @@
 // Every collection is a flat list of {id, ...fields}. Pages subscribe with useCollection.
 import { useEffect, useState } from "react";
 import {
-  collection, doc, onSnapshot, setDoc, getDoc, deleteDoc, serverTimestamp, query, orderBy as fsOrderBy,
+  collection, doc, onSnapshot, setDoc, getDoc, deleteDoc, serverTimestamp, query, orderBy as fsOrderBy, where as fsWhere,
 } from "firebase/firestore";
 import { db, DEMO } from "./firebase.js";
 import { today, addDays } from "./dates.js";
@@ -42,6 +42,9 @@ const demo = {
     ],
     interviewSummary: [],
     presentations: [],
+    documents: [
+      { id: "d1", title: "Proposal (accepted)", category: "Contract", url: "https://example.sharepoint.com/:w:/s/engagement/proposal", visibility: "leaders", date: "2026-09-15", note: "Demo entry" },
+    ],
     surveyInvites: [{ id: "demo-survey", interviewId: "i2" }, { id: "demo-done", interviewId: "i1" }],
     surveyResponses: [{
       id: "demo-done",
@@ -81,25 +84,30 @@ export function newId() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
 
-/** Subscribe to a collection. Returns {rows, loading, error}. */
-export function useCollection(name, { orderBy = null, enabled = true } = {}) {
+/**
+ * Subscribe to a collection. Returns {rows, loading, error}.
+ * where: [field, "==", value] — needed when the rules only let a role read some docs.
+ */
+export function useCollection(name, { orderBy = null, where = null, enabled = true } = {}) {
   const [state, setState] = useState({ rows: [], loading: true, error: null });
   useEffect(() => {
     if (!enabled) { setState({ rows: [], loading: false, error: null }); return; }
     if (DEMO) {
-      return demo.subscribe(name, (rows) => {
+      return demo.subscribe(name, (all) => {
+        const rows = where ? all.filter((r) => r[where[0]] === where[2]) : all;
         const sorted = orderBy ? [...rows].sort((a, b) => (a[orderBy.field] < b[orderBy.field] ? 1 : -1) * (orderBy.dir === "asc" ? -1 : 1)) : rows;
         setState({ rows: sorted, loading: false, error: null });
       });
     }
     const ref = collection(db, name);
-    const q = orderBy ? query(ref, fsOrderBy(orderBy.field, orderBy.dir || "desc")) : ref;
+    const parts = [where && fsWhere(...where), orderBy && fsOrderBy(orderBy.field, orderBy.dir || "desc")].filter(Boolean);
+    const q = parts.length ? query(ref, ...parts) : ref;
     return onSnapshot(
       q,
       (snap) => setState({ rows: snap.docs.map((d) => ({ id: d.id, ...d.data() })), loading: false, error: null }),
       (err) => setState({ rows: [], loading: false, error: err.message }),
     );
-  }, [name, enabled, orderBy?.field, orderBy?.dir]);
+  }, [name, enabled, orderBy?.field, orderBy?.dir, where?.[0], where?.[1], where?.[2]]);
   return state;
 }
 

@@ -24,6 +24,7 @@ export default function Layout() {
               <NavLink to="/" end className={link}>Hub</NavLink>
               {isLeader && <NavLink to="/status" className={link}>Status</NavLink>}
               {isLeader && <NavLink to="/interviews" className={link}>Interviews</NavLink>}
+              {isLeader && <NavLink to="/documents" className={link}>Documents</NavLink>}
               {isAdmin && <NavLink to="/effort" className={link}>Effort</NavLink>}
               {isAdmin && <NavLink to="/admin" className={link}>Admin</NavLink>}
             </nav>
