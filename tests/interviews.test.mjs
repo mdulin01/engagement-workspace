@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { normalizeNotesUrl, summarize, sameSummary } from "../src/lib/interviews.js";
+import { normalizeNotesUrl, summarize, sameSummary, surveyBaseline, prepFlags, surveyToken } from "../src/lib/interviews.js";
+import survey from "../src/config/survey.json" with { type: "json" };
 
 const SP = ".sharepoint.com";
 
@@ -50,4 +51,38 @@ test("sameSummary ignores key order and server fields", () => {
   assert.ok(sameSummary(s, reordered));
   assert.ok(!sameSummary(s, summarize(rows.slice(1), themes, groups)));
   assert.ok(!sameSummary(s, undefined));
+});
+
+const resp = (access, trust, hours) => ({ ratings: { access, trust }, ai: { aiInterest: 4 }, hours: { entry: hours, reconcile: 0, reports: 2 }, text: { fixOne: "private words" } });
+
+test("survey averages are withheld below the minimum", () => {
+  assert.deepEqual(surveyBaseline([resp(1, 2, 5), resp(3, 4, 5)], survey), { n: 2 });
+});
+
+test("survey averages skip don't-know and carry no free text", () => {
+  const b = surveyBaseline([resp(1, 0, 5), resp(3, 4, 10), resp(5, 5, 0)], survey);
+  assert.equal(b.n, 3);
+  assert.equal(b.domains.find((d) => d.id === "access").mean, 3);
+  assert.equal(b.domains.find((d) => d.id === "trust").mean, 4.5);
+  assert.equal(b.domains.find((d) => d.id === "tools").mean, null);
+  assert.equal(b.hoursPerWeek, 7); // (7 + 12 + 2) / 3
+  assert.ok(!JSON.stringify(b).includes("private words"));
+});
+
+test("summary includes the survey baseline", () => {
+  const s = summarize(rows, themes, groups, [resp(2, 2, 1)], survey);
+  assert.deepEqual(s.survey, { n: 1 });
+});
+
+test("prep flags low ratings and heavy hours", () => {
+  const f = prepFlags(resp(1, 3, 12), survey);
+  assert.deepEqual(f.low.map((d) => d.id), ["access"]);
+  assert.equal(f.hours, 14);
+  assert.equal(f.heavy, true);
+});
+
+test("survey tokens are long and url-safe", () => {
+  const t = surveyToken();
+  assert.match(t, /^[A-Za-z0-9_-]{22}$/);
+  assert.notEqual(t, surveyToken());
 });

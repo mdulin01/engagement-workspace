@@ -1,0 +1,32 @@
+{
+  "_comment": "Pre-interview survey. Questions only (public repo). Rating and text ids are also listed in firestore.rules; keep them in sync.",
+  "title": "Before we talk",
+  "intro": "This short survey (about 5 minutes) helps us use your interview time well. Your answers are seen only by the consultant. Leaders see averages across everyone who responds, never individual answers. Please do not include any patient or client information.",
+  "tenureOptions": ["Less than 1 year", "1–3 years", "3–5 years", "5–10 years", "More than 10 years"],
+  "systems": ["VHN (clinical EMR)", "GRITS (immunization registry)", "SendSS (surveillance)", "Excel or Access", "State or federal reporting portals", "Paper forms"],
+  "hours": [
+    { "id": "entry", "label": "Entering or re-entering data" },
+    { "id": "reconcile", "label": "Checking, cleaning or reconciling data" },
+    { "id": "reports", "label": "Building reports or pulling numbers" }
+  ],
+  "domains": [
+    { "id": "access", "label": "I can get the data I need when I need it", "probe": "Walk me through the last time you needed data and could not get it. What did you do instead?" },
+    { "id": "trust", "label": "I trust the accuracy of the data I use", "probe": "Where do errors come from, and how do you catch them?" },
+    { "id": "timely", "label": "The data I use is current enough for my decisions", "probe": "How old is the data by the time you use it? What decision would change with fresher data?" },
+    { "id": "burden", "label": "Reporting takes a reasonable amount of my time", "probe": "Which report costs you the most time? Who uses it?" },
+    { "id": "tools", "label": "The systems I use work well for my job", "probe": "What workarounds do you keep (spreadsheets, paper, re-entry)?" },
+    { "id": "skills", "label": "I have the training and skills to work with data", "probe": "What would you do with data if you had the skills or time?" },
+    { "id": "ownership", "label": "It is clear who owns and decides about our data", "probe": "When data is wrong or a definition is disputed, who decides?" }
+  ],
+  "ai": [
+    { "id": "aiInterest", "label": "I am interested in using AI tools in my work" },
+    { "id": "aiConcern", "label": "I have concerns about AI use in public health" }
+  ],
+  "text": [
+    { "id": "fixOne", "label": "If you could fix one thing about data in your work, what would it be?" },
+    { "id": "reportsMade", "label": "Which reports do you produce regularly, and for whom?" },
+    { "id": "success", "label": "What would make this project a success for you?" }
+  ],
+  "textMax": 600,
+  "minForAverages": 3
+}

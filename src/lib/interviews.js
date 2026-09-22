@@ -37,7 +37,7 @@ export function normalizeNotesUrl(input, hostSuffix) {
  * Themes are counted across completed interviews and never broken out by
  * group, so a small group cannot be tied to what its members said.
  */
-export function summarize(interviews, themes, groups) {
+export function summarize(interviews, themes, groups, responses = [], survey = null) {
   const byStatus = Object.fromEntries(STATUSES.map(([v]) => [v, 0]));
   interviews.forEach((r) => { if (r.status in byStatus) byStatus[r.status] += 1; });
 
@@ -64,7 +64,40 @@ export function summarize(interviews, themes, groups) {
     byStatus,
     byGroup,
     themes: themeCounts,
+    survey: survey ? surveyBaseline(responses, survey) : { n: 0 },
   };
+}
+
+const mean = (xs) => (xs.length ? Math.round((xs.reduce((a, b) => a + b, 0) / xs.length) * 10) / 10 : null);
+
+/**
+ * De-identified survey averages for leaders. Nothing is reported until at
+ * least survey.minForAverages people respond, so no one's answers can be
+ * read off a group of one or two. "Don't know" (0) is left out of means.
+ */
+export function surveyBaseline(responses, survey) {
+  const n = responses.length;
+  if (n < survey.minForAverages) return { n };
+  const rated = (get) => responses.map(get).filter((v) => Number.isInteger(v) && v >= 1 && v <= 5);
+  return {
+    n,
+    domains: survey.domains.map((d) => ({ id: d.id, label: d.label, mean: mean(rated((r) => r.ratings?.[d.id])) })),
+    ai: survey.ai.map((d) => ({ id: d.id, label: d.label, mean: mean(rated((r) => r.ai?.[d.id])) })),
+    hoursPerWeek: mean(responses.map((r) => survey.hours.reduce((s, h) => s + (Number(r.hours?.[h.id]) || 0), 0))),
+  };
+}
+
+/** What to spend interview time on: domains rated 1–2 and heavy data-work hours. */
+export function prepFlags(response, survey) {
+  const low = survey.domains.filter((d) => [1, 2].includes(response.ratings?.[d.id]));
+  const hours = survey.hours.reduce((s, h) => s + (Number(response.hours?.[h.id]) || 0), 0);
+  return { low, hours, heavy: hours >= 10 };
+}
+
+/** Unguessable survey link token (128 bits, base64url). */
+export function surveyToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
 // Key-sorted JSON, because Firestore does not preserve map key order.
@@ -77,6 +110,6 @@ function stable(v) {
 /** Compare two summaries ignoring server-added fields. */
 export function sameSummary(a, b) {
   if (!a || !b) return false;
-  const pick = ({ target, active, byStatus, byGroup, themes }) => stable({ target, active, byStatus, byGroup, themes });
+  const pick = ({ target, active, byStatus, byGroup, themes, survey }) => stable({ target, active, byStatus, byGroup, themes, survey });
   return pick(a) === pick(b);
 }
