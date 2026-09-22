@@ -86,8 +86,8 @@ service cloud.firestore {
         && d.get('guideId', '') is string && d.get('guideId', '').size() <= 40
         && d.status in ['identified', 'invited', 'scheduled', 'completed', 'declined']
         && d.get('scheduledAt', '') is string && d.get('scheduledAt', '').size() <= 16
-        && d.get('notesUrl', '') is string
-        && (d.get('notesUrl', '') == '' || d.get('notesUrl', '').matches('https://[a-z0-9-]+[.]sharepoint[.]com/.{1,2000}'))
+        && d.get('notesUrl', '') is string && d.get('notesUrl', '').size() <= 2000
+        && (d.get('notesUrl', '') == '' || d.get('notesUrl', '').matches('https://[a-z0-9-]+[.]sharepoint[.]com/.+'))
         && d.get('themes', []) is list && d.get('themes', []).size() <= 12;
     }
     match /interviews/{id} {
