@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- helpers -------------------------------------------------------
+    // The owner email is always admin. Keep in sync with VITE_ADMIN_EMAIL.
+    function ownerEmail() { return 'mdulin@gmail.com'; }
+    function signedIn() { return request.auth != null; }
+    function email() { return signedIn() ? request.auth.token.email.lower() : ''; }
+    function isOwner() { return signedIn() && email() == ownerEmail(); }
+    function userDoc() { return get(/databases/$(database)/documents/users/$(request.auth.uid)); }
+    function hasUserDoc() { return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)); }
+    function role() { return isOwner() ? 'admin' : (hasUserDoc() ? userDoc().data.role : 'none'); }
+    function isAdmin() { return role() == 'admin'; }
+    function isLeader() { return role() == 'leader' || isAdmin(); }
+    function isMember() { return role() in ['admin', 'leader', 'participant', 'vendor']; }
+    function inviteFor(e) { return get(/databases/$(database)/documents/invites/$(e)); }
+    function hasInvite(e) { return exists(/databases/$(database)/documents/invites/$(e)); }
+
+    // ---- invites: admin creates; a signed-in user may read their own ---
+    match /invites/{inviteEmail} {
+      allow read: if isAdmin() || (signedIn() && inviteEmail == email());
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---- users: self-registration only against a matching invite -------
+    match /users/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.email == email()
+        && (
+          (isOwner() && request.resource.data.role == 'admin')
+          || (hasInvite(email()) && request.resource.data.role == inviteFor(email()).data.role)
+        );
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---- engagement settings (effective date override etc.) -------------
+    match /settings/{doc} {
+      allow read: if isMember();
+      allow write: if isAdmin();
+    }
+
+    // ---- hub data: leaders read, admin writes --------------------------
+    match /milestones/{id} {
+      allow read: if isMember();
+      allow write: if isAdmin();
+    }
+    match /deliverables/{id} {
+      allow read: if isMember();
+      allow write: if isAdmin();
+    }
+
+    // ---- status log: admin sees all; leaders see published entries -----
+    match /statusLog/{id} {
+      allow read: if isAdmin() || (isLeader() && resource.data.published == true);
+      allow write: if isAdmin();
+    }
+
+    // ---- effort and expenses: admin only (billing data) ----------------
+    match /effortEntries/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /expenses/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // ---- AI call log: admin only -----------------------------------------
+    match /aiLog/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // Everything else is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

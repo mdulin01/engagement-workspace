@@ -1,0 +1,41 @@
+{
+  "client": "Fulton County Board of Health",
+  "clientShort": "FCBOH",
+  "title": "Public Health Data Modernization, Data Strategy & Governance",
+  "consultant": "Michael Dulin, MD, PhD",
+  "sponsor": "Marcus Plescia, MD, MPH — District Health Director",
+  "dayToDay": "Susan Hrapcak, MD — Medical Director",
+  "effectiveDate": "2026-10-01",
+  "termMonths": 6,
+  "termWeeks": 26,
+  "consultingDaysPerMonth": 5,
+  "onsiteDaysPerMonth": 2,
+  "hoursPerConsultingDay": 8,
+  "expenseNotToExceed": 11000,
+  "monthlyRetainer": 10000,
+  "phases": [
+    { "id": "p1", "name": "Discovery", "startWeek": 1, "endWeek": 8, "summary": "Kickoff and charter; stakeholder interviews; systems and data inventory; contract, certification and export-capability review; initial vendor conversations." },
+    { "id": "p2", "name": "Analysis and synthesis", "startWeek": 7, "endWeek": 12, "summary": "Synthesis of interview and inventory findings; capability maturity assessment; gap analysis; AI use-case screening." },
+    { "id": "p3", "name": "Day 90 findings package", "startWeek": 11, "endWeek": 13, "summary": "Deliverables 1–4, concluding with the on-site Executive Briefing." },
+    { "id": "p4", "name": "Strategy and recommendations", "startWeek": 14, "endWeek": 21, "summary": "Target-state architecture, governance framework and roadmap; org and staffing; clinical operations measurement plan; CHA and accreditation mapping; vendor working sessions." },
+    { "id": "p5", "name": "Socialization, finalization and handoff", "startWeek": 22, "endWeek": 26, "summary": "Circulate drafts; incorporate consolidated comments; Deliverables 5–8, concluding with the Transition Briefing." }
+  ],
+  "milestones": [
+    { "id": "kickoff", "name": "Kickoff and charter confirmation", "week": 2, "clause": "2.7" },
+    { "id": "interim", "name": "Interim findings readout", "week": 6, "clause": "2.7" },
+    { "id": "day90", "name": "Day 90 Executive Briefing (on-site)", "day": 90, "clause": "3.1" },
+    { "id": "draftStrategy", "name": "Draft-strategy working session", "week": 18, "clause": "2.7" },
+    { "id": "transition", "name": "Transition Briefing (on-site)", "week": 26, "clause": "3.2" }
+  ],
+  "deliverables": [
+    { "number": 1, "name": "Current-State Assessment Report", "due": "day90" },
+    { "number": 2, "name": "EMR Data Access Assessment (VHN)", "due": "day90" },
+    { "number": 3, "name": "AI Opportunity Assessment", "due": "day90" },
+    { "number": 4, "name": "Executive Briefing", "due": "day90" },
+    { "number": 5, "name": "Data Strategy, Governance Framework and Roadmap", "due": "month6" },
+    { "number": 6, "name": "Clinical Operations Measurement Plan", "due": "month6" },
+    { "number": 7, "name": "Community Health Assessment and Accreditation Readiness", "due": "month6" },
+    { "number": 8, "name": "Transition Briefing and Handoff", "due": "month6" }
+  ],
+  "deliverableStatuses": ["Not started", "In progress", "Draft to client", "In client review", "Final"]
+}

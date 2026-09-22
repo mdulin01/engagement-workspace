@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Document library is not built yet. Deny everything until it is,
+    // then gate by role via a Firestore lookup or custom claims.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
