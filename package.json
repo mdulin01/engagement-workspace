@@ -13,6 +13,7 @@
     "test": "node --test tests/*.test.mjs",
     "lint": "eslint src tests scripts",
     "shells": "node scripts/make-shells.mjs",
+    "addendum": "node scripts/make-addendum.mjs",
     "test:rules": "firebase emulators:exec --only firestore --project demo-engagement 'node --test tests/rules/*.test.mjs'"
   },
   "dependencies": {

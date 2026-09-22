@@ -22,7 +22,8 @@ src/lib/data.js              Firestore or in-memory store; useCollection / save 
 src/lib/engagement.js        config + settings override → computed dates
 src/lib/interviews.js        interview tracker: notes-link check, leader summary (tested)
 src/lib/shell.js             deliverable shell .docx builder (tested)
-src/pages/                   Hub, StatusLog, Interviews, Present, Survey, Effort, Admin, SignIn, NoAccess
+src/lib/addendum.js          draft workspace amendment .docx (tested)
+src/pages/                   Hub, StatusLog, Interviews, Present, Survey, Documents, Effort, Admin, SignIn, NoAccess
 firestore.rules              role model: owner email is admin; others need invites/{email}
 ```
 
@@ -51,9 +52,15 @@ A person signs in with an emailed link. On first sign-in the client copies the r
 - **Leaders** see only averages ("Baseline"), and only once `minForAverages` (3) people have responded. The ratings follow the capability maturity domains, so sending the same questions after implementation shows what changed.
 - Survey free text **is** stored on this site (admin only). The survey asks people not to include patient or client information.
 
+The survey ends with an optional "Start thinking about" section: past events where poor data quality or systems that don't connect caused a real problem, uses beyond the current scope, what works well today, and priorities for the future. The answers appear in the prep panel.
+
 ### Recording
 
 Record and transcribe in Teams, which saves to the client's SharePoint/OneDrive, after the interviewee agrees. Paste the link into the interview and tick the consent box. The rules only accept `*.sharepoint.com` links for recordings, as they do for notes. Audio and transcripts are never stored here.
+
+## Documents
+
+`/documents` lists links to engagement documents (contract, amendments, charter), grouped by category and marked **Leaders** or **Admin only**. The site stores the link, not the file. Leaders query only the entries visible to them, which the rules enforce. Admin can also download **Amendment No. 1**, a draft authorizing use of this workspace (surveys included), generated from `engagement.json` (`npm run addendum` writes it to `out/`). Client counsel should review it before it is signed.
 
 ## Milestone decks and deliverable shells
 
@@ -68,6 +75,7 @@ npm run dev
 npm test
 npm run test:rules   # Firestore rules against the emulator; needs Java (brew install openjdk)
 npm run shells       # all deliverable shells to out/shells/
+npm run addendum     # draft workspace amendment to out/
 npm run lint
 npm run build
 ```

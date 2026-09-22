@@ -2,7 +2,7 @@
 import { test, before, after, beforeEach } from "node:test";
 import { readFileSync } from "node:fs";
 import { initializeTestEnvironment, assertSucceeds, assertFails } from "@firebase/rules-unit-testing";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, collection, query, where, serverTimestamp } from "firebase/firestore";
 
 const OWNER = "mdulin@gmail.com";
 let env;
@@ -112,7 +112,7 @@ const answer = (extra = {}) => ({
   profile: { title: "Nurse Manager", unit: "Clinic A", group: "clinical", tenureOrg: "3–5 years", tenureRole: "1–3 years" },
   systems: ["VHN (clinical EMR)"], systemsOther: "", hours: { entry: 4, reconcile: 2, reports: 1.5 },
   ratings: { access: 2, trust: 3, timely: 0, burden: 1, tools: 2, skills: 4, ownership: 1 },
-  ai: { aiInterest: 4, aiConcern: 3 }, text: { fixOne: "Fewer duplicate forms", reportsMade: "", success: "" },
+  ai: { aiInterest: 4, aiConcern: 3 }, text: { fixOne: "Fewer duplicate forms", reportsMade: "", success: "", sentinel: "A late outbreak report", useCases: "", worksWell: "", priorities: "" },
   updatedAt: serverTimestamp(), ...extra,
 });
 
@@ -144,4 +144,23 @@ test("survey: bad shapes are rejected", async () => {
 test("interviews accept a SharePoint recording link only", async () => {
   await assertSucceeds(setDoc(doc(owner(), "interviews/r1"), interview({ recordingUrl: "https://fulton-my.sharepoint.com/:v:/p/x/abc", recordingConsent: true })));
   await assertFails(setDoc(doc(owner(), "interviews/r2"), interview({ recordingUrl: "https://example.com/audio.m4a" })));
+});
+
+// ---- documents -----------------------------------------------------------
+const docEntry = (extra = {}) => ({ title: "Services Agreement", category: "Contract", url: "https://drive.google.com/file/d/abc", visibility: "leaders", date: "2026-10-01", note: "", updatedAt: serverTimestamp(), ...extra });
+
+test("documents: admin adds links; leaders see only leader-visible ones", async () => {
+  await assertSucceeds(setDoc(doc(owner(), "documents/d1"), docEntry()));
+  await assertSucceeds(setDoc(doc(owner(), "documents/d2"), docEntry({ title: "Private", visibility: "admin" })));
+  await assertSucceeds(getDocs(query(collection(leader(), "documents"), where("visibility", "==", "leaders"))));
+  await assertFails(getDocs(collection(leader(), "documents")));
+  await assertFails(getDoc(doc(leader(), "documents/d2")));
+  await assertFails(getDoc(doc(participant(), "documents/d1")));
+  await assertFails(setDoc(doc(leader(), "documents/d3"), docEntry()));
+});
+
+test("documents: links must be https and fields are fixed", async () => {
+  await assertFails(setDoc(doc(owner(), "documents/d4"), docEntry({ url: "http://example.com/x" })));
+  await assertFails(setDoc(doc(owner(), "documents/d4"), docEntry({ body: "pasted contract text" })));
+  await assertFails(setDoc(doc(owner(), "documents/d4"), docEntry({ category: "Findings" })));
 });
