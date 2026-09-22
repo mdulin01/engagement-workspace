@@ -18,6 +18,7 @@ export default function Layout() {
           <nav className="flex items-center gap-1">
             <NavLink to="/" end className={link}>Hub</NavLink>
             {isLeader && <NavLink to="/status" className={link}>Status</NavLink>}
+            {isLeader && <NavLink to="/interviews" className={link}>Interviews</NavLink>}
             {isAdmin && <NavLink to="/effort" className={link}>Effort</NavLink>}
             {isAdmin && <NavLink to="/admin" className={link}>Admin</NavLink>}
           </nav>

@@ -5,6 +5,7 @@ import SignIn from "./pages/SignIn.jsx";
 import Hub from "./pages/Hub.jsx";
 import Effort from "./pages/Effort.jsx";
 import StatusLog from "./pages/StatusLog.jsx";
+import Interviews from "./pages/Interviews.jsx";
 import Admin from "./pages/Admin.jsx";
 import NoAccess from "./pages/NoAccess.jsx";
 
@@ -27,6 +28,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Guard need="member"><Hub /></Guard>} />
         <Route path="/status" element={<Guard need="leader"><StatusLog /></Guard>} />
+        <Route path="/interviews" element={<Guard need="leader"><Interviews /></Guard>} />
         <Route path="/effort" element={<Guard need="admin"><Effort /></Guard>} />
         <Route path="/admin" element={<Guard need="admin"><Admin /></Guard>} />
         <Route path="*" element={<Navigate to="/" replace />} />
