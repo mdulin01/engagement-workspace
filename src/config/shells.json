@@ -21,7 +21,7 @@
     "purpose": "Assess what EMR data the department can access, under what terms, and the best path to reliable access.",
     "sections": [
       { "heading": "Executive summary", "guidance": "Current access, what the contract allows, the recommended path." },
-      { "heading": "Background and questions", "guidance": "The EMR in use, why access matters, the questions this assessment answers." },
+      { "heading": "Background and questions", "guidance": "VHN, the EMR used by the clinical teams: which programs use it, why access to its data matters, the questions this assessment answers." },
       { "heading": "Current data access", "guidance": "Reports, extracts and interfaces in use today; who runs them; how long they take." },
       { "heading": "Contract and certification review", "guidance": "Data ownership and export rights in the contract; certification status and standards-based export (e.g. FHIR, bulk export)." },
       { "heading": "Vendor conversations", "guidance": "What the vendor offers today and on its roadmap, and at what cost." },

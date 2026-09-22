@@ -37,7 +37,7 @@
       { "id": "approach", "type": "interviews", "title": "What we did" },
       { "id": "findings", "type": "bullets", "title": "Current state: key findings", "bullets": ["[Finding 1]", "[Finding 2]", "[Finding 3]", "[Finding 4]"] },
       { "id": "maturity", "type": "bullets", "title": "Capability maturity", "bullets": ["[Overall maturity level and how it was scored]", "[Strongest domain]", "[Weakest domain and why it matters]"] },
-      { "id": "emr", "type": "bullets", "title": "EMR data access (VHN)", "bullets": ["[What data the department can get today, and how]", "[What the contract and certification allow]", "[Recommended access path]"] },
+      { "id": "emr", "type": "bullets", "title": "EMR data access (VHN)", "bullets": ["[What VHN data the department can get today, and how]", "[What the contract and certification allow]", "[Recommended access path]"] },
       { "id": "ai", "type": "bullets", "title": "AI opportunities", "bullets": ["[Top use case: value, feasibility, risk]", "[Second use case]", "[Readiness gaps to close first]"] },
       { "id": "recs", "type": "bullets", "title": "Priority recommendations", "bullets": ["[Recommendation 1]", "[Recommendation 2]", "[Recommendation 3]"] },
       { "id": "status", "type": "deliverables", "title": "Day 90 deliverables", "numbers": [1, 2, 3, 4] },
