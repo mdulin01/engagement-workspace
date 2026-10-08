@@ -35,6 +35,16 @@
   .ctrl{display:flex;flex-direction:column;gap:4px}
   .ctrl label{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;opacity:.75;font-weight:600}
   .ctrl select{font-family:inherit;font-size:13.5px;padding:8px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.96);color:var(--ink);font-weight:500;min-width:220px}
+  .msel{position:relative}
+  .msel-btn{font-family:inherit;font-size:13.5px;padding:8px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.96);color:var(--ink);font-weight:500;min-width:260px;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .msel-btn::after{content:"\25BE";font-size:10px;color:var(--muted)}
+  .msel-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:60;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-lg);min-width:330px;padding:8px;color:var(--ink);display:none}
+  .msel-pop.open{display:block}
+  .msel-pop label.opt{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500;padding:7px 9px;border-radius:7px;cursor:pointer;text-transform:none;letter-spacing:0;opacity:1}
+  .msel-pop label.opt:hover{background:var(--paper)}
+  .msel-pop input{accent-color:var(--accent);width:15px;height:15px;flex:none}
+  .msel-clear{width:100%;margin-top:6px;border:none;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:600;padding:7px;border-radius:7px;cursor:pointer;font-family:inherit}
+  .msel-clear:hover{background:#d2e8e3}
   .who{margin-left:auto;text-align:right}
   .who .nm{font-size:17px;font-weight:600}
   .who .sub{font-size:12px;opacity:.8}
@@ -119,18 +129,18 @@
 </div>
 
 <div class="controls">
-  <div class="ctrl"><label>Health center</label>
-    <select id="selSite"></select>
+  <div class="ctrl"><label>Health center <span style="opacity:.7;text-transform:none;letter-spacing:0">(select one or more)</span></label>
+    <div class="msel" id="mselSite"><button type="button" class="msel-btn" id="mselBtn">All health centers</button><div class="msel-pop" id="mselPop"></div></div>
   </div>
   <div class="ctrl"><label>Service line</label>
     <select id="selService"></select>
   </div>
   <div class="ctrl"><label>Reporting period</label>
     <select id="selPeriod">
-      <option value="mtd">This month (MTD)</option>
-      <option value="last" selected>Last month (September 2026)</option>
-      <option value="qtd">Quarter to date</option>
-      <option value="ytd">Year to date</option>
+      <option value="8wk" selected>Last 8 weeks</option>
+      <option value="last">Last month (September 2026)</option>
+      <option value="q3">Last quarter (Jul–Sep 2026)</option>
+      <option value="ytd">Year to date (2026)</option>
     </select>
   </div>
   <div class="who"><div class="nm" id="whoName">All health centers</div><div class="sub" id="whoSub">8 sites · 11 service lines</div></div>
@@ -159,7 +169,7 @@
     <div class="sec">Access &amp; volume <span class="note">— encounters, wait times, no-shows by site and service</span></div>
     <div class="kpis" id="kAccess"></div>
     <div class="grid g2">
-      <div class="card"><h3>Encounters by week — last 8 weeks</h3><div class="hint">Completed encounters vs. the same weeks last year</div><div class="chart-box"><canvas id="cVolume"></canvas></div></div>
+      <div class="card"><h3 id="hVolume">Encounters by week — last 8 weeks</h3><div class="hint">Completed encounters vs. the same weeks last year · follows the reporting period</div><div class="chart-box"><canvas id="cVolume"></canvas></div></div>
       <div class="card"><h3>Third-next-available appointment, by service</h3><div class="hint">Days · target ≤ 7 for clinical services, ≤ 3 for STI/HIV testing</div><div class="chart-box"><canvas id="cTNA"></canvas></div></div>
     </div>
     <div class="grid g2">
@@ -247,9 +257,9 @@ const SERVICES = [
 let seed = 20261008; const rnd = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
 const jitter = (v, pct) => Math.round(v * (1 + (rnd() - 0.5) * 2 * pct));
 const BASE_WEEKLY = 1840; // encounters/week, all sites
-const weeks = ["Aug 10", "Aug 17", "Aug 24", "Aug 31", "Sep 7", "Sep 14", "Sep 21", "Sep 28"];
-const volThis = weeks.map((_, i) => jitter(BASE_WEEKLY * (1 + 0.02 * i), 0.06));
-const volLast = weeks.map((_, i) => jitter(BASE_WEEKLY * 0.94 * (1 + 0.015 * i), 0.06));
+const weeks8 = ["Aug 10", "Aug 17", "Aug 24", "Aug 31", "Sep 7", "Sep 14", "Sep 21", "Sep 28"];
+const vol8This = weeks8.map((_, i) => jitter(BASE_WEEKLY * (1 + 0.02 * i), 0.06));
+const vol8Last = weeks8.map((_, i) => jitter(BASE_WEEKLY * 0.94 * (1 + 0.015 * i), 0.06));
 const siteVol = SITES.map((s) => jitter(7600 * s.w / SITES.reduce((a, b) => a + b.w, 0) * 1.0, 0.08));
 const closure = SITES.slice(0, 6).map(() => jitter(93, 0.05));
 const measures = [
@@ -290,6 +300,19 @@ const tbCohorts = ["2023 Q1", "2023 Q3", "2024 Q1", "2024 Q3", "2025 Q1"], tb = 
 const immTrend = [68, 70, 71, 73, 74, 74];
 const expScores = [["Got an appointment when needed", 68, 80], ["Wait time at visit", 61, 75], ["Staff listened carefully", 86, 90], ["Explained things clearly", 84, 90], ["Treated with respect", 91, 92], ["Would recommend", 83, 85]];
 const nps = [31, 34, 33, 38, 41, 44];
+// full-year weekly series (Mondays, Jan 5 – Sep 28 2026): the last 8 weeks are the series above, earlier weeks use a separate generator
+const MON = []; for (let d = new Date(2026, 0, 5); d <= new Date(2026, 8, 28); d.setDate(d.getDate() + 7)) MON.push(new Date(d));
+const fmtW = (d) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+let seed2 = 20260105; const rnd2 = () => { seed2 = (seed2 * 1664525 + 1013904223) % 4294967296; return seed2 / 4294967296; };
+const season = (i) => 1 - 0.07 * Math.cos((i / 52) * 2 * Math.PI) + (i < 2 ? -0.12 : 0); // summer peak, holiday dip
+const WEEKS = MON.map(fmtW);
+const VOL_THIS = MON.map((_, i) => Math.round(BASE_WEEKLY * 0.9 * season(i) * (1 + (rnd2() - 0.5) * 0.12)));
+const VOL_LAST = MON.map((_, i) => Math.round(BASE_WEEKLY * 0.85 * season(i) * (1 + (rnd2() - 0.5) * 0.12)));
+vol8This.forEach((v, i) => { VOL_THIS[MON.length - 8 + i] = v; }); vol8Last.forEach((v, i) => { VOL_LAST[MON.length - 8 + i] = v; });
+const PERIODS = { "8wk": { n: 8, l: "last 8 weeks", k: "8 wks" }, last: { n: 4, l: "September 2026", k: "Sep" }, q3: { n: 13, l: "Jul–Sep 2026", k: "Q3" }, ytd: { n: MON.length, l: "2026 year to date", k: "YTD" } };
+let period = "8wk";
+const win = () => PERIODS[period].n;
+const weeksFn = () => WEEKS.slice(-win()), volThisFn = () => VOL_THIS.slice(-win()), volLastFn = () => VOL_LAST.slice(-win());
 
 // ---------------------------------------------------------------- helpers
 const $ = (s) => document.querySelector(s);
@@ -312,52 +335,69 @@ function table(el, rows, cols, barIdx, max) {
 }
 
 // ---------------------------------------------------------------- controls
-$("#selSite").innerHTML = `<option value="all">All health centers</option>` + SITES.map((s) => `<option value="${s.id}">${s.name}</option>`).join("");
+let siteSel = []; // empty = all health centers
+const selSites = () => siteSel.length ? SITES.filter((s) => siteSel.includes(s.id)) : SITES;
+const siteLabel = () => { const ss = selSites(); return !siteSel.length ? "All health centers" : ss.length === 1 ? ss[0].name : ss.length <= 3 ? ss.map((s) => s.short).join(" + ") : `${ss.length} of ${SITES.length} health centers`; };
+function buildSiteSelect() {
+  const pop = $("#mselPop");
+  pop.innerHTML = SITES.map((s) => `<label class="opt"><input type="checkbox" value="${s.id}" ${siteSel.includes(s.id) ? "checked" : ""}> ${s.name}</label>`).join("") + '<button type="button" class="msel-clear" id="mselClear">Clear — all health centers</button>';
+  pop.querySelectorAll("input").forEach((i) => i.onchange = () => { siteSel = [...pop.querySelectorAll("input:checked")].map((x) => x.value); onFilter(); });
+  $("#mselClear").onclick = () => { siteSel = []; buildSiteSelect(); onFilter(); };
+  $("#mselBtn").textContent = siteLabel();
+}
+buildSiteSelect();
+$("#mselBtn").addEventListener("click", (e) => { e.stopPropagation(); $("#mselPop").classList.toggle("open"); });
+$("#mselPop").addEventListener("click", (e) => e.stopPropagation());
+document.addEventListener("click", () => $("#mselPop").classList.remove("open"));
 $("#selService").innerHTML = `<option value="all">All service lines</option>` + SERVICES.map((s) => `<option value="${s.id}">${s.name}</option>`).join("");
 let scale = 1, siteName = "All health centers";
 function onFilter() {
-  const sid = $("#selSite").value, svc = $("#selService").value;
-  const s = SITES.find((x) => x.id === sid), v = SERVICES.find((x) => x.id === svc);
-  scale = (s ? s.w / SITES.reduce((a, b) => a + b.w, 0) : 1) * (v ? 1 / SERVICES.length * 1.6 : 1);
-  siteName = s ? s.name : "All health centers";
+  const svc = $("#selService").value, v = SERVICES.find((x) => x.id === svc), ss = selSites();
+  period = $("#selPeriod").value;
+  const wAll = SITES.reduce((a, b) => a + b.w, 0), wSel = ss.reduce((a, b) => a + b.w, 0);
+  scale = (siteSel.length ? wSel / wAll : 1) * (v ? 1 / SERVICES.length * 1.6 : 1);
+  siteName = siteLabel();
+  $("#mselBtn").textContent = siteName;
   $("#whoName").textContent = v ? `${siteName} · ${v.name}` : siteName;
-  $("#whoSub").textContent = s ? "1 site" : `${SITES.length} sites · ${SERVICES.length} service lines`;
+  $("#whoSub").textContent = `${siteSel.length ? `${ss.length} of ${SITES.length}` : SITES.length} sites · ${v ? "1 of " : ""}${SERVICES.length} service lines · ${PERIODS[period].l}`;
+  renderDomains();
   render();
 }
-["#selSite", "#selService", "#selPeriod"].forEach((q) => $(q).addEventListener("change", onFilter));
+["#selService", "#selPeriod"].forEach((q) => $(q).addEventListener("change", onFilter));
 
 // ---------------------------------------------------------------- domains
 const DOMAINS = [
-  { id: "access", l: "Access & volume", icon: "A", color: "var(--d-access)", v: () => Math.round(volThis.reduce((a, b) => a + b) * scale).toLocaleString(), d: "encounters · last 8 weeks" },
+  { id: "access", l: "Access & volume", icon: "A", color: "var(--d-access)", v: () => Math.round(volThisFn().reduce((a, b) => a + b) * scale).toLocaleString(), d: () => `encounters · ${PERIODS[period].l}` },
   { id: "quality", l: "Quality & care gaps", icon: "Q", color: "var(--d-quality)", v: () => `${atTarget} of ${measures.length}`, d: `measures at target · ART ≤ 7 days: ${timely[0].pct}%` },
   { id: "programs", l: "Program outcomes", icon: "P", color: "var(--d-programs)", v: () => "88%", d: "Rapid Entry within 7 days (goal 90%)" },
   { id: "experience", l: "Client experience", icon: "E", color: "var(--d-experience)", v: () => "+44", d: "net promoter, September" },
 ];
 let active = "access";
 function renderDomains() {
-  $("#domains").innerHTML = DOMAINS.map((d) => `<div class="dchip ${d.id === active ? "active" : ""}" data-id="${d.id}" style="border-top-color:${d.color}"><div class="drow"><div class="dicon" style="background:${d.color}">${d.icon}</div><div class="dl">${d.l}</div></div><div class="dv num">${d.v()}</div><div class="dd">${d.d}</div><div class="dgo">${d.id === active ? "Open ▾" : "Open ›"}</div></div>`).join("");
+  $("#domains").innerHTML = DOMAINS.map((d) => `<div class="dchip ${d.id === active ? "active" : ""}" data-id="${d.id}" style="border-top-color:${d.color}"><div class="drow"><div class="dicon" style="background:${d.color}">${d.icon}</div><div class="dl">${d.l}</div></div><div class="dv num">${d.v()}</div><div class="dd">${typeof d.d === "function" ? d.d() : d.d}</div><div class="dgo">${d.id === active ? "Open ▾" : "Open ›"}</div></div>`).join("");
   document.querySelectorAll(".dchip").forEach((c) => c.addEventListener("click", () => { active = c.dataset.id; document.querySelectorAll("section[data-tab]").forEach((s) => s.classList.toggle("tabhide", s.dataset.tab !== active)); renderDomains(); render(); }));
 }
 
 // ---------------------------------------------------------------- render
 function render() {
   const sc = (v) => Math.round(v * scale);
-  const tot = volThis.reduce((a, b) => a + b), last = volLast.reduce((a, b) => a + b);
+  const tot = volThisFn().reduce((a, b) => a + b), last = volLastFn().reduce((a, b) => a + b);
   const svc = $("#selService").value; const v = SERVICES.find((x) => x.id === svc);
   const tna = v ? v.tna : 7, ns = v ? v.noshow : 16;
   renderAI();
 
   if (active === "access") {
     kpi($("#kAccess"), [
-      { l: "Encounters (8 wks)", v: sc(tot).toLocaleString(), c: "good", t: `${((tot - last) / last * 100).toFixed(1)}% vs. last year` },
+      { l: `Encounters (${PERIODS[period].k})`, v: sc(tot).toLocaleString(), c: "good", t: `${((tot - last) / last * 100).toFixed(1)}% vs. last year` },
       { l: "Third-next-available", v: tna, u: "days", c: pctClass(tna, 7, true), t: "target ≤ 7 days" },
       { l: "No-show rate", v: ns, u: "%", c: pctClass(ns, 15, true), t: "target ≤ 15%" },
       { l: "Same-day STI/HIV slots used", v: 84, u: "%", c: "good", t: "of slots offered" },
       { l: "Unique clients (YTD)", v: sc(41280).toLocaleString(), c: "good", t: "+6% vs. last year" },
     ]);
-    chart("cVolume", { type: "line", data: { labels: weeks, datasets: [{ label: "2026", data: volThis.map(sc), borderColor: TEAL, backgroundColor: TEAL, tension: .3, pointRadius: 3 }, { label: "2025", data: volLast.map(sc), borderColor: GRAY, backgroundColor: GRAY, borderDash: [4, 4], tension: .3, pointRadius: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: quiet, y: { ...quiet, beginAtZero: true } } } });
+    $("#hVolume").textContent = `Encounters by week — ${PERIODS[period].l}`;
+    chart("cVolume", { type: "line", data: { labels: weeksFn(), datasets: [{ label: "2026", data: volThisFn().map(sc), borderColor: TEAL, backgroundColor: TEAL, tension: .3, pointRadius: 3 }, { label: "2025", data: volLastFn().map(sc), borderColor: GRAY, backgroundColor: GRAY, borderDash: [4, 4], tension: .3, pointRadius: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: quiet, y: { ...quiet, beginAtZero: true } } } });
     chart("cTNA", { type: "bar", data: { labels: SERVICES.map((s) => s.name.split(" (")[0].split(" /")[0]), datasets: [{ data: SERVICES.map((s) => s.tna), backgroundColor: SERVICES.map((s) => s.tna <= (s.id === "sti" || s.id === "hiv" ? 3 : 7) ? TEAL : s.tna <= 10 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ...quiet, beginAtZero: true, title: { display: true, text: "days" } }, y: { grid: { display: false }, border: { display: false }, ticks: { autoSkip: false } } } } });
-    chart("cSites", { type: "bar", data: { labels: SITES.map((s) => s.short), datasets: [{ data: siteVol.map((x) => Math.round(x * (v ? 1 / SERVICES.length * 1.6 : 1))), backgroundColor: INK, borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true } } } });
+    chart("cSites", { type: "bar", data: { labels: selSites().map((s) => s.short), datasets: [{ data: SITES.map((s, i) => [s, siteVol[i]]).filter(([s]) => selSites().includes(s)).map(([, x]) => Math.round(x * (v ? 1 / SERVICES.length * 1.6 : 1))), backgroundColor: INK, borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true } } } });
     table($("#tNoShow"), SERVICES.slice().sort((a, b) => b.noshow - a.noshow).map((s) => [s.name, s.noshow, `${s.noshow}%`]), ["Service line", "", "No-show"], 1, 30);
   }
   if (active === "quality") {
@@ -380,7 +420,8 @@ function render() {
     $("#tTimely").innerHTML = `<table><thead><tr><th>Measure</th><th>Target window</th><th>Median</th><th>Within window</th><th>Goal</th><th>6-month trend</th><th>Outside window now</th></tr></thead><tbody>${timely.map((t) => { const cls = pctClass(t.pct, t.tp); return `<tr><td>${t.m}</td><td>${t.goal}</td><td class="num">${t.med} ${t.unit}</td><td class="num ${cls}"><b>${t.pct}%</b></td><td class="num">${t.tp}%</td><td class="num" style="color:var(--muted)">${t.trend[0]}% → ${t.trend[t.trend.length - 1]}% <span class="${t.trend[5] > t.trend[0] ? "good" : "bad"}">${t.trend[5] > t.trend[0] ? "▲" : "▼"}</span></td><td class="num">${sc(t.open) || t.open} <span style="color:var(--muted);font-size:11px">clients</span></td></tr>`; }).join("")}</tbody></table>`;
     chart("cMeasures", { type: "bar", data: { labels: measures.map((m) => m[0]), datasets: [{ label: "Performance", data: measures.map((m) => m[1]), backgroundColor: measures.map((m) => m[1] >= m[2] ? TEAL : INK), borderRadius: 4 }, { label: "Target", data: measures.map((m) => m[2]), type: "line", borderColor: GOLD, backgroundColor: GOLD, pointStyle: "line", pointRadius: 10, pointBorderWidth: 3, showLine: false }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { ...quiet, min: 0, max: 100 }, y: { grid: { display: false }, border: { display: false } } } } });
     table($("#tGaps"), gaps.map((g) => [g[0], sc(g[1]), sc(g[1])]), ["Measure", "", "Clients"], 1, 1500);
-    chart("cClosure", { type: "bar", data: { labels: SITES.slice(0, 6).map((s) => s.short), datasets: [{ data: closure, backgroundColor: closure.map((c) => c >= 95 ? TEAL : c >= 90 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, min: 70, max: 100 } } } });
+    const clos = SITES.slice(0, 6).map((s, i) => [s, closure[i]]).filter(([s]) => selSites().includes(s)); const closV = clos.map(([, c]) => c);
+    chart("cClosure", { type: "bar", data: { labels: clos.map(([s]) => s.short), datasets: [{ data: closV, backgroundColor: closV.map((c) => c >= 95 ? TEAL : c >= 90 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, min: 70, max: 100 } } } });
     table($("#tDocs"), docs.map((d) => [d[0], d[1], `${d[1]}%`]), ["Field", "", "Complete"], 1, 100);
   }
   if (active === "programs") {
@@ -421,8 +462,8 @@ function watchouts() {
 }
 function scopeLabel() { const v = SERVICES.find((x) => x.id === $("#selService").value); return (siteName === "All health centers" ? "all FCBOH health centers" : siteName) + (v ? ` · ${v.name}` : ""); }
 function renderAI() {
-  const tot = volThis.reduce((a, b) => a + b), last = volLast.reduce((a, b) => a + b), w = watchouts(), t0 = timely[0];
-  let txt = `Encounters at <b>${scopeLabel()}</b> are <b>${((tot - last) / last * 100).toFixed(1)}% above</b> the same eight weeks last year. `;
+  const tot = volThisFn().reduce((a, b) => a + b), last = volLastFn().reduce((a, b) => a + b), w = watchouts(), t0 = timely[0];
+  let txt = `Encounters at <b>${scopeLabel()}</b> are <b>${((tot - last) / last * 100).toFixed(1)}% above</b> the same period last year (${PERIODS[period].l}). `;
   txt += `The measure that matters most for transmission, <b>new HIV diagnosis to ART within 7 days</b>, is at <b>${t0.pct}%</b> against a ${t0.tp}% goal and has risen every month since April <span class="ai-link" data-area="quality">[open]</span>. `;
   txt += `Top watch-outs: ${w.slice(0, 2).map((f) => `${f.txt} <span class="ai-link" data-area="${f.area}">[review]</span>`).join("; and ")}.`;
   const ai = $("#aiInsight"); ai.innerHTML = txt;
