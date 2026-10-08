@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Community Health Profiles</title>
+<meta name="description" content="Demo: neighborhood-level Community Health Assessment indicators for Fulton County, built from CDC PLACES and USALEEP public data.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%2314283a%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%277%27 fill=%27%230f766e%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root{
+    --brand:#14283a; --brand-2:#1f3b52; --accent:#0f766e; --accent-soft:#e3f1ee;
+    --gold:#b7791f; --gold-soft:#fbf1dc; --paper:#f6f4ef; --line:#e4ded3;
+    --text:#1e293b; --muted:#5b6473; --card:#ffffff; --map-bg:#e9ecef;
+    --shadow:0 1px 2px rgba(20,40,58,.04), 0 6px 20px rgba(20,40,58,.06);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--paper); color:var(--text); font-size:15px; line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent)}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+
+  /* Header */
+  header.bar{
+    background:linear-gradient(110deg,var(--brand) 0%,var(--brand-2) 70%,#24496a 100%);
+    color:#fff; padding:22px 0 24px;
+  }
+  .wordmark{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72);font-weight:600}
+  .titlerow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:6px}
+  header h1{margin:0;font-size:30px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+  header .sub{margin:6px 0 0;color:rgba(255,255,255,.8);font-size:15px}
+  .pill{
+    display:inline-flex;align-items:center;gap:8px;background:#f5c04a;color:#3b2a06;
+    font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+    padding:7px 12px;border-radius:999px;white-space:nowrap;box-shadow:0 1px 0 rgba(0,0,0,.15) inset;
+  }
+  .pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#8a5a00}
+
+  /* KPI strip */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:-18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px}
+  .kpi .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+  .kpi .value{font-size:28px;font-weight:700;color:var(--brand);margin-top:4px;letter-spacing:-.01em;line-height:1.1}
+  .kpi .value small{font-size:14px;font-weight:500;color:var(--muted);margin-left:4px}
+  .kpi .note{font-size:12.5px;color:var(--muted);margin-top:6px}
+
+  /* Controls */
+  .controls{
+    display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-top:22px;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;
+  }
+  .field label{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:6px}
+  select{
+    font:inherit;font-size:15px;font-weight:500;color:var(--text);background:#fff;border:1px solid #cfc8bb;border-radius:10px;
+    padding:9px 36px 9px 12px;min-width:320px;appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%2314283a' stroke-width='1.8'/></svg>");
+    background-repeat:no-repeat;background-position:right 12px center;
+  }
+  select:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid #7fbcb3;outline-offset:2px}
+  .legend{flex:1;min-width:300px}
+  .legend .swatches{display:flex;gap:2px;margin-top:4px}
+  .legend .sw{flex:1;min-width:0}
+  .legend .sw i{display:block;height:14px;border-radius:3px}
+  .legend .sw span{display:block;font-size:12px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .legend .meta{font-size:12.5px;color:var(--muted);margin-top:6px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .legend .meta b{color:var(--text);font-weight:600}
+  .legend .nodata{display:inline-flex;align-items:center;gap:5px}
+  .legend .nodata i{width:12px;height:12px;border-radius:3px;background:#f1efe9;border:1px solid #cfc8bb;display:inline-block}
+  .check{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;padding-bottom:8px;white-space:nowrap}
+  .check input{width:17px;height:17px;accent-color:var(--accent);margin:0}
+  .check .dot{width:12px;height:12px;border-radius:50%;background:var(--brand);border:2px solid #fff;box-shadow:0 0 0 1px var(--brand);display:inline-block}
+
+  /* Map + panel */
+  .main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;margin-top:16px}
+  .mapcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;position:relative}
+  #map{height:640px;background:var(--map-bg)}
+  .mapcard .status{
+    position:absolute;left:12px;bottom:12px;z-index:500;background:rgba(255,255,255,.92);border:1px solid var(--line);
+    border-radius:10px;padding:6px 10px;font-size:12.5px;color:var(--muted);backdrop-filter:blur(4px)
+  }
+  .mapcard .loading{
+    position:absolute;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;background:rgba(246,244,239,.75);
+    font-weight:500;color:var(--brand)
+  }
+  .leaflet-container{font-family:inherit;font-size:13px}
+  .leaflet-tooltip.tt{border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:8px 10px;color:var(--text);font-size:13px}
+  .leaflet-tooltip.tt b{color:var(--brand)}
+  .leaflet-popup-content-wrapper{border-radius:12px;font-size:13.5px}
+  .leaflet-popup-content{margin:12px 14px}
+  .leaflet-control-attribution{font-size:12px}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);height:640px;overflow:auto;padding:18px 20px}
+  .panel h2{margin:0;font-size:17px;font-weight:700;color:var(--brand);letter-spacing:-.005em}
+  .panel .eyebrow{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:4px}
+  .panel .popline{font-size:13.5px;color:var(--muted);margin-top:3px}
+  .panel .empty{color:var(--muted);font-size:14px;margin-top:14px;line-height:1.55}
+  .panel .empty ol{padding-left:18px;margin:10px 0 0}
+  .panel .empty li{margin:4px 0}
+  .le{
+    margin-top:14px;border-radius:12px;background:var(--accent-soft);padding:12px 14px;display:flex;gap:14px;align-items:center
+  }
+  .le .big{font-size:30px;font-weight:700;color:var(--accent);line-height:1;letter-spacing:-.01em}
+  .le .big small{font-size:13px;font-weight:500;color:var(--muted);margin-left:3px}
+  .le .txt{font-size:12.5px;color:var(--muted);line-height:1.4}
+  .le .txt b{color:var(--text);font-weight:600;display:block;font-size:13px}
+  .le.none{background:#f3f1ec}
+  .le.none .big{color:var(--muted);font-size:16px}
+  .sect{margin-top:18px}
+  .sect h3{margin:0 0 6px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+  .chartbox{position:relative;height:262px}
+  .keyrow{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+  .keyrow i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .standout{list-style:none;padding:0;margin:0}
+  .standout li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+  .standout li:first-child{border-top:0}
+  .standout .m{font-weight:500}
+  .standout .d{color:var(--gold);font-weight:700;white-space:nowrap}
+  .standout .d small{font-weight:500;color:var(--muted);font-size:12px}
+  .foot-note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.5}
+
+  /* Use cases */
+  .section-title{margin:34px 0 12px;font-size:20px;font-weight:700;color:var(--brand);letter-spacing:-.01em}
+  .uses{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .use{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px}
+  .use .num{width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .use h3{margin:12px 0 6px;font-size:16px;color:var(--brand)}
+  .use p{margin:0;color:var(--muted);font-size:14px}
+
+  footer{margin:36px 0 40px;border-top:1px solid var(--line);padding-top:18px;font-size:13px;color:var(--muted);line-height:1.6}
+  footer p{margin:4px 0}
+
+  @media (max-width:1100px){
+    .main{grid-template-columns:minmax(0,1fr) 340px}
+  }
+  @media (max-width:900px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .main{grid-template-columns:1fr}
+    .panel{height:auto;max-height:640px}
+    .uses{grid-template-columns:1fr}
+    select{min-width:0;width:100%}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 16px}
+    .kpis{grid-template-columns:1fr}
+    #map{height:460px}
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <div class="wordmark">Fulton County Board of Health</div>
+    <div class="titlerow">
+      <div>
+        <h1>Community Health Profiles</h1>
+        <p class="sub">Neighborhood-level indicators for the Community Health Assessment and CHIP</p>
+      </div>
+      <span class="pill">Demo · public data · not an FCBOH product</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="kpis" aria-label="Key figures">
+    <div class="kpi">
+      <div class="label">Life expectancy gap across tracts</div>
+      <div class="value" id="kpi-le">—</div>
+      <div class="note" id="kpi-le-note">USALEEP 2010–2015, 2010 tract boundaries</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Tracts with data</div>
+      <div class="value" id="kpi-tracts">—</div>
+      <div class="note">CDC PLACES 2025 release, 2020 tract boundaries</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Uninsured adults, county-wide median</div>
+      <div class="value" id="kpi-unins">—</div>
+      <div class="note">Median of tract values, adults 18–64</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Tracts where &gt;20% report food insecurity</div>
+      <div class="value" id="kpi-food">—</div>
+      <div class="note" id="kpi-food-note">Of tracts with data</div>
+    </div>
+  </section>
+
+  <section class="controls" aria-label="Map controls">
+    <div class="field">
+      <label for="indicator">Indicator</label>
+      <select id="indicator" aria-describedby="legend-meta">
+        <optgroup label="Life expectancy">
+          <option value="LE">Life expectancy at birth (USALEEP, years)</option>
+        </optgroup>
+        <optgroup label="Health outcomes">
+          <option value="GHLTH" selected>Fair or poor health</option>
+          <option value="BPHIGH">High blood pressure</option>
+          <option value="DIABETES">Diabetes</option>
+          <option value="OBESITY">Obesity</option>
+          <option value="CHD">Coronary heart disease</option>
+          <option value="DEPRESSION">Depression</option>
+          <option value="MHLTH">Frequent mental distress</option>
+          <option value="PHLTH">Frequent physical distress</option>
+          <option value="CSMOKING">Current smoking</option>
+        </optgroup>
+        <optgroup label="Access &amp; social needs">
+          <option value="ACCESS2">No health insurance (18–64)</option>
+          <option value="CHECKUP">Routine checkup in past year</option>
+          <option value="FOODINSECU">Food insecurity</option>
+          <option value="HOUSINSECU">Housing insecurity</option>
+          <option value="LACKTRPT">Lack of reliable transportation</option>
+          <option value="SHUTUTILITY">Utility shut-off threat</option>
+          <option value="EMOTIONSPT">Lack of social and emotional support</option>
+          <option value="FOODSTAMP">Received food stamps</option>
+          <option value="LONELINESS">Feeling socially isolated</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="legend" aria-live="polite">
+      <div class="field"><label id="legend-title">Legend · 5 quantile classes</label></div>
+      <div class="swatches" id="legend-swatches"></div>
+      <div class="meta" id="legend-meta"></div>
+    </div>
+    <label class="check"><input type="checkbox" id="toggle-sites" checked> <span class="dot" aria-hidden="true"></span> Show FCBOH health centers</label>
+  </section>
+
+  <section class="main">
+    <div class="mapcard">
+      <div id="map" role="region" aria-label="Map of Fulton County census tracts"></div>
+      <div class="status" id="map-status">Loading tract boundaries…</div>
+      <div class="loading" id="map-loading">Loading data…</div>
+    </div>
+    <aside class="panel" id="panel" aria-live="polite">
+      <div class="eyebrow">Tract profile</div>
+      <h2>Select a tract</h2>
+      <div class="empty">
+        Hover any tract for its value. Click a tract to open its profile:
+        <ol>
+          <li>Life expectancy estimate, where one exists</li>
+          <li>Eight key measures compared with the county median</li>
+          <li>The three measures furthest above the county median</li>
+        </ol>
+      </div>
+    </aside>
+  </section>
+
+  <h2 class="section-title">How this would be used</h2>
+  <section class="uses">
+    <div class="use">
+      <div class="num">1</div>
+      <h3>Community Health Assessment</h3>
+      <p>Indicators refresh annually from CDC PLACES and state sources instead of a one-time contracted report.</p>
+    </div>
+    <div class="use">
+      <div class="num">2</div>
+      <h3>CHIP monitoring</h3>
+      <p>Track priority neighborhoods against targets, with the same tract definitions year over year.</p>
+    </div>
+    <div class="use">
+      <div class="num">3</div>
+      <h3>Service planning</h3>
+      <p>Overlay FCBOH health center locations and catchments on need, as shown by the markers on the map.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Sources.</strong>
+      <a href="https://www.cdc.gov/places/" target="_blank" rel="noopener">CDC PLACES, 2025 release</a> (BRFSS 2023 model-based crude prevalence, %, 2020 census tracts) ·
+      <a href="https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html" target="_blank" rel="noopener">NCHS USALEEP</a> (life expectancy at birth, 2010–2015, 2010 census tracts) ·
+      <a href="https://tigerweb.geo.census.gov/" target="_blank" rel="noopener">Census TIGERweb</a> (tract boundaries) ·
+      Basemap © <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a> World Light Gray Canvas (Esri, HERE, Garmin, OpenStreetMap contributors).</p>
+    <p>Health center coordinates are approximate, placed from street addresses for illustration. County median is the unweighted median of tract values. Life expectancy uses 2010 tract boundaries, so it is joined to 2020 tracts only where the 11-digit tract id is unchanged.</p>
+    <p>Demo built from public data for discussion with FCBOH leadership. Modeled estimates have uncertainty; not for individual-level decisions.</p>
+  </footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  // ---------- Config ----------
+  const DATA = '../data/';
+  const LABELS = {
+    LE:'Life expectancy at birth',
+    ACCESS2:'No health insurance (18–64)', BPHIGH:'High blood pressure', DIABETES:'Diabetes', OBESITY:'Obesity',
+    CSMOKING:'Current smoking', MHLTH:'Frequent mental distress', PHLTH:'Frequent physical distress',
+    CHECKUP:'Routine checkup in past year', DEPRESSION:'Depression', CHD:'Coronary heart disease',
+    GHLTH:'Fair or poor health', FOODINSECU:'Food insecurity', HOUSINSECU:'Housing insecurity',
+    LACKTRPT:'Lack of reliable transportation', SHUTUTILITY:'Utility shut-off threat',
+    EMOTIONSPT:'Lack of social and emotional support', FOODSTAMP:'Received food stamps', LONELINESS:'Feeling socially isolated'
+  };
+  const HIGHER_IS_BETTER = new Set(['LE','CHECKUP']);
+  const KEY_MEASURES = ['GHLTH','BPHIGH','DIABETES','OBESITY','MHLTH','ACCESS2','FOODINSECU','LACKTRPT'];
+  const SHORT = {GHLTH:'Fair or poor health', BPHIGH:'High blood pressure', DIABETES:'Diabetes', OBESITY:'Obesity', MHLTH:'Frequent mental distress', ACCESS2:'Uninsured (18–64)', FOODINSECU:'Food insecurity', LACKTRPT:'No reliable transport'};
+  const RAMP = ['#d9ece8','#93c6bd','#3f9a91','#1f6670','#14283a']; // teal -> ink, light -> dark
+  const NODATA = '#f1efe9';
+  const SITES = [
+    {name:'Adamsville Regional Health Center', addr:'3700 MLK Jr. Drive SW, Atlanta 30331', lat:33.7576, lon:-84.5000},
+    {name:'Center for Health and Rehabilitation', addr:'265 Boulevard NE, Atlanta 30312', lat:33.7625, lon:-84.3718},
+    {name:'College Park Regional Health Center', addr:'1920 John Wesley Ave, College Park 30337', lat:33.6565, lon:-84.4505},
+    {name:'Neighborhood Union Health Center', addr:'186 Sunset Ave NW, Atlanta 30314', lat:33.7585, lon:-84.4120},
+    {name:'Health and Human Services – North', addr:'4700 North Point Pkwy, Alpharetta 30022', lat:34.0598, lon:-84.2796},
+    {name:'North Fulton Services Center', addr:'7741 Roswell Rd, Sandy Springs 30350', lat:33.9710, lon:-84.3570},
+    {name:'Oak Hill Child, Adolescent & Family Center', addr:'2805 Metropolitan Pkwy, Atlanta 30315', lat:33.6985, lon:-84.4080},
+    {name:'10 Park Place Health Center', addr:'10 Park Place SE, Atlanta 30303', lat:33.7545, lon:-84.3880}
+  ];
+  const FULTON_BOUNDS = L.latLngBounds([33.50,-84.85],[34.19,-84.10]);
+
+  // ---------- State ----------
+  const S = {
+    places:null, placesById:new Map(), medians:{}, usaleep:new Map(),
+    geo2020:null, layer2020:null, idx2020:new Map(),
+    geo2010:null, layer2010:null, idx2010:new Map(),
+    indicator:'GHLTH', breaks:[], selectedId:null, selectedLayer:null, chart:null,
+    sitesLayer:null
+  };
+
+  const $ = (id)=>document.getElementById(id);
+  const fmtPct = (v)=> (v==null||isNaN(v)) ? 'n/a' : v.toFixed(1)+'%';
+  const fmtNum = (n)=> (n==null||isNaN(n)) ? 'n/a' : Number(n).toLocaleString('en-US');
+  const median = (arr)=>{ const a=arr.filter(v=>typeof v==='number'&&!isNaN(v)).sort((x,y)=>x-y); if(!a.length) return NaN; const m=a.length>>1; return a.length%2 ? a[m] : (a[m-1]+a[m])/2; };
+  const quantile = (sorted,q)=>{ const pos=(sorted.length-1)*q, b=Math.floor(pos), r=pos-b; return sorted[b+1]!==undefined ? sorted[b]+r*(sorted[b+1]-sorted[b]) : sorted[b]; };
+  const esc = (s)=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const tractLabel = (id)=>{ const n=id.slice(5); const main=parseInt(n.slice(0,4),10), sub=n.slice(4); return 'Tract '+main+(sub!=='00' ? '.'+sub : ''); };
+
+  // ---------- Map ----------
+  const map = L.map('map',{zoomSnap:.5, preferCanvas:false});
+  map.fitBounds(FULTON_BOUNDS,{padding:[8,8]});
+  // Quiet basemap: Esri World Light Gray (no API key). Place-name labels sit in a pane above the tracts.
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{
+    attribution:'Basemap &copy; <a href="https://www.esri.com/">Esri</a>, HERE, Garmin, OpenStreetMap contributors', maxZoom:16
+  }).addTo(map);
+
+  const tractPane = map.createPane('tracts'); tractPane.style.zIndex = 400;
+  const labelPane = map.createPane('labels'); labelPane.style.zIndex = 450; labelPane.style.pointerEvents = 'none';
+  const sitePane = map.createPane('sites'); sitePane.style.zIndex = 650;
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{
+    pane:'labels', maxZoom:16, opacity:.9
+  }).addTo(map);
+
+  // Health center markers
+  S.sitesLayer = L.layerGroup();
+  SITES.forEach(s=>{
+    L.circleMarker([s.lat,s.lon],{pane:'sites', radius:7, color:'#fff', weight:2, fillColor:'#14283a', fillOpacity:1})
+      .bindPopup('<b>'+esc(s.name)+'</b><br>'+esc(s.addr)+'<br><span style="color:#5b6473;font-size:12px">FCBOH site · location approximate</span>')
+      .bindTooltip(s.name,{direction:'top',offset:[0,-6],className:'tt'})
+      .addTo(S.sitesLayer);
+  });
+  S.sitesLayer.addTo(map);
+  $('toggle-sites').addEventListener('change',e=>{ if(e.target.checked) S.sitesLayer.addTo(map); else map.removeLayer(S.sitesLayer); });
+
+  // ---------- Values ----------
+  function valueFor(id, ind){
+    if(ind==='LE'){ const r=S.usaleep.get(id); return r ? r.life_expectancy : null; }
+    const r=S.placesById.get(id); if(!r) return null;
+    const v=r.measures[ind]; return (typeof v==='number') ? v : null;
+  }
+  function allValues(ind){
+    if(ind==='LE') return Array.from(S.usaleep.values()).map(r=>r.life_expectancy).filter(v=>typeof v==='number');
+    return S.places.map(r=>r.measures[ind]).filter(v=>typeof v==='number');
+  }
+  function computeBreaks(ind){
+    const a=allValues(ind).sort((x,y)=>x-y);
+    S.breaks=[0.2,0.4,0.6,0.8].map(q=>quantile(a,q));
+    S.min=a[0]; S.max=a[a.length-1];
+  }
+  function classOf(v){ if(v==null) return -1; let c=0; while(c<4 && v>S.breaks[c]) c++; return c; }
+  function colorOf(v){ const c=classOf(v); return c<0 ? NODATA : RAMP[c]; }
+
+  function styleFor(id){
+    const v=valueFor(id,S.indicator);
+    const sel = id===S.selectedId;
+    return {
+      fillColor:colorOf(v), fillOpacity: v==null ? .55 : .82,
+      color: sel ? '#b7791f' : '#ffffff', weight: sel ? 3 : .8, opacity:1
+    };
+  }
+
+  // ---------- Layers ----------
+  function buildLayer(geo, idx, vintage){
+    const layer = L.geoJSON(geo,{
+      pane:'tracts',
+      style:(f)=>styleFor(f.properties.GEOID),
+      onEachFeature:(f,lyr)=>{
+        const id=f.properties.GEOID; idx.set(id,lyr);
+        lyr.bindTooltip(()=>tooltipHtml(id,vintage),{sticky:true,className:'tt',direction:'top',opacity:1});
+        lyr.on('mouseover',()=>{ if(id!==S.selectedId){ lyr.setStyle({weight:2,color:'#14283a'}); } lyr.bringToFront(); if(S.selectedLayer) S.selectedLayer.bringToFront(); });
+        lyr.on('mouseout',()=>{ lyr.setStyle(styleFor(id)); });
+        lyr.on('click',()=>selectTract(id,lyr,vintage));
+      }
+    });
+    return layer;
+  }
+  function tooltipHtml(id,vintage){
+    const v=valueFor(id,S.indicator);
+    const p=S.placesById.get(id);
+    const unit = S.indicator==='LE' ? ' years' : '%';
+    const vs = v==null ? 'no estimate' : (S.indicator==='LE' ? v.toFixed(1)+unit : v.toFixed(1)+unit);
+    return '<b>'+tractLabel(id)+'</b> <span style="color:#5b6473">'+id+'</span><br>'+
+      esc(LABELS[S.indicator])+': <b>'+vs+'</b><br>'+
+      (p ? 'Population: '+fmtNum(p.population) : 'Population: n/a (2010 boundary)');
+  }
+  function restyleAll(){
+    const idx = S.indicator==='LE' ? S.idx2010 : S.idx2020;
+    idx.forEach((lyr,id)=>lyr.setStyle(styleFor(id)));
+    if(S.selectedLayer) S.selectedLayer.bringToFront();
+  }
+
+  async function ensure2010(){
+    if(S.geo2010) return;
+    $('map-loading').style.display='flex'; $('map-loading').textContent='Loading 2010 tract boundaries…';
+    const r=await fetch(DATA+'fulton_tracts_2010.geojson'); if(!r.ok) throw new Error('2010 geojson '+r.status);
+    S.geo2010=await r.json();
+    S.layer2010=buildLayer(S.geo2010,S.idx2010,'2010');
+    $('map-loading').style.display='none';
+  }
+
+  async function setIndicator(ind){
+    S.indicator=ind;
+    computeBreaks(ind);
+    if(ind==='LE'){
+      await ensure2010();
+      if(S.layer2020 && map.hasLayer(S.layer2020)) map.removeLayer(S.layer2020);
+      if(!map.hasLayer(S.layer2010)) S.layer2010.addTo(map);
+      S.selectedLayer = S.selectedId ? (S.idx2010.get(S.selectedId)||null) : null;
+    } else {
+      if(S.layer2010 && map.hasLayer(S.layer2010)) map.removeLayer(S.layer2010);
+      if(!map.hasLayer(S.layer2020)) S.layer2020.addTo(map);
+      S.selectedLayer = S.selectedId ? (S.idx2020.get(S.selectedId)||null) : null;
+    }
+    restyleAll();
+    renderLegend();
+    renderStatus();
+  }
+
+  function renderLegend(){
+    const ind=S.indicator, isLE=ind==='LE';
+    const f = (v)=> isLE ? v.toFixed(1) : v.toFixed(1)+'%';
+    const edges=[S.min,...S.breaks,S.max];
+    const sw=$('legend-swatches'); sw.innerHTML='';
+    for(let i=0;i<5;i++){
+      const d=document.createElement('div'); d.className='sw';
+      d.innerHTML='<i style="background:'+RAMP[i]+'"></i><span>'+f(edges[i])+' – '+f(edges[i+1])+'</span>';
+      sw.appendChild(d);
+    }
+    const better=HIGHER_IS_BETTER.has(ind);
+    const med=median(allValues(ind));
+    $('legend-title').textContent = LABELS[ind]+' · 5 quantile classes'+(isLE?' (years)':' (% of adults)');
+    $('legend-meta').innerHTML =
+      '<span>Darker = higher value. <b>Higher is '+(better?'better':'worse')+'.</b></span>'+
+      '<span>County median of tracts: <b>'+(isLE? med.toFixed(1)+' yrs' : fmtPct(med))+'</b></span>'+
+      '<span class="nodata"><i></i>No estimate</span>'+
+      (isLE ? '<span>USALEEP 2010–2015 · 2010 tract boundaries · '+S.usaleep.size+' of '+S.idx2010.size+' tracts</span>'
+            : '<span>CDC PLACES 2025 · BRFSS 2023 · crude prevalence</span>');
+  }
+  function renderStatus(){
+    const isLE=S.indicator==='LE';
+    $('map-status').textContent = isLE
+      ? '2010 census tracts ('+S.idx2010.size+') · life expectancy for '+S.usaleep.size+' tracts'
+      : '2020 census tracts ('+S.idx2020.size+') · PLACES estimates for '+S.placesById.size+' tracts';
+  }
+
+  // ---------- Profile panel ----------
+  function selectTract(id,lyr,vintage){
+    if(S.selectedLayer && S.selectedLayer!==lyr){ const prev=S.selectedId; S.selectedId=null; S.selectedLayer.setStyle(styleFor(prev)); }
+    S.selectedId=id; S.selectedLayer=lyr;
+    lyr.setStyle(styleFor(id)); lyr.bringToFront();
+    renderPanel(id,vintage);
+  }
+
+  function renderPanel(id,vintage){
+    const panel=$('panel');
+    const p=S.placesById.get(id);
+    const le=S.usaleep.get(id);
+    if(S.chart){ S.chart.destroy(); S.chart=null; }
+
+    let html = '<div class="eyebrow">Tract profile · '+(vintage==='2010'?'2010 boundary':'2020 boundary')+'</div>'+
+      '<h2>'+tractLabel(id)+' <span style="color:#5b6473;font-weight:500;font-size:13px">'+id+'</span></h2>'+
+      '<div class="popline">'+(p ? 'Population '+fmtNum(p.population)+' · adults 18+ '+fmtNum(p.population_18plus) : 'Population not available for 2010 boundaries')+'</div>';
+
+    // (a) life expectancy
+    if(le){
+      html += '<div class="le"><div class="big">'+le.life_expectancy.toFixed(1)+'<small>years</small></div>'+
+        '<div class="txt"><b>Life expectancy at birth</b>2010–2015 estimate, 2010 tract boundaries · ±'+(1.96*le.se).toFixed(1)+' yrs (95% CI) · county range 63.6–87.2</div></div>';
+    } else {
+      html += '<div class="le none"><div class="big">No estimate</div>'+
+        '<div class="txt"><b>Life expectancy at birth</b>No USALEEP estimate for this tract id (2010–2015 estimates use 2010 tract boundaries; this id is new or was suppressed).</div></div>';
+    }
+
+    if(p){
+      // (b) chart
+      html += '<div class="sect"><h3>Key measures vs. county median</h3>'+
+        '<div class="keyrow"><span><i style="background:#0f766e"></i>This tract</span><span><i style="background:#c9c3b8"></i>County median of tracts</span></div>'+
+        '<div class="chartbox"><canvas id="profile-chart" role="img" aria-label="Bar chart of eight measures for this tract versus the county median"></canvas></div></div>';
+      // (c) stands out
+      const diffs = Object.keys(p.measures)
+        .filter(k=>!HIGHER_IS_BETTER.has(k) && typeof p.measures[k]==='number' && typeof S.medians[k]==='number')
+        .map(k=>({k, d:p.measures[k]-S.medians[k], v:p.measures[k]}))
+        .sort((a,b)=>b.d-a.d).slice(0,3);
+      const belowAll = diffs.length && diffs[0].d <= 0;
+      html += '<div class="sect"><h3>What stands out</h3>'+
+        (belowAll ? '<div class="foot-note" style="margin:0 0 6px">This tract is at or below the county median on every measure; the closest three are listed.</div>' : '')+
+        '<ul class="standout">'+
+        diffs.map(x=>'<li><span class="m">'+esc(LABELS[x.k])+'</span><span class="d">'+(x.d>=0?'+':'')+x.d.toFixed(1)+' pts <small>('+fmtPct(x.v)+' vs '+fmtPct(S.medians[x.k])+')</small></span></li>').join('')+
+        '</ul><div class="foot-note">Measures where this tract is furthest above the county median, in percentage points. Model-based estimates from CDC PLACES; differences of a point or two are within modeling uncertainty.</div></div>';
+    } else {
+      html += '<div class="sect"><div class="empty">PLACES measures are keyed to 2020 tract boundaries and this 2010 tract id has no 2020 match. Choose a health or social-needs indicator to profile the current tract covering this area.</div></div>';
+    }
+    panel.innerHTML=html;
+    panel.scrollTop=0;
+
+    if(p){
+      const ctx=$('profile-chart').getContext('2d');
+      const tract=KEY_MEASURES.map(k=>p.measures[k]);
+      const med=KEY_MEASURES.map(k=>S.medians[k]);
+      S.chart=new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels:KEY_MEASURES.map(k=>SHORT[k]),
+          datasets:[
+            {label:'This tract', data:tract, backgroundColor:'#0f766e', borderRadius:3, borderSkipped:'start', barPercentage:.9, categoryPercentage:.72},
+            {label:'County median', data:med, backgroundColor:'#c9c3b8', borderRadius:3, borderSkipped:'start', barPercentage:.9, categoryPercentage:.72}
+          ]
+        },
+        options:{
+          indexAxis:'y', responsive:true, maintainAspectRatio:false, animation:{duration:250},
+          layout:{padding:{right:8}},
+          plugins:{
+            legend:{display:false},
+            tooltip:{
+              backgroundColor:'#14283a', titleFont:{family:'Geist, system-ui', weight:'600'}, bodyFont:{family:'Geist, system-ui'},
+              callbacks:{label:(c)=>' '+c.dataset.label+': '+c.parsed.x.toFixed(1)+'%'}
+            }
+          },
+          scales:{
+            x:{beginAtZero:true, grid:{color:'#eeebe4'}, border:{display:false}, ticks:{font:{family:'Geist, system-ui', size:12}, color:'#5b6473', callback:(v)=>v+'%'}},
+            y:{grid:{display:false}, border:{display:false}, ticks:{font:{family:'Geist, system-ui', size:12}, color:'#1e293b', autoSkip:false}}
+          }
+        }
+      });
+    }
+  }
+
+  // ---------- KPIs ----------
+  function renderKPIs(){
+    const les=Array.from(S.usaleep.values()).map(r=>r.life_expectancy);
+    const lo=Math.min(...les), hi=Math.max(...les);
+    $('kpi-le').innerHTML=(hi-lo).toFixed(1)+'<small>years</small>';
+    $('kpi-le-note').textContent=lo.toFixed(1)+' to '+hi.toFixed(1)+' years · USALEEP 2010–2015, '+les.length+' tracts';
+    $('kpi-tracts').innerHTML=fmtNum(S.places.length)+'<small>of '+S.idx2020.size+' tracts</small>';
+    $('kpi-unins').innerHTML=fmtPct(S.medians.ACCESS2);
+    const food=S.places.filter(r=>typeof r.measures.FOODINSECU==='number' && r.measures.FOODINSECU>20).length;
+    const foodPop=S.places.filter(r=>typeof r.measures.FOODINSECU==='number' && r.measures.FOODINSECU>20).reduce((a,r)=>a+(r.population||0),0);
+    $('kpi-food').innerHTML=fmtNum(food)+'<small>of '+S.places.length+'</small>';
+    $('kpi-food-note').textContent='About '+fmtNum(foodPop)+' residents live in these tracts';
+  }
+
+  // ---------- Boot ----------
+  async function boot(){
+    try{
+      const [places, usaleep, geo] = await Promise.all([
+        fetch(DATA+'places_fulton_tracts.json').then(r=>{ if(!r.ok) throw new Error('places '+r.status); return r.json(); }),
+        fetch(DATA+'usaleep_fulton.json').then(r=>{ if(!r.ok) throw new Error('usaleep '+r.status); return r.json(); }),
+        fetch(DATA+'fulton_tracts.geojson').then(r=>{ if(!r.ok) throw new Error('geojson '+r.status); return r.json(); })
+      ]);
+      S.places=places; places.forEach(r=>S.placesById.set(r.tract,r));
+      usaleep.forEach(r=>S.usaleep.set(r.tract,r));
+      Object.keys(LABELS).filter(k=>k!=='LE').forEach(k=>{ S.medians[k]=median(places.map(r=>r.measures[k])); });
+      S.geo2020=geo;
+      S.layer2020=buildLayer(geo,S.idx2020,'2020');
+      $('map-loading').style.display='none';
+      await setIndicator($('indicator').value);
+      renderKPIs();
+      $('indicator').addEventListener('change',async e=>{
+        try{ await setIndicator(e.target.value); }
+        catch(err){ console.error(err); $('map-status').textContent='Could not load layer: '+err.message; $('map-loading').style.display='none'; }
+      });
+    }catch(err){
+      console.error(err);
+      $('map-loading').innerHTML='<div style="text-align:center;max-width:420px;padding:20px"><b>Could not load data.</b><br><span style="font-size:13px;color:#5b6473">'+esc(err.message)+'. The page expects data files at ../data/ relative to this page.</span></div>';
+      $('map-status').textContent='Data load failed';
+    }
+  }
+  boot();
+})();
+</script>
+</body>
+</html>

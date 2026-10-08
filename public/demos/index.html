@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>FCBOH Demos — What governed data makes possible</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--brand:#14283a;--brand-2:#1f3b52;--accent:#0f766e;--accent-soft:#e3f1ee;--gold:#b7791f;--paper:#f6f4ef;--line:#e4ded3;--ink:#1e293b;--muted:#64748b;--shadow:0 1px 2px rgb(20 40 58/.04),0 8px 24px -12px rgb(20 40 58/.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Geist",ui-sans-serif,system-ui,sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5}
+  .hero{background:radial-gradient(900px 300px at 85% -40%,rgb(15 118 110/.45),transparent 60%),linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;padding:40px 26px 48px}
+  .in{max-width:1100px;margin:0 auto}
+  .crumbs{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.65)}
+  h1{font-size:34px;font-weight:600;letter-spacing:-.02em;margin-top:12px;max-width:800px}
+  .sub{color:rgba(255,255,255,.78);margin-top:10px;max-width:760px;font-size:16px}
+  .demo-pill{display:inline-block;background:#fde68a;color:#78350f;font-weight:600;font-size:11.5px;padding:4px 10px;border-radius:999px;margin-top:16px}
+  .grid{max-width:1100px;margin:-26px auto 0;padding:0 26px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative}
+  a.card{display:block;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px;text-decoration:none;color:inherit;transition:transform .12s,box-shadow .12s;border-top:4px solid var(--c)}
+  a.card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgb(20 40 58/.18)}
+  .k{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600}
+  .card h2{font-size:19px;font-weight:600;letter-spacing:-.01em;margin:6px 0 8px;color:var(--brand)}
+  .card p{color:var(--ink);font-size:14px}
+  .card .data{margin-top:12px;font-size:12px;color:var(--muted)}
+  .card .go{margin-top:14px;font-weight:600;color:var(--accent);font-size:14px}
+  .why{max-width:1100px;margin:34px auto 0;padding:0 26px 50px}
+  .why h3{font-size:18px;font-weight:600;margin-bottom:8px}
+  .why p{max-width:800px;color:var(--ink)}
+  .why ol{margin:12px 0 0 20px;max-width:800px}
+  .why li{margin-bottom:6px}
+  .foot{max-width:1100px;margin:0 auto;padding:0 26px 40px;font-size:12px;color:var(--muted)}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hero"><div class="in">
+  <div class="crumbs">Fulton County Board of Health · Data modernization engagement</div>
+  <h1>What governed data makes possible: three working demos</h1>
+  <div class="sub">Each demo is a working web page, not a slide. They show the kinds of routine products FCBOH could run once it has agreed data definitions, standing data feeds and a review step before publication.</div>
+  <span class="demo-pill">Demos for discussion · October 2026 · not FCBOH products</span>
+</div></div>
+
+<div class="grid">
+  <a class="card" href="clinical/" style="--c:#1f3b52">
+    <div class="k">Demo 1 · Internal</div>
+    <h2>Clinical Services Dashboard</h2>
+    <p>Access, quality, program outcomes and client experience across FCBOH's eight health centers and eleven service lines, filterable by site and service.</p>
+    <div class="data">Structure and names are FCBOH's. All numbers are synthetic.</div>
+    <div class="go">Open the dashboard →</div>
+  </a>
+  <a class="card" href="hiv/" style="--c:#0f766e">
+    <div class="k">Demo 2 · Public</div>
+    <h2>HIV in Fulton County: progress against the EHE goals</h2>
+    <p>Diagnose, treat, prevent, respond. Modeled on Mecklenburg County's CHAMPS site, with Fulton's real indicators against the national 2025 and 2030 goals.</p>
+    <div class="data">Real data: AHEAD (CDC/HHS), AIDSVu (Emory), Georgia DPH.</div>
+    <div class="go">Open the dashboard →</div>
+  </a>
+  <a class="card" href="neighborhoods/" style="--c:#b7791f">
+    <div class="k">Demo 3 · Community Health Assessment</div>
+    <h2>Community Health Profiles by neighborhood</h2>
+    <p>326 census tracts, 18 health and social-need indicators, life expectancy, and FCBOH health center locations on one map. The CHA as a refreshable product.</p>
+    <div class="data">Real data: CDC PLACES 2025, NCHS USALEEP, Census TIGER.</div>
+    <div class="go">Open the map →</div>
+  </a>
+</div>
+
+<div class="why">
+  <h3>Why these three</h3>
+  <p>They cover the three things leadership asked about first: running the clinics, the HIV priority, and the Community Health Assessment that feeds the CHIP and accreditation. Two of the three run on public data today. The clinical dashboard is the one that needs what the engagement is designed to deliver:</p>
+  <ol>
+    <li>Agreed measure definitions and owners (the governance framework, Deliverable 5).</li>
+    <li>A standing, computable extract from the clinical system instead of per-report purchases (Deliverable 2).</li>
+    <li>A place to join clinical, state and community data (the target architecture, Deliverable 5).</li>
+  </ol>
+</div>
+<div class="foot">Prepared by Michael Dulin, MD, PhD for the Fulton County Board of Health. Demo pages use public data or synthetic data only; no FCBOH client information. Hosted on the engagement workspace.</div>
+</body>
+</html>

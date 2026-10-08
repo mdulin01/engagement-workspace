@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Fulton County HIV Data — Ending the HIV Epidemic (Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{--brand:#14283a;--brand-2:#1f3b52;--accent:#0f766e;--accent-soft:#e3f1ee;--gold:#b7791f;--paper:#f6f4ef;--line:#e4ded3;--ink:#1e293b;--muted:#64748b;
+    --diag:#1f3b52;--treat:#0f766e;--prev:#6b5b95;--resp:#b7791f;--shadow:0 1px 2px rgb(20 40 58/.04),0 8px 24px -12px rgb(20 40 58/.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Geist",ui-sans-serif,system-ui,sans-serif;background:var(--paper);color:var(--ink);font-size:14px;line-height:1.45}
+  .num{font-variant-numeric:tabular-nums}
+  a{color:var(--accent)}
+  .hero{background:radial-gradient(900px 300px at 85% -40%,rgb(15 118 110/.45),transparent 60%),linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;padding:22px 26px 26px}
+  .hero-in{max-width:1400px;margin:0 auto}
+  .crumbs{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.65);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .demo-pill{display:inline-block;background:#fde68a;color:#78350f;font-weight:600;font-size:11px;padding:3px 9px;border-radius:999px;letter-spacing:.02em;text-transform:none}
+  h1{font-size:30px;font-weight:600;letter-spacing:-.02em;margin-top:10px}
+  .sub{color:rgba(255,255,255,.75);margin-top:4px;max-width:900px}
+  .tabs{max-width:1400px;margin:-18px auto 0;padding:0 26px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;position:relative;z-index:2}
+  .tab{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;cursor:pointer;border-top:4px solid var(--line);transition:transform .12s}
+  .tab:hover{transform:translateY(-2px)}
+  .tab.active{box-shadow:0 0 0 2px var(--brand) inset,var(--shadow)}
+  .tab .tl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+  .tab .tv{font-size:26px;font-weight:600;letter-spacing:-.02em;margin-top:6px}
+  .tab .tv small{font-size:12px;color:var(--muted);font-weight:500;margin-left:4px}
+  .tab .td{font-size:12px;color:var(--muted);margin-top:2px}
+  .wrap{max-width:1400px;margin:0 auto;padding:22px 26px 40px}
+  section.hide{display:none}
+  .q{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:6px 0 4px}
+  .q-sub{color:var(--muted);margin-bottom:14px;max-width:900px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:1.4fr 1fr}
+  .g3{grid-template-columns:1fr 1fr 1fr}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px}
+  .card h3{font-size:14px;font-weight:600}
+  .card .hint{font-size:12px;color:var(--muted);margin:2px 0 10px}
+  .chart-box{position:relative;height:280px}
+  .goal{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .goal .big{font-size:40px;font-weight:600;letter-spacing:-.03em}
+  .goal .g{font-size:13px;color:var(--muted)}
+  .meter{height:10px;border-radius:999px;background:#eef2f5;overflow:hidden;margin:6px 0 4px;position:relative}
+  .meter i{display:block;height:100%;background:var(--accent);border-radius:999px}
+  .meter b{position:absolute;top:-3px;width:2px;height:16px;background:var(--gold)}
+  .cont{display:flex;gap:6px;align-items:flex-end;height:220px;padding-top:10px}
+  .cont .step{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+  .cont .bar{width:100%;border-radius:8px 8px 0 0;background:var(--accent);display:flex;align-items:flex-start;justify-content:center;color:#fff;font-weight:600;padding-top:8px;font-size:15px}
+  .cont .lab{font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.3;height:34px}
+  .note{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .src{max-width:1400px;margin:0 auto;padding:0 26px 30px;font-size:11.5px;color:var(--muted);line-height:1.7}
+  .plan{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .plan .card b{display:block;font-size:13px;margin-bottom:4px;color:var(--brand)}
+  .plan .card{font-size:13px;color:var(--ink)}
+  .ribbon{background:var(--accent-soft);border:1px solid #cfe6e0;color:#0b4f4a;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:16px}
+  @media (max-width:1000px){.tabs,.plan{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="hero"><div class="hero-in">
+  <div class="crumbs"><span>Fulton County Board of Health</span><span>·</span><span>Ending the HIV Epidemic</span><span class="demo-pill">DEMO · built from public data (AHEAD, AIDSVu, Georgia DPH)</span></div>
+  <h1>HIV in Fulton County: where we stand against the EHE goals</h1>
+  <div class="sub">Modeled on Mecklenburg County's CHAMPS site: one page per plan goal (diagnose, treat, prevent, respond), each answering a plain question with the county's own numbers. Everything below is real, published Fulton County data; a live version would add FCBOH program data and refresh automatically.</div>
+</div></div>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="wrap">
+  <div class="ribbon" id="ribbon"></div>
+
+  <section data-tab="diagnose">
+    <div class="q">How many people are newly diagnosed with HIV each year?</div>
+    <div class="q-sub">The EHE goal is a 75% reduction in new infections by 2025 and 90% by 2030 from the 2017 baseline. Fulton's diagnoses have fallen, but not at that pace.</div>
+    <div class="grid g2">
+      <div class="card"><h3>New HIV diagnoses by year, ages 13+</h3><div class="hint">Count · AHEAD goals shown as dashed lines (2025: 155, 2030: 62)</div><div class="chart-box"><canvas id="cDx"></canvas></div><div class="note" id="nDx"></div></div>
+      <div class="card"><h3>Who is being diagnosed (2024)</h3><div class="hint">Rate per 100,000 by race/ethnicity, AHEAD</div><div class="chart-box"><canvas id="cDxRace"></canvas></div></div>
+    </div>
+    <div class="grid g3" style="margin-top:14px">
+      <div class="card"><h3>Knowledge of HIV status</h3><div class="hint">Share of people with HIV who know it · goal 95%</div><div id="kKnow"></div></div>
+      <div class="card"><h3>Estimated new infections (incidence)</h3><div class="hint">Rate per 100,000 with 95% CI (shaded) · AHEAD</div><div class="chart-box" style="height:200px"><canvas id="cInc"></canvas></div></div>
+      <div class="card"><h3>Late diagnoses</h3><div class="hint">AIDS within 12 months of HIV diagnosis · Georgia DPH</div><div class="chart-box" style="height:200px"><canvas id="cLate"></canvas></div></div>
+    </div>
+  </section>
+
+  <section data-tab="treat" class="hide">
+    <div class="q">How quickly do people start care, and how many reach viral suppression?</div>
+    <div class="q-sub">People with HIV who are virally suppressed stay healthy and cannot transmit HIV sexually. Linkage within one month and suppression are the two treatment indicators in the national plan.</div>
+    <div class="grid g2">
+      <div class="card"><h3>Linkage to care within 1 month and viral suppression</h3><div class="hint">Percent · goal 95% for both</div><div class="chart-box"><canvas id="cTreat"></canvas></div></div>
+      <div class="card"><h3>Viral suppression by race/ethnicity (2024)</h3><div class="hint">Percent of people with diagnosed HIV · AHEAD · groups under 50 people omitted</div><div class="chart-box"><canvas id="cVSRace"></canvas></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="card"><h3>HIV care continuum, Fulton EHE jurisdiction (2019)</h3><div class="hint">Georgia DPH Integrated Epidemiologic Profile · people diagnosed before 2019 and alive at end of 2019</div><div class="cont" id="cont"></div><div class="note">Of those retained in care, 88.9% were suppressed. The gap is in getting people into and keeping them in care, not in treatment effectiveness. Georgia DPH has not published a Fulton-level continuum for later years; a live dashboard would draw this from SendSS under a data-sharing agreement.</div></div>
+      <div class="card"><h3>Viral suppression by sex and age (2024)</h3><div class="hint">Percent · AHEAD</div><div class="chart-box"><canvas id="cVSAge"></canvas></div></div>
+    </div>
+  </section>
+
+  <section data-tab="prevent" class="hide">
+    <div class="q">Are the people who could benefit from PrEP getting it?</div>
+    <div class="q-sub">PrEP coverage is the share of people with indications for PrEP who were prescribed it. The national goal is 50% by 2025.</div>
+    <div class="grid g2">
+      <div class="card"><h3>PrEP coverage by year</h3><div class="hint">Percent · AHEAD · 2019 onward preliminary; 2023 through June only</div><div class="chart-box"><canvas id="cPrep"></canvas></div></div>
+      <div class="card"><h3>PrEP users and PrEP-to-need ratio</h3><div class="hint">AIDSVu · users per 100,000 and users per new diagnosis</div><div id="kPrep"></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="card"><h3>PrEP coverage by race/ethnicity (latest year)</h3><div class="hint">Percent · AHEAD</div><div class="chart-box"><canvas id="cPrepRace"></canvas></div></div>
+      <div class="card"><h3>People living with diagnosed HIV, rate by group (2024)</h3><div class="hint">Per 100,000 · AIDSVu · where prevalence is highest, prevention and treatment matter most</div><div class="chart-box"><canvas id="cPrev"></canvas></div></div>
+    </div>
+  </section>
+
+  <section data-tab="respond" class="hide">
+    <div class="q">What would it take to close the gap, and how would FCBOH track it?</div>
+    <div class="q-sub">A public page like this one is a product of governed data: agreed definitions, standing feeds, and a review step before publication. The plan below is illustrative.</div>
+    <div class="plan">
+      <div class="card"><b>1. Agree the indicator set</b>The six AHEAD indicators plus FCBOH program measures (Rapid Entry within 7 days, PrEP starts, retention) with written definitions and owners.</div>
+      <div class="card"><b>2. Secure the feeds</b>Data-sharing agreement with Georgia DPH for Fulton line-level SendSS data; a standing extract from FCBOH's clinical system; AIDSVu and AHEAD by API.</div>
+      <div class="card"><b>3. Publish on a cadence</b>Quarterly public refresh with a review by epidemiology and the data governance council; monthly internal view for program managers.</div>
+      <div class="card"><b>4. Connect to action</b>Fulton County's Department for HIV Elimination (Ryan White Part A, EHE) and FCBOH clinics use the same numbers to target Rapid Entry, PrEP navigation and re-engagement.</div>
+    </div>
+    <div class="card" style="margin-top:14px"><h3>What this page cannot yet show</h3><div class="note" style="font-size:13px;color:var(--ink)">Retention in care and a current care continuum (county-level data not public since 2019); outcomes by neighborhood; FCBOH program performance such as Rapid Entry timeliness; and PrEP coverage after mid-2023. Each is available to FCBOH through its own systems or a DPH agreement, which is why the governance and data-access work comes first.</div></div>
+  </section>
+</div>
+
+<div class="src">
+  <b>Sources.</b> <a href="https://ahead.hiv.gov/georgia/fulton_county/">AHEAD: America's HIV Epidemic Analysis Dashboard, Fulton County</a> (data updated August 17, 2026; indicator definitions and goals from AHEAD) ·
+  <a href="https://map.aidsvu.org/profiles/county/13121/overview">AIDSVu county profile, Fulton County</a> (Emory University Rollins School of Public Health) ·
+  Georgia DPH <a href="https://dph.georgia.gov/document/document/hivepi2024gahivsurveillancesummary202604pdf/download">HIV Surveillance Summary 2024</a> and <a href="https://dph.georgia.gov/document/document/integrated-hiv-epidemiologic-profile-georgia-2021/download">Integrated HIV Epidemiologic Profile 2021</a> (values transcribed from PDFs).
+  Different sources use slightly different definitions and populations; small differences between them are expected. Demo prepared by Michael Dulin, MD, PhD for discussion with FCBOH leadership; not an FCBOH publication.
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const INK = "#14283a", TEAL = "#0f766e", GOLD = "#b7791f", PURPLE = "#6b5b95", GRAY = "#cbd5e1";
+Chart.defaults.font.family = '"Geist", ui-sans-serif, system-ui, sans-serif'; Chart.defaults.color = "#64748b";
+const quiet = { grid: { color: "#eef2f5" }, border: { display: false } };
+const charts = {}; const chart = (id, cfg) => { if (charts[id]) charts[id].destroy(); charts[id] = new Chart($("#" + id), cfg); };
+const by = (rows, ind) => rows.filter((r) => r.indicator === ind).sort((a, b) => a.year - b.year);
+
+Promise.all(["ahead_fulton.json", "ahead_fulton_stratified.json", "aidsvu_fulton.json", "gadph_hiv_fulton.json"].map((f) => fetch("../data/" + f).then((r) => r.json()))).then(([A, S, V, G]) => {
+  const dx = by(A, "New HIV diagnoses").filter((r) => !/partial/.test(r.data_status));
+  const link = by(A, "Linkage to HIV medical care within 1 month");
+  const vs = by(A, "HIV viral suppression");
+  const prep = by(A, "PrEP coverage");
+  const inc = by(A, "Estimated HIV incidence");
+  const know = by(A, "Knowledge of HIV status");
+  const lastFinal = (arr) => arr.filter((r) => /final/.test(r.data_status)).at(-1);
+  const dxF = lastFinal(dx), vsF = vs.at(-1), linkF = lastFinal(link), prepF = prep.filter((r) => r.year === 2022)[0], knowF = know.at(-1);
+  const plwh = V.find((r) => r.indicator.startsWith("People living") && r.value_type === "rate" && r.strat_type === "all" && r.year === 2024);
+  const plwhN = G.new_diagnoses_and_plwh_by_year.at(-1);
+
+  // ---- tabs
+  const TABS = [
+    { id: "diagnose", l: "Diagnose", c: "var(--diag)", v: dxF.value.toLocaleString(), u: `new diagnoses, ${dxF.year}`, d: `goal ${dxF.goal2025} by 2025` },
+    { id: "treat", l: "Treat", c: "var(--treat)", v: vsF.value + "%", u: `virally suppressed, ${vsF.year}`, d: "goal 95%" },
+    { id: "prevent", l: "Prevent", c: "var(--prev)", v: prepF.value + "%", u: `PrEP coverage, ${prepF.year}`, d: "goal 50%" },
+    { id: "respond", l: "Respond", c: "var(--resp)", v: plwhN.plwh.toLocaleString(), u: `people living with HIV, ${plwhN.year}`, d: `${plwh ? plwh.value.toLocaleString() : ""} per 100,000` },
+  ];
+  let active = "diagnose";
+  function renderTabs() {
+    $("#tabs").innerHTML = TABS.map((t) => `<div class="tab ${t.id === active ? "active" : ""}" data-id="${t.id}" style="border-top-color:${t.c}"><div class="tl">${t.l}</div><div class="tv num">${t.v}<small>${t.u}</small></div><div class="td">${t.d}</div></div>`).join("");
+    document.querySelectorAll(".tab").forEach((el) => el.addEventListener("click", () => { active = el.dataset.id; document.querySelectorAll("section[data-tab]").forEach((s) => s.classList.toggle("hide", s.dataset.tab !== active)); renderTabs(); }));
+  }
+  renderTabs();
+  const base = dx[0];
+  $("#ribbon").innerHTML = `<b>Headline.</b> New diagnoses in Fulton fell from <b>${base.value}</b> in ${base.year} to <b>${dxF.value}</b> in ${dxF.year} (${Math.round((1 - dxF.value / base.value) * 100)}% lower; Georgia DPH reports a significant average decline of 5.3% a year in the rate). The 2025 goal was ${dxF.goal2025}. Viral suppression reached <b>${vsF.value}%</b> against a 95% goal, and linkage within a month was <b>${linkF.value}%</b>. The arithmetic is plain: Fulton is improving on every indicator and is far from every goal.`;
+
+  // ---- diagnose
+  chart("cDx", { type: "bar", data: { labels: dx.map((r) => r.year + (/prelim/.test(r.data_status) ? "*" : "")), datasets: [
+    { label: "New diagnoses", data: dx.map((r) => r.value), backgroundColor: dx.map((r) => /prelim/.test(r.data_status) ? GRAY : INK), borderRadius: 4 },
+    { label: "2025 goal (155)", type: "line", data: dx.map(() => 155), borderColor: GOLD, borderDash: [5, 4], pointRadius: 0 },
+    { label: "2030 goal (62)", type: "line", data: dx.map(() => 62), borderColor: TEAL, borderDash: [5, 4], pointRadius: 0 },
+  ] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true } } } });
+  $("#nDx").textContent = "* 2025 is preliminary (reporting not complete). Rates per 100,000 ages 13+: " + dx.filter((r) => r.rate_per_100k).map((r) => `${r.year} ${r.rate_per_100k}`).join(" · ");
+  const race24 = S.filter((r) => r.indicator === "New HIV diagnoses" && r.strat_type === "race" && r.year === 2024 && r.denominator_or_population > 5000).sort((a, b) => b.rate - a.rate);
+  chart("cDxRace", { type: "bar", data: { labels: race24.map((r) => r.group), datasets: [{ data: race24.map((r) => r.rate), backgroundColor: INK, borderRadius: 4 }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw} per 100,000 (${race24[c.dataIndex].numerator_or_cases} diagnoses)` } } }, scales: { x: { ...quiet, beginAtZero: true, title: { display: true, text: "per 100,000" } }, y: { grid: { display: false }, border: { display: false } } } } });
+  $("#kKnow").innerHTML = `<div class="goal"><span class="big num">${knowF.value}%</span><span class="g">${knowF.year} · goal 95%</span></div><div class="meter"><i style="width:${knowF.value}%"></i><b style="left:95%"></b></div><div class="note">${know[0].year}: ${know[0].value}% → ${knowF.year}: ${knowF.value}%. Modeled estimate (95% CI ${knowF.lci}–${knowF.uci}).</div>`;
+  chart("cInc", { type: "line", data: { labels: inc.map((r) => r.year), datasets: [{ label: "Rate per 100,000", data: inc.map((r) => r.rate_per_100k), borderColor: INK, backgroundColor: INK, tension: .3 }, { label: "95% CI", data: inc.map((r) => r.uci), borderColor: "transparent", backgroundColor: "rgba(20,40,58,.10)", fill: "+1", pointRadius: 0, tension: .3 }, { label: "", data: inc.map((r) => r.lci), borderColor: "transparent", pointRadius: 0, tension: .3 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => c.datasetIndex === 0 ? `${c.raw} per 100,000 (about ${inc[c.dataIndex].value} infections; 95% CI ${inc[c.dataIndex].lci}–${inc[c.dataIndex].uci})` : null } } }, scales: { x: quiet, y: { ...quiet, beginAtZero: true, title: { display: true, text: "per 100,000" } } } } });
+  const late = G.new_diagnoses_and_plwh_by_year;
+  chart("cLate", { type: "bar", data: { labels: late.map((r) => r.year), datasets: [{ data: late.map((r) => r.late_diagnosis_pct_of_diagnoses), backgroundColor: PURPLE, borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw}% (${late[c.dataIndex].late_diagnoses} people)` } } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true, title: { display: true, text: "% of diagnoses" } } } } });
+
+  // ---- treat
+  const yrs = vs.map((r) => r.year);
+  chart("cTreat", { type: "line", data: { labels: link.map((r) => r.year + (/prelim/.test(r.data_status) ? "*" : "")), datasets: [
+    { label: "Linked to care within 1 month", data: link.map((r) => r.value), borderColor: INK, backgroundColor: INK, tension: .3 },
+    { label: "Virally suppressed", data: link.map((r) => (vs.find((v) => v.year === r.year) || {}).value ?? null), borderColor: TEAL, backgroundColor: TEAL, tension: .3 },
+    { label: "Goal 95%", data: link.map(() => 95), borderColor: GOLD, borderDash: [5, 4], pointRadius: 0 },
+  ] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: quiet, y: { ...quiet, min: 40, max: 100 } } } });
+  const vsRace = S.filter((r) => r.indicator === "HIV viral suppression" && r.strat_type === "race" && r.year === 2024 && r.denominator_or_population >= 50).sort((a, b) => b.value - a.value);
+  chart("cVSRace", { type: "bar", data: { labels: vsRace.map((r) => r.group), datasets: [{ data: vsRace.map((r) => r.value), backgroundColor: vsRace.map((r) => r.group.startsWith("Black") ? INK : TEAL), borderRadius: 4 }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw}% of ${vsRace[c.dataIndex].denominator_or_population.toLocaleString()} people` } } }, scales: { x: { ...quiet, min: 0, max: 100 }, y: { grid: { display: false }, border: { display: false } } } } });
+  const cc = G.care_continuum_2019_ehe_jurisdiction;
+  const steps = [["People with diagnosed HIV", 100, cc.plwh_denominator], ["Engaged in any care", cc.engaged_in_any_care.pct, cc.engaged_in_any_care.n], ["Retained in care", cc.retained_in_care.pct, cc.retained_in_care.n], ["Virally suppressed", cc.virally_suppressed.pct, cc.virally_suppressed.n]];
+  $("#cont").innerHTML = steps.map((s, i) => `<div class="step"><div class="bar num" style="height:${s[1] * 1.7}px;background:${i === 0 ? INK : TEAL};opacity:${i === 0 ? 1 : .75 + i * .08}">${s[1]}%</div><div class="lab">${s[0]}<br><span class="num">${s[2].toLocaleString()}</span></div></div>`).join("");
+  const vsSexAge = S.filter((r) => r.indicator === "HIV viral suppression" && r.year === 2024 && (r.strat_type === "sex" || r.strat_type === "age"));
+  chart("cVSAge", { type: "bar", data: { labels: vsSexAge.map((r) => r.group), datasets: [{ data: vsSexAge.map((r) => r.value), backgroundColor: vsSexAge.map((r) => r.strat_type === "sex" ? INK : TEAL), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, min: 0, max: 100 } } } });
+
+  // ---- prevent
+  chart("cPrep", { type: "bar", data: { labels: prep.map((r) => r.year + (/prelim/.test(r.data_status) ? "*" : "")), datasets: [{ label: "PrEP coverage", data: prep.map((r) => r.value), backgroundColor: prep.map((r) => /partial/.test(r.data_status) ? GRAY : PURPLE), borderRadius: 4 }, { label: "Goal 50%", type: "line", data: prep.map(() => 50), borderColor: GOLD, borderDash: [5, 4], pointRadius: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, min: 0, max: 60 } } } });
+  const pu = V.filter((r) => r.indicator === "PrEP users" && r.strat_type === "all" && r.value_type === "rate").sort((a, b) => a.year - b.year);
+  const pnr = V.filter((r) => r.indicator === "PrEP-to-Need Ratio" && r.strat_type === "all").sort((a, b) => a.year - b.year);
+  const puL = pu.at(-1), pnrL = pnr.at(-1), pu5 = pu.find((r) => r.year === puL.year - 5);
+  $("#kPrep").innerHTML = `<div class="goal"><span class="big num">${puL.value.toLocaleString()}</span><span class="g">PrEP users per 100,000, ${puL.year}${pu5 ? ` · ${pu5.year}: ${pu5.value.toLocaleString()}` : ""}</span></div><div class="goal"><span class="big num">${pnrL.value}</span><span class="g">PrEP-to-need ratio, ${pnrL.year} (PrEP users per new diagnosis)</span></div><div class="note">A higher PrEP-to-need ratio means more prevention relative to the burden of new infections. AIDSVu counts PrEP users from prescription data; AHEAD's coverage measure uses estimated indications as the denominator, so the two are not directly comparable.</div>`;
+  const prepYear = Math.max(...S.filter((r) => r.indicator === "PrEP coverage" && r.strat_type === "race" && !/partial/.test(r.data_status)).map((r) => r.year));
+  const prepRace = S.filter((r) => r.indicator === "PrEP coverage" && r.strat_type === "race" && r.year === prepYear && r.value != null && ["Black/African American", "Hispanic/Latino", "White", "Asian", "Multiracial"].includes(r.group)).sort((a, b) => b.value - a.value);
+  chart("cPrepRace", { type: "bar", data: { labels: prepRace.map((r) => r.group), datasets: [{ data: prepRace.map((r) => r.value), backgroundColor: PURPLE, borderRadius: 4 }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: String(prepYear), align: "end", font: { size: 11 } } }, scales: { x: { ...quiet, min: 0, max: 100 }, y: { grid: { display: false }, border: { display: false } } } } });
+  const prevG = V.filter((r) => r.indicator.startsWith("People living") && r.value_type === "rate" && r.year === 2024 && (r.strat_type === "sex" || (r.strat_type === "race" && ["Black/African American", "Hispanic/Latino", "White", "Asian"].includes(r.group))));
+  chart("cPrev", { type: "bar", data: { labels: prevG.map((r) => r.group), datasets: [{ data: prevG.map((r) => r.value), backgroundColor: prevG.map((r) => r.strat_type === "sex" ? INK : TEAL), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true, title: { display: true, text: "per 100,000" } } } } });
+}).catch((e) => { $("#ribbon").textContent = "Could not load data: " + e.message; });
+</script>
+</body>
+</html>

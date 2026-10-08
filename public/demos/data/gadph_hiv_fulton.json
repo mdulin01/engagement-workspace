@@ -1,0 +1,80 @@
+{
+ "jurisdiction": "Fulton County, GA (Georgia Public Health District 3-2; district = county)",
+ "transcribed": true,
+ "note": "All values transcribed from Georgia DPH HIV Epidemiology PDFs (no machine-readable download). Surveillance Summary county tables count people of ALL ages; the annual Fact Sheet district tables count ages 13+ (hence 479 vs 481 for 2024). Rates are per 100,000 population. 'Late diagnosis' = stage 3 (AIDS) within 12 months of HIV diagnosis.",
+ "sources": {
+  "summary_2024": "https://dph.georgia.gov/document/document/hivepi2024gahivsurveillancesummary202604pdf/download",
+  "summary_2023": "https://dph.georgia.gov/document/document/hivepisurveillancesummaryga202320250323pdf/download",
+  "summary_2022": "https://dph.georgia.gov/document/document/hivepi2022hivsurveillancesummary20240318pdf/download",
+  "summary_2021": "https://dph.georgia.gov/document/document/hivepi2021gahivsurveillancesummary20231207fixed-errorpdf/download",
+  "summary_2020": "https://dph.georgia.gov/document/document/hivepi2020gahivsurveillancesummary120723fixed-errorpdf/download",
+  "summary_2019": "https://dph.georgia.gov/document/document/hivepi2019gahivsurveillancesummary12072023fixed-errorpdf/download",
+  "factsheet_2024": "https://dph.georgia.gov/document/document/hiv-epi-2024-surveillance-factsheet/download",
+  "factsheet_2023": "https://dph.georgia.gov/document/document/hivepi2023surveillancefactsheet06102025pdf/download",
+  "integrated_profile_2021": "https://dph.georgia.gov/document/document/integrated-hiv-epidemiologic-profile-georgia-2021/download",
+  "landing_page": "https://dph.georgia.gov/epidemiology/hiv-epidemiology-unit/hiv-case-surveillance-and-care-continuum"
+ },
+ "new_diagnoses_and_plwh_by_year": [
+  {"year": 2019, "new_diagnoses": 557, "new_diagnoses_rate_per_100k": 52.4, "plwh": 16120, "plwh_rate_per_100k": 1515.1, "late_diagnoses": 95, "late_diagnosis_pct_of_diagnoses": 17.1, "source": "summary_2019", "transcribed": true},
+  {"year": 2020, "new_diagnoses": 481, "new_diagnoses_rate_per_100k": 44.6, "plwh": 16377, "plwh_rate_per_100k": 1520.0, "late_diagnoses": 92, "late_diagnosis_pct_of_diagnoses": 19.1, "source": "summary_2020", "transcribed": true},
+  {"year": 2021, "new_diagnoses": 537, "new_diagnoses_rate_per_100k": 50.4, "plwh": 16667, "plwh_rate_per_100k": 1564.5, "late_diagnoses": 106, "late_diagnosis_pct_of_diagnoses": 19.7, "source": "summary_2021", "transcribed": true},
+  {"year": 2022, "new_diagnoses": 526, "new_diagnoses_rate_per_100k": 48.9, "plwh": 16975, "plwh_rate_per_100k": 1579.6, "late_diagnoses": 111, "late_diagnosis_pct_of_diagnoses": 21.1, "source": "summary_2022", "transcribed": true},
+  {"year": 2023, "new_diagnoses": 466, "new_diagnoses_rate_per_100k": 43.2, "plwh": 16920, "plwh_rate_per_100k": 1568.0, "late_diagnoses": 69, "late_diagnosis_pct_of_diagnoses": 14.8, "source": "summary_2023", "transcribed": true},
+  {"year": 2024, "new_diagnoses": 481, "new_diagnoses_rate_per_100k": 44.1, "plwh": 17441, "plwh_rate_per_100k": 1599.6, "late_diagnoses": 66, "late_diagnosis_pct_of_diagnoses": 13.7, "source": "summary_2024", "transcribed": true}
+ ],
+ "factsheet_district_3_2_ages13plus": [
+  {"year": 2023, "new_diagnoses_13plus": 466, "rate_per_100k": 50.5, "avg_annual_pct_change_in_rate_2014_2023": -5.2, "significant_decrease": true, "source": "factsheet_2023", "transcribed": true},
+  {"year": 2024, "new_diagnoses_13plus": 479, "rate_per_100k": 51.3, "avg_annual_pct_change_in_rate_2015_2024": -5.3, "significant_decrease": true, "source": "factsheet_2024", "transcribed": true}
+ ],
+ "demographics_2024": {
+  "source": "summary_2024 Table 19 (District 3-2 Fulton), all ages",
+  "transcribed": true,
+  "new_diagnoses_total": 481,
+  "plwh_total": 17441,
+  "birth_sex": {"Male": {"dx": 389, "dx_pct": 80.9, "plwh": 14852, "plwh_pct": 85.2}, "Female": {"dx": 92, "dx_pct": 19.1, "plwh": 2574, "plwh_pct": 14.8}},
+  "gender_identity": {"Cisgender men": {"dx": 374, "dx_pct": 77.8, "plwh": 14512, "plwh_pct": 83.2}, "Cisgender women": {"dx": 91, "dx_pct": 18.9, "plwh": 2564, "plwh_pct": 14.7}, "Transgender/additional gender identity": {"dx": 16, "dx_pct": 3.3, "plwh": 350, "plwh_pct": 2.0}},
+  "race_ethnicity": {
+   "Black/African American, non-Hispanic": {"dx": 350, "dx_pct": 72.8, "plwh": 12626, "plwh_pct": 72.4},
+   "White, non-Hispanic": {"dx": 55, "dx_pct": 11.4, "plwh": 2318, "plwh_pct": 13.3},
+   "Hispanic/Latino": {"dx": 52, "dx_pct": 10.8, "plwh": 1218, "plwh_pct": 7.0},
+   "Asian": {"dx": 5, "dx_pct": 1.0, "plwh": 62, "plwh_pct": 0.4},
+   "American Indian/Alaska Native": {"dx": "<5", "plwh": 8, "plwh_pct": 0.0},
+   "Native Hawaiian/Pacific Islander": {"dx": 0, "dx_pct": 0.0, "plwh": "<5"},
+   "Multiple races": {"dx": 16, "dx_pct": 3.3, "plwh": 1044, "plwh_pct": 6.0}
+  },
+  "age_group": {
+   "<13": {"dx": "<5", "plwh": 12, "plwh_pct": 0.1}, "13-17": {"dx": "<5", "plwh": 14, "plwh_pct": 0.1},
+   "18-24": {"dx": 85, "dx_pct": 17.7, "plwh": 381, "plwh_pct": 2.2}, "25-34": {"dx": 196, "dx_pct": 40.7, "plwh": 3251, "plwh_pct": 18.6},
+   "35-44": {"dx": 112, "dx_pct": 23.3, "plwh": 4630, "plwh_pct": 26.5}, "45-54": {"dx": 44, "dx_pct": 9.1, "plwh": 3385, "plwh_pct": 19.4},
+   "55-64": {"dx": 26, "dx_pct": 5.4, "plwh": 3726, "plwh_pct": 21.4}, "65+": {"dx": 14, "dx_pct": 2.9, "plwh": 2041, "plwh_pct": 11.7}
+  },
+  "transmission_category_adjusted": {
+   "Male-to-male sexual contact": {"dx": 318, "dx_pct": 66.2, "plwh": 12748, "plwh_pct": 73.1},
+   "Heterosexual contact": {"dx": 140, "dx_pct": 29.1, "plwh": 2986, "plwh_pct": 17.1},
+   "Injection drug use": {"dx": 10, "dx_pct": 2.2, "plwh": 690, "plwh_pct": 4.0},
+   "MMSC and IDU": {"dx": 8, "dx_pct": 1.7, "plwh": 738, "plwh_pct": 4.2},
+   "Adult other": {"dx": 0, "plwh": 109, "plwh_pct": 0.6},
+   "Perinatal/other pediatric": {"dx": "<5", "plwh": 10, "plwh_pct": 0.1},
+   "No risk identified/reported": {"dx": "<5", "plwh": 160, "plwh_pct": 0.9}
+  }
+ },
+ "care_continuum_2019_ehe_jurisdiction": {
+  "source": "integrated_profile_2021, Appendix B Tables 11-14 (HIV care continuum by Georgia EHE jurisdiction, 2019); denominator = PLWH diagnosed before 2019 and alive at end of 2019",
+  "transcribed": true,
+  "year": 2019,
+  "plwh_denominator": 15631,
+  "engaged_in_any_care": {"n": 10755, "pct": 68.8},
+  "retained_in_care": {"n": 8225, "pct": 52.6},
+  "virally_suppressed": {"n": 8992, "pct": 57.5},
+  "virally_suppressed_among_retained": {"n": 7312, "pct": 88.9},
+  "virally_suppressed_by_group": {"Male": 58.6, "Female": 52.2, "Transgender": 58.0, "White": 65.0, "Black/African American": 55.8, "Hispanic/Latino": 57.9},
+  "comparison_other_ehe_counties_viral_suppression_pct": {"DeKalb": 60.9, "Cobb": 61.5, "Gwinnett": 64.2},
+  "linkage_to_care_note": "GA DPH reports linkage to care within 30 days only statewide / Atlanta EMA vs non-EMA (2019: Georgia males 83%, females 80%; EMA ~85%), not for Fulton County alone. Fulton-specific linkage comes from AHEAD (ahead_fulton.json)."
+ },
+ "georgia_statewide_context": {
+  "source": "factsheet_2023 and factsheet_2024",
+  "transcribed": true,
+  "new_diagnoses_2023": 2442, "new_diagnoses_2024": 2478, "plwh_2023": 65195,
+  "care_continuum_2023_statewide": {"linkage_to_care_pct": 81, "engaged_in_care_pct": 74, "retained_in_care_pct": 56, "viral_suppression_pct": 63, "viral_suppression_among_retained_pct": 91}
+ }
+}

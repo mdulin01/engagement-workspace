@@ -1,0 +1,1298 @@
+[
+ {
+  "tract": "13121000100",
+  "life_expectancy": 80.2,
+  "se": 1.6983,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121000200",
+  "life_expectancy": 82.4,
+  "se": 1.7217,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121000400",
+  "life_expectancy": 84.6,
+  "se": 3.8116,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121001201",
+  "life_expectancy": 79.0,
+  "se": 2.6509,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121001300",
+  "life_expectancy": 82.8,
+  "se": 2.8771,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121001500",
+  "life_expectancy": 74.7,
+  "se": 3.3885,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121001700",
+  "life_expectancy": 77.6,
+  "se": 1.7952,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121001800",
+  "life_expectancy": 73.7,
+  "se": 1.6706,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121002300",
+  "life_expectancy": 63.6,
+  "se": 2.1652,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121002400",
+  "life_expectancy": 72.2,
+  "se": 1.7362,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121002500",
+  "life_expectancy": 72.2,
+  "se": 2.6913,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121002900",
+  "life_expectancy": 80.5,
+  "se": 2.5128,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121003100",
+  "life_expectancy": 73.3,
+  "se": 1.9114,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121003600",
+  "life_expectancy": 74.6,
+  "se": 3.0509,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121003900",
+  "life_expectancy": 71.8,
+  "se": 2.3438,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121004000",
+  "life_expectancy": 71.7,
+  "se": 1.931,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121004100",
+  "life_expectancy": 71.2,
+  "se": 2.0578,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121004200",
+  "life_expectancy": 74.3,
+  "se": 2.7383,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121004400",
+  "life_expectancy": 73.1,
+  "se": 3.7823,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121005000",
+  "life_expectancy": 80.3,
+  "se": 1.7445,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121005200",
+  "life_expectancy": 79.9,
+  "se": 2.3158,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121005300",
+  "life_expectancy": 79.9,
+  "se": 2.0944,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121005501",
+  "life_expectancy": 74.1,
+  "se": 1.5269,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121005502",
+  "life_expectancy": 71.6,
+  "se": 1.8592,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121005700",
+  "life_expectancy": 71.6,
+  "se": 2.5631,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121005800",
+  "life_expectancy": 73.4,
+  "se": 2.9598,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006000",
+  "life_expectancy": 71.4,
+  "se": 1.645,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006100",
+  "life_expectancy": 72.0,
+  "se": 1.5621,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006200",
+  "life_expectancy": 73.5,
+  "se": 2.9671,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006300",
+  "life_expectancy": 67.9,
+  "se": 2.2729,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006500",
+  "life_expectancy": 75.3,
+  "se": 2.161,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006601",
+  "life_expectancy": 72.7,
+  "se": 1.6056,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006602",
+  "life_expectancy": 71.3,
+  "se": 3.521,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006700",
+  "life_expectancy": 75.3,
+  "se": 2.1276,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006802",
+  "life_expectancy": 67.1,
+  "se": 3.5559,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121006900",
+  "life_expectancy": 78.1,
+  "se": 3.9035,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007001",
+  "life_expectancy": 71.8,
+  "se": 1.0931,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007002",
+  "life_expectancy": 68.0,
+  "se": 2.4722,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007100",
+  "life_expectancy": 71.8,
+  "se": 0.9837,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007200",
+  "life_expectancy": 73.5,
+  "se": 2.7642,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007300",
+  "life_expectancy": 72.0,
+  "se": 1.2721,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007400",
+  "life_expectancy": 71.7,
+  "se": 2.7081,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007500",
+  "life_expectancy": 68.6,
+  "se": 1.3307,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007602",
+  "life_expectancy": 74.1,
+  "se": 1.6526,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007603",
+  "life_expectancy": 70.0,
+  "se": 1.3686,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007703",
+  "life_expectancy": 75.8,
+  "se": 1.8597,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007704",
+  "life_expectancy": 74.3,
+  "se": 1.0426,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007705",
+  "life_expectancy": 73.7,
+  "se": 1.6272,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007706",
+  "life_expectancy": 80.3,
+  "se": 2.6736,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007802",
+  "life_expectancy": 76.6,
+  "se": 1.1476,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007805",
+  "life_expectancy": 71.8,
+  "se": 1.7485,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007806",
+  "life_expectancy": 75.5,
+  "se": 2.5744,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007807",
+  "life_expectancy": 72.3,
+  "se": 1.9707,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007808",
+  "life_expectancy": 69.7,
+  "se": 2.4334,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121007900",
+  "life_expectancy": 79.8,
+  "se": 1.9593,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008000",
+  "life_expectancy": 72.3,
+  "se": 1.5441,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008101",
+  "life_expectancy": 72.7,
+  "se": 2.1021,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008102",
+  "life_expectancy": 76.3,
+  "se": 1.7048,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008201",
+  "life_expectancy": 76.0,
+  "se": 1.7324,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008202",
+  "life_expectancy": 69.6,
+  "se": 2.6169,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008400",
+  "life_expectancy": 70.7,
+  "se": 1.7754,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008500",
+  "life_expectancy": 69.3,
+  "se": 2.0705,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008601",
+  "life_expectancy": 67.5,
+  "se": 1.7274,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008700",
+  "life_expectancy": 73.1,
+  "se": 1.4532,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008902",
+  "life_expectancy": 81.3,
+  "se": 3.7557,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121008904",
+  "life_expectancy": 80.3,
+  "se": 1.2183,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009000",
+  "life_expectancy": 84.5,
+  "se": 2.9874,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009101",
+  "life_expectancy": 81.3,
+  "se": 3.0049,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009102",
+  "life_expectancy": 76.0,
+  "se": 2.6067,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009200",
+  "life_expectancy": 81.3,
+  "se": 1.9712,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009300",
+  "life_expectancy": 79.5,
+  "se": 1.476,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009403",
+  "life_expectancy": 79.2,
+  "se": 3.0378,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009404",
+  "life_expectancy": 80.5,
+  "se": 1.5889,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009501",
+  "life_expectancy": 82.4,
+  "se": 2.3655,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009601",
+  "life_expectancy": 80.9,
+  "se": 2.224,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009602",
+  "life_expectancy": 83.3,
+  "se": 1.573,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009603",
+  "life_expectancy": 80.9,
+  "se": 1.3749,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009700",
+  "life_expectancy": 87.2,
+  "se": 2.8714,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009801",
+  "life_expectancy": 82.4,
+  "se": 1.0991,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121009802",
+  "life_expectancy": 84.5,
+  "se": 2.0901,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010001",
+  "life_expectancy": 78.9,
+  "se": 1.6076,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010002",
+  "life_expectancy": 82.4,
+  "se": 1.2471,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010106",
+  "life_expectancy": 82.7,
+  "se": 2.4131,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010107",
+  "life_expectancy": 84.8,
+  "se": 2.1246,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010108",
+  "life_expectancy": 87.0,
+  "se": 2.9297,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010110",
+  "life_expectancy": 83.3,
+  "se": 1.6887,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010113",
+  "life_expectancy": 77.8,
+  "se": 1.4206,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010114",
+  "life_expectancy": 79.6,
+  "se": 1.4248,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010115",
+  "life_expectancy": 78.8,
+  "se": 1.4157,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010119",
+  "life_expectancy": 74.7,
+  "se": 2.7528,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010121",
+  "life_expectancy": 79.2,
+  "se": 3.1849,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010122",
+  "life_expectancy": 82.9,
+  "se": 2.2721,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010123",
+  "life_expectancy": 79.7,
+  "se": 1.3909,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010204",
+  "life_expectancy": 87.2,
+  "se": 2.3654,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010205",
+  "life_expectancy": 83.3,
+  "se": 2.0331,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010206",
+  "life_expectancy": 85.2,
+  "se": 1.9386,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010208",
+  "life_expectancy": 83.4,
+  "se": 1.6601,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010210",
+  "life_expectancy": 84.4,
+  "se": 2.7023,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010211",
+  "life_expectancy": 81.0,
+  "se": 1.5343,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010212",
+  "life_expectancy": 80.3,
+  "se": 1.4404,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010301",
+  "life_expectancy": 77.4,
+  "se": 1.3829,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010303",
+  "life_expectancy": 77.2,
+  "se": 1.0835,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010304",
+  "life_expectancy": 79.7,
+  "se": 2.1205,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010400",
+  "life_expectancy": 76.8,
+  "se": 1.1077,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010507",
+  "life_expectancy": 76.9,
+  "se": 3.6747,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010508",
+  "life_expectancy": 75.7,
+  "se": 1.3311,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010510",
+  "life_expectancy": 78.5,
+  "se": 2.691,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010511",
+  "life_expectancy": 78.4,
+  "se": 3.1095,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010513",
+  "life_expectancy": 76.8,
+  "se": 1.5572,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010514",
+  "life_expectancy": 76.8,
+  "se": 1.0881,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010515",
+  "life_expectancy": 74.2,
+  "se": 1.5085,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010516",
+  "life_expectancy": 74.7,
+  "se": 3.3742,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010601",
+  "life_expectancy": 75.6,
+  "se": 1.7398,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010603",
+  "life_expectancy": 72.0,
+  "se": 1.9365,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010604",
+  "life_expectancy": 69.5,
+  "se": 1.6309,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121010800",
+  "life_expectancy": 75.1,
+  "se": 1.9521,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011000",
+  "life_expectancy": 70.1,
+  "se": 1.5854,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011100",
+  "life_expectancy": 74.7,
+  "se": 2.9679,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011201",
+  "life_expectancy": 73.3,
+  "se": 1.5006,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011202",
+  "life_expectancy": 76.8,
+  "se": 2.9213,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011301",
+  "life_expectancy": 74.9,
+  "se": 1.5346,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011303",
+  "life_expectancy": 75.6,
+  "se": 1.4344,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011305",
+  "life_expectancy": 75.5,
+  "se": 2.1082,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011306",
+  "life_expectancy": 75.6,
+  "se": 3.3717,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011405",
+  "life_expectancy": 82.6,
+  "se": 2.6939,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011410",
+  "life_expectancy": 83.0,
+  "se": 2.2413,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011411",
+  "life_expectancy": 81.8,
+  "se": 1.942,
+  "abridged_life_table_flag": 1,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011412",
+  "life_expectancy": 83.6,
+  "se": 3.29,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011414",
+  "life_expectancy": 78.4,
+  "se": 1.5488,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011416",
+  "life_expectancy": 83.1,
+  "se": 2.0469,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011417",
+  "life_expectancy": 84.3,
+  "se": 1.5812,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011418",
+  "life_expectancy": 78.7,
+  "se": 1.1902,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011419",
+  "life_expectancy": 80.0,
+  "se": 1.3858,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011420",
+  "life_expectancy": 75.9,
+  "se": 3.005,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011421",
+  "life_expectancy": 78.1,
+  "se": 1.9969,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011422",
+  "life_expectancy": 81.0,
+  "se": 1.7028,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011423",
+  "life_expectancy": 79.7,
+  "se": 1.4942,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011424",
+  "life_expectancy": 82.8,
+  "se": 2.2732,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011425",
+  "life_expectancy": 79.6,
+  "se": 2.1979,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011426",
+  "life_expectancy": 80.7,
+  "se": 2.4758,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011427",
+  "life_expectancy": 79.9,
+  "se": 0.7964,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011503",
+  "life_expectancy": 81.8,
+  "se": 1.8918,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011505",
+  "life_expectancy": 79.9,
+  "se": 1.7769,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011506",
+  "life_expectancy": 82.6,
+  "se": 2.1044,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011610",
+  "life_expectancy": 80.8,
+  "se": 2.0405,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011611",
+  "life_expectancy": 83.0,
+  "se": 1.8212,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011613",
+  "life_expectancy": 80.3,
+  "se": 2.1949,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011614",
+  "life_expectancy": 84.5,
+  "se": 2.8912,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011615",
+  "life_expectancy": 83.6,
+  "se": 2.0085,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011616",
+  "life_expectancy": 78.9,
+  "se": 2.3426,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011617",
+  "life_expectancy": 83.6,
+  "se": 2.056,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011618",
+  "life_expectancy": 80.8,
+  "se": 2.1266,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011619",
+  "life_expectancy": 80.3,
+  "se": 2.0845,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011620",
+  "life_expectancy": 81.1,
+  "se": 1.4469,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011621",
+  "life_expectancy": 80.4,
+  "se": 1.8947,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011622",
+  "life_expectancy": 81.0,
+  "se": 1.634,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011623",
+  "life_expectancy": 82.9,
+  "se": 2.1588,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011625",
+  "life_expectancy": 84.7,
+  "se": 2.5236,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011626",
+  "life_expectancy": 80.3,
+  "se": 2.1962,
+  "abridged_life_table_flag": 2,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121011800",
+  "life_expectancy": 69.4,
+  "se": 3.3599,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121012000",
+  "life_expectancy": 65.6,
+  "se": 1.9545,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ },
+ {
+  "tract": "13121012300",
+  "life_expectancy": 72.8,
+  "se": 1.9604,
+  "abridged_life_table_flag": 3,
+  "tract_vintage": "2010",
+  "period": "2010-2015"
+ }
+]

@@ -25,6 +25,7 @@ export default function Layout() {
               {isLeader && <NavLink to="/status" className={link}>Status</NavLink>}
               {isLeader && <NavLink to="/interviews" className={link}>Interviews</NavLink>}
               {isLeader && <NavLink to="/documents" className={link}>Documents</NavLink>}
+              {isLeader && <a href="/demos/" className="relative px-3 py-1.5 text-sm text-white/65 hover:text-white transition-colors">Demos</a>}
               {isAdmin && <NavLink to="/effort" className={link}>Effort</NavLink>}
               {isAdmin && <NavLink to="/admin" className={link}>Admin</NavLink>}
             </nav>
