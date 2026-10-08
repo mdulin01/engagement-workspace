@@ -337,7 +337,7 @@
   // ---------- Map ----------
   const map = L.map('map',{zoomSnap:.5, preferCanvas:false});
   // Safety net against tooltips left open by a missed mouseout (seen on trackpads): close every open tooltip on zoom, pan or when the cursor leaves the map
-  const closeAllTooltips=()=>{ map.eachLayer((l)=>{ if(l.isTooltipOpen && l.isTooltipOpen() && !(l.getTooltip() && l.getTooltip().options.permanent)) l.closeTooltip(); }); };
+  const closeAllTooltips=()=>{ map.eachLayer((l)=>{ const t=l.getTooltip && l.getTooltip(); if(t && !t.options.permanent && l.isTooltipOpen()) l.closeTooltip(); }); };
   map.on('zoomstart movestart mouseout',closeAllTooltips);
   map.fitBounds(FULTON_BOUNDS,{padding:[8,8]});
   // Quiet basemap: Esri World Light Gray (no API key). Place-name labels sit in a pane above the tracts.
