@@ -40,11 +40,27 @@
   .who .sub{font-size:12px;opacity:.8}
 
   .aibar-wrap{max-width:1520px;margin:16px auto 0;padding:0 26px}
-  .aibar{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px 16px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
-  .ai-badge{background:var(--accent-soft);color:var(--accent);font-weight:600;font-size:11.5px;padding:4px 9px;border-radius:999px;white-space:nowrap}
-  .ai-insight{flex:1;min-width:260px;font-size:13.5px;color:var(--ink)}
+  .aibar{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:13px 16px 12px}
+  .ai-top{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+  .ai-badge{background:linear-gradient(135deg,var(--brand),var(--accent));color:#fff;font-weight:600;font-size:11.5px;padding:5px 10px;border-radius:999px;white-space:nowrap;flex:none}
+  .ai-insight{flex:1;min-width:260px;font-size:13.5px;color:var(--ink);line-height:1.5}
   .ai-insight b{color:var(--brand)}
-  .ai-foot{width:100%;font-size:11px;color:var(--muted)}
+  .ai-link{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline;text-decoration-color:rgb(15 118 110/.4)}
+  .ai-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .ai-chip{font-size:12px;font-weight:500;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--brand);cursor:pointer;transition:background .12s,color .12s}
+  .ai-chip:hover{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .ai-ask{display:flex;gap:8px;margin-top:10px}
+  .ai-ask input{flex:1;font-family:inherit;font-size:13px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+  .ai-ask input:focus{outline:2px solid rgb(15 118 110/.35);border-color:var(--accent)}
+  .ai-ask button{font-family:inherit;font-size:13px;font-weight:600;padding:9px 18px;border:none;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer}
+  .ai-ask button:hover{background:var(--brand)}
+  .ai-resp{margin-top:12px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5}
+  .ai-resp[hidden]{display:none}
+  .ai-resp h5{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+  .ai-resp ul{margin:6px 0 0;padding-left:18px}
+  .ai-resp li{margin:3px 0}
+  .ai-resp .draft{background:#fff;border:1px dashed var(--line);border-radius:8px;padding:10px 12px;margin-top:8px;white-space:pre-wrap;font-size:12.5px}
+  .ai-foot{font-size:11px;color:var(--muted);margin-top:9px;font-style:italic}
 
   .domains-head{max-width:1520px;margin:18px auto 2px;padding:0 26px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
   .domains-head span{font-weight:500;text-transform:none;letter-spacing:0;color:var(--accent)}
@@ -121,9 +137,17 @@
 </div>
 
 <div class="aibar-wrap"><div class="aibar">
-  <span class="ai-badge">✦ Insight</span>
-  <div class="ai-insight" id="aiInsight"></div>
-  <div class="ai-foot">In a live system this summary would be generated from the current view under FCBOH's AI policy, with a human reviewing before anything is acted on. Here it is scripted from the synthetic data.</div>
+  <div class="ai-top">
+    <span class="ai-badge">✦ FCBOH AI</span>
+    <div class="ai-insight" id="aiInsight">Reading this view…</div>
+  </div>
+  <div class="ai-chips" id="aiChips"></div>
+  <div class="ai-ask">
+    <input id="aiInput" type="text" placeholder="Ask about this view — e.g. “Where are we slow from a positive result to action?”">
+    <button id="aiSend">Ask</button>
+  </div>
+  <div class="ai-resp" id="aiResp" hidden></div>
+  <div class="ai-foot">Illustrative assistant. In a live system the answers come from an approved model running inside FCBOH's environment under its AI policy (Deliverable 3): no client data leaves the county, every answer cites the measure it used, and a person reviews before anything is acted on. Here the answers are scripted from the synthetic data.</div>
 </div></div>
 
 <div class="domains-head">Performance areas <span>— select an area to open its view below</span></div>
@@ -155,6 +179,14 @@
       <div class="card"><h3>Chart closure within 72 hours</h3><div class="hint">By health center · target ≥ 95%</div><div class="chart-box"><canvas id="cClosure"></canvas></div></div>
       <div class="card"><h3>Documentation completeness</h3><div class="hint">Fields needed for state reporting and PHAB evidence, present at visit close</div><div id="tDocs"></div></div>
     </div>
+
+    <div class="sec" style="margin-top:26px">Timeliness: from positive result to action <span class="note">— STI, HIV and TB clinics · the measures that most affect onward transmission</span></div>
+    <div class="kpis" id="kTimely"></div>
+    <div class="grid g2">
+      <div class="card"><h3>Clients acted on within the target window</h3><div class="hint">Percent · last 6 months · gold mark = target</div><div class="chart-box" style="height:340px"><canvas id="cTimely"></canvas></div></div>
+      <div class="card"><h3>New HIV diagnoses: steps completed within 7 days</h3><div class="hint">Last 6 months · 38 new diagnoses across FCBOH sites · Rapid Entry standard</div><div class="chart-box"><canvas id="cCascade"></canvas></div><div class="hint" style="margin-top:8px">Each step is a count of people, so the gap between bars is a worklist: 7 people not yet on ART and 12 without partner elicitation.</div></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h3>Time-to-action detail</h3><div class="hint">Median time, share within target, 6-month trend and the clients currently outside the window · each row would open a client-level worklist in a live system</div><div id="tTimely"></div></div>
   </section>
 
   <section data-tab="programs" class="tabhide">
@@ -222,15 +254,36 @@ const siteVol = SITES.map((s) => jitter(7600 * s.w / SITES.reduce((a, b) => a + 
 const closure = SITES.slice(0, 6).map(() => jitter(93, 0.05));
 const measures = [
   ["Chlamydia screening, females 16–24", 71, 80],
-  ["HIV test offered at STI visit", 88, 95],
+  ["HIV test offered at STI visit", 96, 95],
+  ["Syphilis screen at first prenatal visit", 97, 95],
   ["PrEP offered when indicated", 54, 75],
+  ["Expedited partner therapy offered (CT/GC)", 41, 60],
   ["Childhood series complete by 24 mo", 74, 80],
   ["HPV series complete by 13", 48, 60],
+  ["Lead screening by 24 months", 59, 75],
   ["Cervical cancer screening up to date", 66, 75],
   ["TB: LTBI treatment started within 30 days", 79, 85],
-  ["Hypertension documented with plan (adults)", 82, 90],
+  ["Hypertension documented with plan (adults)", 91, 90],
 ];
-const gaps = [["HPV series incomplete", 1412], ["Chlamydia screening due", 936], ["Cervical screening overdue", 804], ["Childhood series behind", 611], ["PrEP indicated, not offered", 287], ["LTBI treatment not started", 64]];
+const atTarget = measures.filter((m) => m[1] >= m[2]).length;
+const gaps = [["HPV series incomplete", 1412], ["Chlamydia screening due", 936], ["Cervical screening overdue", 804], ["Childhood series behind", 611], ["Lead screening missed", 348], ["PrEP indicated, not offered", 287], ["LTBI treatment not started", 64]];
+// time from a positive result (or eligibility) to the action that stops transmission
+// m: measure · goal: target window · med: median · unit · pct: share within window (6 mo) · tp: target share · trend: monthly pct · open: clients outside window now
+const timely = [
+  { m: "New HIV diagnosis → ART started", goal: "≤ 7 days, same-day offered", med: 4, unit: "days", pct: 81, tp: 90, trend: [62, 66, 70, 74, 78, 81], open: 7, svc: "hiv" },
+  { m: "New HIV diagnosis → first medical visit", goal: "≤ 30 days", med: 6, unit: "days", pct: 96, tp: 95, trend: [89, 91, 92, 94, 95, 96], open: 1, svc: "hiv" },
+  { m: "HIV-negative, PrEP indicated → PrEP started", goal: "≤ 30 days", med: 12, unit: "days", pct: 46, tp: 70, trend: [31, 35, 38, 41, 44, 46], open: 58, svc: "hiv" },
+  { m: "Positive syphilis → treated", goal: "≤ 7 days", med: 5, unit: "days", pct: 77, tp: 90, trend: [70, 72, 71, 75, 76, 77], open: 11, svc: "sti" },
+  { m: "Early syphilis → DIS interview", goal: "≤ 7 days", med: 6, unit: "days", pct: 68, tp: 85, trend: [60, 61, 64, 66, 67, 68], open: 14, svc: "sti" },
+  { m: "Positive chlamydia / gonorrhea → client notified", goal: "≤ 3 days", med: 2.1, unit: "days", pct: 84, tp: 95, trend: [78, 80, 81, 83, 83, 84], open: 23, svc: "sti" },
+  { m: "Positive chlamydia / gonorrhea → treated", goal: "≤ 7 days", med: 4, unit: "days", pct: 86, tp: 95, trend: [80, 82, 83, 85, 85, 86], open: 19, svc: "sti" },
+  { m: "Positive TB test → treatment started", goal: "≤ 7 days", med: 5, unit: "days", pct: 83, tp: 90, trend: [79, 80, 82, 81, 83, 83], open: 2, svc: "tb" },
+  { m: "Lab specimen → result in chart", goal: "≤ 72 hours", med: 41, unit: "hours", pct: 96, tp: 95, trend: [91, 92, 93, 94, 95, 96], open: 12 },
+  { m: "Reportable result → SendSS report filed", goal: "≤ 7 days (Georgia rule)", med: 2, unit: "days", pct: 94, tp: 100, trend: [90, 91, 92, 93, 94, 94], open: 6 },
+];
+const timelyAt = timely.filter((t) => t.pct >= t.tp).length;
+const cascade = [["Diagnosed", 38], ["Notified", 38], ["Seen in clinic", 33], ["ART started", 31], ["Partners elicited", 26]];
+const noContact14 = 9; // positive STI/HIV results with no documented contact after 14 days
 const docs = [["Race & ethnicity recorded", 97], ["Preferred language", 91], ["Sexual orientation & gender identity", 58], ["Housing status (SDOH screen)", 44], ["Insurance status verified", 93], ["Referral outcome documented", 61]];
 const rapidMonths = ["Apr", "May", "Jun", "Jul", "Aug", "Sep"], rapid = [71, 76, 74, 82, 85, 88];
 const tbCohorts = ["2023 Q1", "2023 Q3", "2024 Q1", "2024 Q3", "2025 Q1"], tb = [89, 91, 94, 92, 95];
@@ -276,7 +329,7 @@ function onFilter() {
 // ---------------------------------------------------------------- domains
 const DOMAINS = [
   { id: "access", l: "Access & volume", icon: "A", color: "var(--d-access)", v: () => Math.round(volThis.reduce((a, b) => a + b) * scale).toLocaleString(), d: "encounters · last 8 weeks" },
-  { id: "quality", l: "Quality & care gaps", icon: "Q", color: "var(--d-quality)", v: () => "3 of 8", d: "measures at target" },
+  { id: "quality", l: "Quality & care gaps", icon: "Q", color: "var(--d-quality)", v: () => `${atTarget} of ${measures.length}`, d: `measures at target · ART ≤ 7 days: ${timely[0].pct}%` },
   { id: "programs", l: "Program outcomes", icon: "P", color: "var(--d-programs)", v: () => "88%", d: "Rapid Entry within 7 days (goal 90%)" },
   { id: "experience", l: "Client experience", icon: "E", color: "var(--d-experience)", v: () => "+44", d: "net promoter, September" },
 ];
@@ -292,7 +345,7 @@ function render() {
   const tot = volThis.reduce((a, b) => a + b), last = volLast.reduce((a, b) => a + b);
   const svc = $("#selService").value; const v = SERVICES.find((x) => x.id === svc);
   const tna = v ? v.tna : 7, ns = v ? v.noshow : 16;
-  $("#aiInsight").innerHTML = `Encounters are <b>${((tot - last) / last * 100).toFixed(1)}% above</b> the same eight weeks last year. The constraint is access in two services: third-next-available is <b>${Math.max(...SERVICES.map((s) => s.tna))} days for children's oral health</b> and <b>14 days for breast and cervical screening</b>, and both run no-show rates above 20%. Rapid Entry for new HIV diagnoses reached <b>88% seen within 7 days</b>, the best month this year. The largest open care gap is <b>HPV series completion (1,412 clients)</b>.`;
+  renderAI();
 
   if (active === "access") {
     kpi($("#kAccess"), [
@@ -309,11 +362,22 @@ function render() {
   }
   if (active === "quality") {
     kpi($("#kQuality"), [
-      { l: "Measures at target", v: "3", u: "of 8", c: "warn", t: "5 below target" },
+      { l: "Measures at target", v: atTarget, u: `of ${measures.length}`, c: "warn", t: `${measures.length - atTarget} below target` },
       { l: "Open care gaps", v: sc(gaps.reduce((a, b) => a + b[1], 0)).toLocaleString(), c: "warn", t: "clients due or overdue" },
       { l: "Charts closed ≤ 72 h", v: 93, u: "%", c: "warn", t: "target ≥ 95%" },
       { l: "SOGI documented", v: 58, u: "%", c: "bad", t: "needed for HIV and STI reporting" },
     ]);
+    const t0 = timely[0], tSy = timely[3], tCT = timely[5];
+    kpi($("#kTimely"), [
+      { l: "HIV+ → ART ≤ 7 days", v: t0.pct, u: "%", c: pctClass(t0.pct, t0.tp), t: `median ${t0.med} days · goal ${t0.tp}%` },
+      { l: "Syphilis+ → treated ≤ 7 d", v: tSy.pct, u: "%", c: pctClass(tSy.pct, tSy.tp), t: `median ${tSy.med} days · goal ${tSy.tp}%` },
+      { l: "CT/GC+ → notified ≤ 3 d", v: tCT.pct, u: "%", c: pctClass(tCT.pct, tCT.tp), t: `median ${tCT.med} days · goal ${tCT.tp}%` },
+      { l: "Time measures at target", v: timelyAt, u: `of ${timely.length}`, c: timelyAt >= timely.length / 2 ? "warn" : "bad", t: "share-within-window vs. goal" },
+      { l: "No contact after 14 days", v: sc(noContact14) || noContact14, c: "bad", t: "positive results · worklist" },
+    ]);
+    chart("cTimely", { type: "bar", data: { labels: timely.map((t) => t.m), datasets: [{ label: "Within window", data: timely.map((t) => t.pct), backgroundColor: timely.map((t) => t.pct >= t.tp ? TEAL : t.pct >= t.tp * 0.92 ? INK : "#b4433a"), borderRadius: 4 }, { label: "Target", data: timely.map((t) => t.tp), type: "line", borderColor: GOLD, backgroundColor: GOLD, pointStyle: "line", pointRadius: 10, pointBorderWidth: 3, showLine: false }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { position: "bottom" }, tooltip: { callbacks: { afterLabel: (c) => c.datasetIndex === 0 ? `goal ${timely[c.dataIndex].goal} · median ${timely[c.dataIndex].med} ${timely[c.dataIndex].unit}` : "" } } }, scales: { x: { ...quiet, min: 0, max: 100 }, y: { grid: { display: false }, border: { display: false }, ticks: { autoSkip: false, font: { size: 11 } } } } } });
+    chart("cCascade", { type: "bar", data: { labels: cascade.map((c) => c[0]), datasets: [{ data: cascade.map((c) => c[1]), backgroundColor: cascade.map((c, i) => i === 0 ? INK : c[1] / cascade[0][1] >= 0.9 ? TEAL : c[1] / cascade[0][1] >= 0.8 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw} people · ${Math.round(c.raw / cascade[0][1] * 100)}%` } } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true, title: { display: true, text: "people" } } } } });
+    $("#tTimely").innerHTML = `<table><thead><tr><th>Measure</th><th>Target window</th><th>Median</th><th>Within window</th><th>Goal</th><th>6-month trend</th><th>Outside window now</th></tr></thead><tbody>${timely.map((t) => { const cls = pctClass(t.pct, t.tp); return `<tr><td>${t.m}</td><td>${t.goal}</td><td class="num">${t.med} ${t.unit}</td><td class="num ${cls}"><b>${t.pct}%</b></td><td class="num">${t.tp}%</td><td class="num" style="color:var(--muted)">${t.trend[0]}% → ${t.trend[t.trend.length - 1]}% <span class="${t.trend[5] > t.trend[0] ? "good" : "bad"}">${t.trend[5] > t.trend[0] ? "▲" : "▼"}</span></td><td class="num">${sc(t.open) || t.open} <span style="color:var(--muted);font-size:11px">clients</span></td></tr>`; }).join("")}</tbody></table>`;
     chart("cMeasures", { type: "bar", data: { labels: measures.map((m) => m[0]), datasets: [{ label: "Performance", data: measures.map((m) => m[1]), backgroundColor: measures.map((m) => m[1] >= m[2] ? TEAL : INK), borderRadius: 4 }, { label: "Target", data: measures.map((m) => m[2]), type: "line", borderColor: GOLD, backgroundColor: GOLD, pointStyle: "line", pointRadius: 10, pointBorderWidth: 3, showLine: false }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { ...quiet, min: 0, max: 100 }, y: { grid: { display: false }, border: { display: false } } } } });
     table($("#tGaps"), gaps.map((g) => [g[0], sc(g[1]), sc(g[1])]), ["Measure", "", "Clients"], 1, 1500);
     chart("cClosure", { type: "bar", data: { labels: SITES.slice(0, 6).map((s) => s.short), datasets: [{ data: closure, backgroundColor: closure.map((c) => c >= 95 ? TEAL : c >= 90 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, min: 70, max: 100 } } } });
@@ -344,6 +408,60 @@ function render() {
     chart("cNPS", { type: "line", data: { labels: rapidMonths, datasets: [{ data: nps, borderColor: TEAL, backgroundColor: TEAL, tension: .3, fill: false }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: quiet, y: { ...quiet, min: 0, max: 60 } } } });
   }
 }
+
+// ---------------------------------------------------------------- FCBOH AI (illustrative assistant, scripted from the synthetic data)
+function openArea(id) { active = id; document.querySelectorAll("section[data-tab]").forEach((s) => s.classList.toggle("tabhide", s.dataset.tab !== active)); renderDomains(); render(); $("#domains").scrollIntoView({ behavior: "smooth", block: "start" }); }
+function watchouts() {
+  const out = [];
+  timely.filter((t) => t.pct < t.tp).sort((a, b) => (a.pct / a.tp) - (b.pct / b.tp)).slice(0, 3).forEach((t) => out.push({ sev: t.pct < t.tp * 0.85 ? 2 : 1, dom: "Timeliness", txt: `${t.m} within ${t.goal.split(",")[0].replace("≤ ", "")}: ${t.pct}% (goal ${t.tp}%), ${t.open} clients outside the window`, area: "quality" }));
+  SERVICES.filter((s) => s.tna > 10).forEach((s) => out.push({ sev: 1, dom: "Access", txt: `third-next-available ${s.tna} days for ${s.name.split(" (")[0].toLowerCase()} with a ${s.noshow}% no-show rate`, area: "access" }));
+  out.push({ sev: 1, dom: "Quality", txt: `${measures.length - atTarget} of ${measures.length} care measures below target; largest gap ${gaps[0][0].toLowerCase()} (${gaps[0][1].toLocaleString()} clients)`, area: "quality" });
+  out.push({ sev: 1, dom: "Data", txt: `SOGI recorded on 58% of charts, which limits HIV and STI reporting`, area: "quality" });
+  return out.sort((a, b) => b.sev - a.sev);
+}
+function scopeLabel() { const v = SERVICES.find((x) => x.id === $("#selService").value); return (siteName === "All health centers" ? "all FCBOH health centers" : siteName) + (v ? ` · ${v.name}` : ""); }
+function renderAI() {
+  const tot = volThis.reduce((a, b) => a + b), last = volLast.reduce((a, b) => a + b), w = watchouts(), t0 = timely[0];
+  let txt = `Encounters at <b>${scopeLabel()}</b> are <b>${((tot - last) / last * 100).toFixed(1)}% above</b> the same eight weeks last year. `;
+  txt += `The measure that matters most for transmission, <b>new HIV diagnosis to ART within 7 days</b>, is at <b>${t0.pct}%</b> against a ${t0.tp}% goal and has risen every month since April <span class="ai-link" data-area="quality">[open]</span>. `;
+  txt += `Top watch-outs: ${w.slice(0, 2).map((f) => `${f.txt} <span class="ai-link" data-area="${f.area}">[review]</span>`).join("; and ")}.`;
+  const ai = $("#aiInsight"); ai.innerHTML = txt;
+  ai.querySelectorAll(".ai-link").forEach((l) => l.onclick = () => openArea(l.dataset.area));
+  const chips = ["What should clinical leadership focus on this month?", "Where are we slow from a positive result to action?", "Which care gaps are largest?", "Draft a huddle note for the STI clinic"];
+  const cc = $("#aiChips"); cc.innerHTML = chips.map((c) => `<span class="ai-chip">${c}</span>`).join("");
+  cc.querySelectorAll(".ai-chip").forEach((el) => el.onclick = () => { $("#aiInput").value = el.textContent; askAI(el.textContent); });
+}
+function askAI(q) {
+  if (!q || !q.trim()) return;
+  const ql = q.toLowerCase(), w = watchouts(), who = scopeLabel();
+  const list = (items) => `<ul>${items.map((i) => `<li>${i}</li>`).join("")}</ul>`;
+  const link = (area, label) => `<span class="ai-link" data-area="${area}">${label}</span>`;
+  let html = "";
+  if (/(focus|priorit|month|week|today|important|first|leadership)/.test(ql)) {
+    html = `<h5>Focus this month — ${who}</h5>Ranked by effect on transmission and access:` + list(w.slice(0, 4).map((f) => `<b>${f.dom}:</b> ${f.txt} — ${link(f.area, "open worklist")}`));
+  } else if (/(slow|time|timel|delay|positive|result|action|art|syphilis|chlamydia|gonorr|sti|hiv|notif|contact|partner|dis\b)/.test(ql)) {
+    const slow = timely.slice().sort((a, b) => (a.pct / a.tp) - (b.pct / b.tp)).slice(0, 4);
+    html = `<h5>Where the clock is slipping — ${who}</h5>${timelyAt} of ${timely.length} time-to-action measures meet their goal. Furthest from goal:` + list(slow.map((t) => `<b>${t.m}</b>: ${t.pct}% within ${t.goal.split(",")[0].replace("≤ ", "")} (goal ${t.tp}%), median ${t.med} ${t.unit}, <b>${t.open}</b> clients outside the window now — ${link("quality", "open")}`)) + `<p style="margin-top:8px">The HIV cascade shows where people drop: 38 diagnosed, 33 seen, 31 on ART, 26 with partners elicited. The 7 not yet on ART and ${noContact14} positive results with no contact after 14 days are the two worklists to clear first.</p>`;
+  } else if (/(gap|quality|measure|screen|hpv|immuniz|vaccine|cervical|lead)/.test(ql)) {
+    html = `<h5>Care gaps — ${who}</h5>${atTarget} of ${measures.length} measures at target. Largest open gaps by client count:` + list(gaps.slice(0, 5).map((g) => `<b>${g[0]}</b>: ${g[1].toLocaleString()} clients — ${link("quality", "outreach list")}`)) + `<p style="margin-top:8px">Two of these (HPV, childhood series) can be worked from GRITS reminder-recall; chlamydia and cervical screening need a standing list from the clinical system, which is what Deliverable 2 is for.</p>`;
+  } else if (/(no.?show|access|appoint|wait|third|tna|schedul|volume)/.test(ql)) {
+    const worst = SERVICES.slice().sort((a, b) => b.tna - a.tna).slice(0, 3);
+    html = `<h5>Access — ${who}</h5>Third-next-available exceeds the 7-day target in ${SERVICES.filter((s) => s.tna > 7).length} of ${SERVICES.length} service lines. Longest waits:` + list(worst.map((s) => `<b>${s.name}</b>: ${s.tna} days, ${s.noshow}% no-show — ${link("access", "open")}`)) + list([`Backfill from a same-day list in the two services over 20% no-show`, `Automated reminders at 48 h and 2 h, in the client's preferred language (91% recorded)`]);
+  } else if (/(experience|satisf|promoter|nps|recommend|complain)/.test(ql)) {
+    html = `<h5>Client experience — ${who}</h5>Net promoter <b>+44</b>, up 13 since April. Lowest sub-score is <b>"got an appointment when needed" (68%, target 80%)</b>, which tracks the access numbers above.` + list([`Share site-level top-box scores at the monthly huddle`, `Review verbatim comments for the two lowest sub-scores — ${link("experience", "open")}`]);
+  } else if (/(draft|note|memo|huddle|email|message|team|communicat)/.test(ql)) {
+    const sti = timely.filter((t) => t.svc === "sti");
+    const draft = `Team — STI clinic huddle, week of October 5.\n\nWhere we stand (last 6 months):\n` + sti.map((t, i) => `${i + 1}. ${t.m}: ${t.pct}% within ${t.goal.split(",")[0].replace("≤ ", "")} (goal ${t.tp}%); ${t.open} clients currently outside the window.`).join("\n") + `\n\nThis week: clear the ${sti.reduce((a, t) => a + t.open, 0)} clients outside the window, starting with the ${sti[0].open} untreated syphilis results. DIS interviews within 7 days are our weakest step; please flag any early syphilis case not yet interviewed by day 5.\n\nExpedited partner therapy was offered in 41% of CT/GC cases; the goal is 60%. Offer it at the result call, not just at the visit.\n\nThank you — these numbers have moved in the right direction every month since April.`;
+    html = `<h5>Draft huddle note — STI clinic</h5>An example of turning the view into action. Review and edit before sending; nothing goes out automatically.<div class="draft">${draft}</div>`;
+  } else {
+    html = `<h5>Summary — ${who}</h5>${atTarget} of ${measures.length} care measures and ${timelyAt} of ${timely.length} time-to-action measures at target · HIV+ to ART ≤ 7 days ${timely[0].pct}% · net promoter +44.` + list(w.slice(0, 3).map((f) => `${f.dom}: ${f.txt} — ${link(f.area, "open")}`));
+  }
+  const resp = $("#aiResp"); resp.hidden = false; resp.innerHTML = html;
+  resp.querySelectorAll(".ai-link").forEach((l) => l.onclick = () => openArea(l.dataset.area));
+}
+$("#aiSend").addEventListener("click", () => askAI($("#aiInput").value));
+$("#aiInput").addEventListener("keydown", (e) => { if (e.key === "Enter") askAI($("#aiInput").value); });
+
 renderDomains();
 onFilter();
 </script>
