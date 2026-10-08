@@ -5,6 +5,7 @@
   "consultant": "Michael Dulin, MD, PhD",
   "sponsor": "Marcus Plescia, MD, MPH — District Health Director",
   "dayToDay": "Susan Hrapcak, MD — Medical Director",
+  "liaison": "Alix Ferdinand, MD — resident physician, client liaison",
   "effectiveDate": "2026-10-01",
   "termMonths": 6,
   "termWeeks": 26,
@@ -46,6 +47,7 @@
       { "id": "epi", "name": "Epidemiology and surveillance", "target": 3 },
       { "id": "it", "name": "IT and data systems", "target": 2 },
       { "id": "programs", "name": "Community health programs", "target": 2 },
+      { "id": "eval", "name": "Evaluation and quality improvement", "target": 3 },
       { "id": "admin", "name": "Finance and administration", "target": 1 },
       { "id": "external", "name": "External partners and vendors", "target": 1 }
     ],

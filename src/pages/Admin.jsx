@@ -2,6 +2,11 @@ import { useState } from "react";
 import { useCollection, save, remove } from "../lib/data.js";
 import { useEngagement } from "../lib/engagement.js";
 import { fmt } from "../lib/dates.js";
+import { validateSeed, applySeed } from "../lib/seeds.js";
+import seedsConfig from "../config/seeds.json";
+import { today } from "../lib/dates.js";
+
+const SEEDS = seedsConfig.seeds;
 
 const ROLES = ["leader", "team", "participant", "vendor", "admin"];
 
@@ -11,6 +16,18 @@ export default function Admin() {
   const { rows: users } = useCollection("users");
   const [inv, setInv] = useState({ email: "", name: "", role: "leader" });
   const [eff, setEff] = useState("");
+  const { rows: settings } = useCollection("settings");
+  const applied = settings.find((s) => s.id === "seeds") || {};
+  const [seedMsg, setSeedMsg] = useState("");
+  const seedOpts = { groups: eng.config.interviews.groups.map((g) => g.id), guideIds: eng.config.interviews.starterGuides.map((g) => g.id) };
+
+  async function runSeed(seed) {
+    const errs = validateSeed(seed, seedOpts);
+    if (errs.length) { setSeedMsg(errs.join("; ")); return; }
+    const again = applied[seed.id] ? " It was applied on " + fmt(applied[seed.id]) + "; re-applying overwrites those same records." : "";
+    if (!window.confirm(`Apply "${seed.title}" (${seed.docs.length} records)?${again}`)) return;
+    try { await applySeed(seed, seedOpts, save, today()); setSeedMsg(`Applied ${seed.id}.`); } catch (e) { setSeedMsg(e.message); }
+  }
 
   async function addInvite(e) {
     e.preventDefault();
@@ -30,8 +47,23 @@ export default function Admin() {
           <button className="btn btn-primary" type="submit">Set</button>
         </form>
         <div className="text-xs text-slate-500">
-          Client: {eng.config.client} · Sponsor: {eng.config.sponsor} · Day-to-day: {eng.config.dayToDay}
+          Client: {eng.config.client} · Sponsor: {eng.config.sponsor} · Day-to-day: {eng.config.dayToDay}{eng.config.liaison ? ` · Liaison: ${eng.config.liaison}` : ""}
         </div>
+      </section>
+
+      <section className="card space-y-3">
+        <div className="label">Data seeds</div>
+        <p className="text-sm">One-time loads defined in <code>src/config/seeds.json</code> (stakeholders, status entries, effort, document links). Fixed ids, so applying twice updates rather than duplicates. Load the interview starters first if the Interviews page is still empty.</p>
+        <ul className="divide-y divide-slate-100 text-sm">
+          {SEEDS.map((sd) => (
+            <li key={sd.id} className="py-1.5 flex items-center gap-2">
+              <span className="flex-1">{sd.title} <span className="text-xs text-slate-500">· {sd.docs.length} records</span></span>
+              <span className={`pill ${applied[sd.id] ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>{applied[sd.id] ? `applied ${fmt(applied[sd.id])}` : "not applied"}</span>
+              <button className="btn" onClick={() => runSeed(sd)}>{applied[sd.id] ? "Re-apply" : "Apply"}</button>
+            </li>
+          ))}
+        </ul>
+        {seedMsg && <p className="text-xs text-slate-600">{seedMsg}</p>}
       </section>
 
       <section className="card space-y-3">
