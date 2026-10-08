@@ -13,19 +13,26 @@ const TYPES = [
 export default function StatusLog() {
   const { isAdmin } = useAuth();
   const { rows, loading, error } = useCollection("statusLog", { orderBy: { field: "date", dir: "desc" } });
-  const [draft, setDraft] = useState({ date: today(), type: "checkin", title: "", body: "", published: false });
+  const blank = () => ({ date: today(), type: "checkin", title: "", body: "", published: false });
+  const [draft, setDraft] = useState(blank);
+  const [editing, setEditing] = useState(null);
 
   async function add(e) {
     e.preventDefault();
-    await save("statusLog", newId(), draft);
-    setDraft({ date: today(), type: "checkin", title: "", body: "", published: false });
+    await save("statusLog", editing || newId(), { ...draft, title: draft.title.trim() });
+    setDraft(blank()); setEditing(null);
+  }
+  function startEdit(r) {
+    setEditing(r.id);
+    setDraft({ date: r.date || today(), type: r.type || "note", title: r.title || "", body: r.body || "", published: !!r.published });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
     <div className="grid gap-4 lg:grid-cols-3">
       {isAdmin && (
         <form onSubmit={add} className="card space-y-2 lg:col-span-1 self-start">
-          <div className="label">New entry</div>
+          <div className="label">{editing ? "Edit entry" : "New entry"}</div>
           <input type="date" className="input" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })} />
           <select className="input" value={draft.type} onChange={(e) => setDraft({ ...draft, type: e.target.value })}>
             {TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
@@ -36,7 +43,10 @@ export default function StatusLog() {
             <input type="checkbox" checked={draft.published} onChange={(e) => setDraft({ ...draft, published: e.target.checked })} />
             Visible to leaders
           </label>
-          <button className="btn btn-primary" type="submit">Add entry</button>
+          <div className="flex gap-2">
+            <button className="btn btn-primary" type="submit">{editing ? "Save changes" : "Add entry"}</button>
+            {editing && <button className="btn" type="button" onClick={() => { setDraft(blank()); setEditing(null); }}>Cancel</button>}
+          </div>
           <p className="text-xs text-slate-500">Entries feed the monthly written status summary (§2.7) and the invoice narrative (§7).</p>
         </form>
       )}
@@ -52,6 +62,7 @@ export default function StatusLog() {
               {r.published ? <span className="pill bg-green-100 text-green-800">Leaders</span> : <span className="pill bg-amber-100 text-amber-800">Private</span>}
               {isAdmin && (
                 <span className="ml-auto flex gap-2">
+                  <button className="underline" onClick={() => startEdit(r)}>Edit</button>
                   <button className="underline" onClick={() => save("statusLog", r.id, { published: !r.published })}>{r.published ? "Unpublish" : "Publish"}</button>
                   <button className="underline text-red-600" onClick={() => { if (window.confirm("Delete this entry?")) remove("statusLog", r.id); }}>Delete</button>
                 </span>

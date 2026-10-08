@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useEngagement } from "../lib/engagement.js";
 import { useCollection, save } from "../lib/data.js";
 import { useAuth } from "../lib/auth.jsx";
@@ -110,7 +111,12 @@ export default function Hub() {
               {deliverables.map((d) => (
                 <tr key={d.number}>
                   <td className="py-2 pr-2 text-slate-500">{d.number}</td>
-                  <td className="py-2 pr-2">{d.name}</td>
+                  <td className="py-2 pr-2">
+                    <div>{d.name}</div>
+                    {isAdmin ? (
+                      <NoteField value={d.note || ""} onSave={(note) => save("deliverables", String(d.number), { note })} />
+                    ) : d.note ? <div className="text-xs text-slate-500 mt-0.5">{d.note}</div> : null}
+                  </td>
                   <td className="py-2 pr-2 text-xs text-slate-500 whitespace-nowrap">{fmt(d.dueDate)}</td>
                   <td className="py-2">
                     {isAdmin ? (
@@ -133,5 +139,19 @@ export default function Hub() {
         </div>
       </div>
     </div>
+  );
+}
+
+/** Click-to-edit note under a deliverable; saves on blur or Enter. */
+function NoteField({ value, onSave }) {
+  const [v, setV] = useState(value);
+  const [open, setOpen] = useState(false);
+  useEffect(() => { if (!open) setV(value); }, [value, open]);
+  if (!open) return <button type="button" className="text-xs text-left text-slate-500 mt-0.5 hover:underline" onClick={() => setOpen(true)}>{value || "add a note"}</button>;
+  return (
+    <textarea autoFocus className="input text-xs mt-1" rows={2} maxLength={300} value={v}
+      onChange={(e) => setV(e.target.value)}
+      onBlur={() => { setOpen(false); if (v.trim() !== (value || "")) onSave(v.trim()); }}
+      onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); e.target.blur(); } if (e.key === "Escape") { setV(value); setOpen(false); } }} />
   );
 }
