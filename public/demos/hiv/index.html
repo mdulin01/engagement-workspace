@@ -21,7 +21,7 @@
   .demo-pill{display:inline-block;background:#fde68a;color:#78350f;font-weight:600;font-size:11px;padding:3px 9px;border-radius:999px;letter-spacing:.02em;text-transform:none}
   h1{font-size:30px;font-weight:600;letter-spacing:-.02em;margin-top:10px}
   .sub{color:rgba(255,255,255,.75);margin-top:4px;max-width:900px}
-  .tabs{max-width:1400px;margin:-18px auto 0;padding:0 26px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;position:relative;z-index:2}
+  .tabs{max-width:1400px;margin:-18px auto 0;padding:0 26px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;position:relative;z-index:2}
   .tab{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;cursor:pointer;border-top:4px solid var(--line);transition:transform .12s}
   .tab:hover{transform:translateY(-2px)}
   .tab.active{box-shadow:0 0 0 2px var(--brand) inset,var(--shadow)}
@@ -55,6 +55,13 @@
   .plan{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
   .plan .card b{display:block;font-size:13px;margin-bottom:4px;color:var(--brand)}
   .plan .card{font-size:13px;color:var(--ink)}
+  table.cmp{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.cmp th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);font-weight:600}
+  table.cmp th:first-child,table.cmp td:first-child{text-align:left}
+  table.cmp td{padding:7px 8px;border-bottom:1px solid #f0ece4;text-align:right;font-variant-numeric:tabular-nums}
+  table.cmp tr.me td{background:var(--accent-soft);font-weight:600}
+  table.cmp td.best{color:var(--accent);font-weight:600}
+  table.cmp td.worst{color:#b4433a}
   .ribbon{background:var(--accent-soft);border:1px solid #cfe6e0;color:#0b4f4a;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:16px}
   @media (max-width:1000px){.tabs,.plan{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}}
 </style>
@@ -113,6 +120,20 @@
     </div>
   </section>
 
+  <section data-tab="compare" class="hide">
+    <div class="q">How does Fulton compare with Georgia and its neighbors?</div>
+    <div class="q-sub">The same six AHEAD indicators for Georgia and the three neighboring Ending the HIV Epidemic counties. Rates are per 100,000 residents aged 13+, so counties of different size compare directly. Where a benchmark is unfavorable, the worklist question is <i>why</i>: testing reach, linkage, or retention.</div>
+    <div class="grid g2">
+      <div class="card"><h3>New HIV diagnosis rate, ages 13+</h3><div class="hint">Per 100,000 · AHEAD final/provisional years · Fulton in dark, Georgia dashed</div><div class="chart-box" style="height:300px"><canvas id="cCmpDx"></canvas></div></div>
+      <div class="card"><h3>Latest year, side by side</h3><div class="hint" id="hCmp">Most recent annual value for each indicator (year in parentheses) · teal = best in group, red = weakest</div><div id="tCmp"></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="card"><h3>Viral suppression, people diagnosed</h3><div class="hint">Percent · goal 95%</div><div class="chart-box"><canvas id="cCmpVs"></canvas></div></div>
+      <div class="card"><h3>PrEP coverage</h3><div class="hint">Percent of people with PrEP indications who were prescribed PrEP · goal 50%</div><div class="chart-box"><canvas id="cCmpPrep"></canvas></div></div>
+    </div>
+    <div class="note" style="margin-top:12px"><b>What this does not show.</b> AHEAD publishes outcomes, not HIV or STI test volumes. A testing-reach benchmark (tests per 1,000 residents, positivity, tests by site) needs Georgia DPH's county testing data and FCBOH's own clinical counts, which is part of the data-access assessment (Deliverable 2). Until then, a falling diagnosis count can mean fewer infections or fewer tests, and this page cannot tell them apart.</div>
+  </section>
+
   <section data-tab="respond" class="hide">
     <div class="q">What would it take to close the gap, and how would FCBOH track it?</div>
     <div class="q-sub">A public page like this one is a product of governed data: agreed definitions, standing feeds, and a review step before publication. The plan below is illustrative.</div>
@@ -141,7 +162,7 @@ const quiet = { grid: { color: "#eef2f5" }, border: { display: false } };
 const charts = {}; const chart = (id, cfg) => { if (charts[id]) charts[id].destroy(); charts[id] = new Chart($("#" + id), cfg); };
 const by = (rows, ind) => rows.filter((r) => r.indicator === ind).sort((a, b) => a.year - b.year);
 
-Promise.all(["ahead_fulton.json", "ahead_fulton_stratified.json", "aidsvu_fulton.json", "gadph_hiv_fulton.json"].map((f) => fetch("../data/" + f).then((r) => r.json()))).then(([A, S, V, G]) => {
+Promise.all(["ahead_fulton.json", "ahead_fulton_stratified.json", "aidsvu_fulton.json", "gadph_hiv_fulton.json", "ahead_compare.json"].map((f) => fetch("../data/" + f).then((r) => r.json()))).then(([A, S, V, G, C]) => {
   const dx = by(A, "New HIV diagnoses").filter((r) => !/partial/.test(r.data_status));
   const link = by(A, "Linkage to HIV medical care within 1 month");
   const vs = by(A, "HIV viral suppression");
@@ -154,10 +175,19 @@ Promise.all(["ahead_fulton.json", "ahead_fulton_stratified.json", "aidsvu_fulton
   const plwhN = G.new_diagnoses_and_plwh_by_year.at(-1);
 
   // ---- tabs
+  // ---- comparison with Georgia and neighboring EHE counties (ahead_compare.json)
+  const AREAS = ["Fulton County", "DeKalb County", "Cobb County", "Gwinnett County", "Georgia"];
+  const ACOL = { "Fulton County": INK, "DeKalb County": PURPLE, "Cobb County": GOLD, "Gwinnett County": "#2d7dd2", "Georgia": "#64748b" };
+  const cmpRows = (ind, area) => C.filter((r) => r.indicator === ind && r.area === area && !/partial/.test(r.data_status) && r.value != null).sort((a, b) => a.year - b.year);
+  const cmpDxYear = Math.max(...cmpRows("New HIV diagnoses", "Fulton County").filter((r) => r.rate_per_100k).map((r) => r.year));
+  const cmpDxAt = (area) => cmpRows("New HIV diagnoses", area).find((r) => r.year === cmpDxYear);
+  const gaDx = cmpDxAt("Georgia"), fDx = cmpDxAt("Fulton County");
+  const cmpTab = { v: fDx.rate_per_100k.toFixed(1), u: `per 100k, ${cmpDxYear}`, d: `Georgia ${gaDx.rate_per_100k} · ${(fDx.rate_per_100k / gaDx.rate_per_100k).toFixed(1)}× the state rate` };
   const TABS = [
     { id: "diagnose", l: "Diagnose", c: "var(--diag)", v: dxF.value.toLocaleString(), u: `new diagnoses, ${dxF.year}`, d: `goal ${dxF.goal2025} by 2025` },
     { id: "treat", l: "Treat", c: "var(--treat)", v: vsF.value + "%", u: `virally suppressed, ${vsF.year}`, d: "goal 95%" },
     { id: "prevent", l: "Prevent", c: "var(--prev)", v: prepF.value + "%", u: `PrEP coverage, ${prepF.year}`, d: "goal 50%" },
+    { id: "compare", l: "Compare", c: "var(--gold)", v: cmpTab.v, u: cmpTab.u, d: cmpTab.d },
     { id: "respond", l: "Respond", c: "var(--resp)", v: plwhN.plwh.toLocaleString(), u: `people living with HIV, ${plwhN.year}`, d: `${plwh ? plwh.value.toLocaleString() : ""} per 100,000` },
   ];
   let active = "diagnose";
@@ -180,6 +210,22 @@ Promise.all(["ahead_fulton.json", "ahead_fulton_stratified.json", "aidsvu_fulton
   chart("cDxRace", { type: "bar", data: { labels: race24.map((r) => r.group), datasets: [{ data: race24.map((r) => r.rate), backgroundColor: INK, borderRadius: 4 }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw} per 100,000 (${race24[c.dataIndex].numerator_or_cases} diagnoses)` } } }, scales: { x: { ...quiet, beginAtZero: true, title: { display: true, text: "per 100,000" } }, y: { grid: { display: false }, border: { display: false } } } } });
   $("#kKnow").innerHTML = `<div class="goal"><span class="big num">${knowF.value}%</span><span class="g">${knowF.year} · goal 95%</span></div><div class="meter"><i style="width:${knowF.value}%"></i><b style="left:95%"></b></div><div class="note">${know[0].year}: ${know[0].value}% → ${knowF.year}: ${knowF.value}%. Modeled estimate (95% CI ${knowF.lci}–${knowF.uci}).</div>`;
   chart("cInc", { type: "line", data: { labels: inc.map((r) => r.year), datasets: [{ label: "Rate per 100,000", data: inc.map((r) => r.rate_per_100k), borderColor: INK, backgroundColor: INK, tension: .3 }, { label: "95% CI", data: inc.map((r) => r.uci), borderColor: "transparent", backgroundColor: "rgba(20,40,58,.10)", fill: "+1", pointRadius: 0, tension: .3 }, { label: "", data: inc.map((r) => r.lci), borderColor: "transparent", pointRadius: 0, tension: .3 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => c.datasetIndex === 0 ? `${c.raw} per 100,000 (about ${inc[c.dataIndex].value} infections; 95% CI ${inc[c.dataIndex].lci}–${inc[c.dataIndex].uci})` : null } } }, scales: { x: quiet, y: { ...quiet, beginAtZero: true, title: { display: true, text: "per 100,000" } } } } });
+
+  // ---- Compare tab
+  const cyrs = cmpRows("New HIV diagnoses", "Georgia").filter((r) => r.rate_per_100k).map((r) => r.year);
+  chart("cCmpDx", { type: "line", data: { labels: cyrs, datasets: AREAS.map((a) => ({ label: a.replace(" County", ""), data: cyrs.map((y) => (cmpRows("New HIV diagnoses", a).find((r) => r.year === y) || {}).rate_per_100k ?? null), borderColor: ACOL[a], backgroundColor: ACOL[a], borderWidth: a === "Fulton County" ? 3 : 1.5, borderDash: a === "Georgia" ? [5, 4] : [], tension: .3, pointRadius: a === "Fulton County" ? 3 : 2 })) },
+    options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, title: { display: true, text: "per 100,000" } } } } });
+  const pctLine = (id, ind) => { const ys = cmpRows(ind, "Georgia").map((r) => r.year); chart(id, { type: "line", data: { labels: ys, datasets: AREAS.map((a) => ({ label: a.replace(" County", ""), data: ys.map((y) => (cmpRows(ind, a).find((r) => r.year === y) || {}).value ?? null), borderColor: ACOL[a], backgroundColor: ACOL[a], borderWidth: a === "Fulton County" ? 3 : 1.5, borderDash: a === "Georgia" ? [5, 4] : [], tension: .3, pointRadius: 2, spanGaps: true })) }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { grid: { display: false } }, y: { title: { display: true, text: "%" } } } } }); };
+  pctLine("cCmpVs", "HIV viral suppression"); pctLine("cCmpPrep", "PrEP coverage");
+  const CMP_IND = [["New HIV diagnoses", "New diagnoses per 100k", "rate_per_100k", false], ["Estimated HIV incidence", "Est. incidence per 100k", "rate_per_100k", false], ["Knowledge of HIV status", "Know their status %", "value", true], ["Linkage to HIV medical care within 1 month", "Linked within 1 month %", "value", true], ["HIV viral suppression", "Virally suppressed %", "value", true], ["PrEP coverage", "PrEP coverage %", "value", true]];
+  const cmpCells = CMP_IND.map(([ind, lbl, key, higherBetter]) => {
+    const latest = {}; AREAS.forEach((a) => { const rr = cmpRows(ind, a).filter((r) => r[key] != null); latest[a] = rr.at(-1); });
+    const vals = AREAS.map((a) => latest[a] ? latest[a][key] : null).filter((v) => v != null);
+    const best = higherBetter ? Math.max(...vals) : Math.min(...vals), worst = higherBetter ? Math.min(...vals) : Math.max(...vals);
+    const yr = Math.max(...AREAS.map((a) => latest[a] ? latest[a].year : 0));
+    return { lbl: `${lbl} <span style="color:var(--muted);font-weight:400">(${yr})</span>`, cells: AREAS.map((a) => { const r = latest[a]; if (!r) return ["—", ""]; const v = r[key]; return [(key === "rate_per_100k" ? v.toFixed(1) : v) + (r.year !== yr ? `<small style="color:var(--muted)"> ${r.year}</small>` : ""), v === best ? "best" : v === worst ? "worst" : ""]; }) };
+  });
+  $("#tCmp").innerHTML = `<table class="cmp"><thead><tr><th>Indicator</th>${AREAS.map((a) => `<th>${a.replace(" County", "")}</th>`).join("")}</tr></thead><tbody>${cmpCells.map((row) => `<tr>${"<td>" + row.lbl + "</td>"}${row.cells.map(([v, c], i) => `<td class="${c}"${i === 0 ? ' style="background:var(--accent-soft);font-weight:600"' : ""}>${v}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
   const late = G.new_diagnoses_and_plwh_by_year;
   chart("cLate", { type: "bar", data: { labels: late.map((r) => r.year), datasets: [{ data: late.map((r) => r.late_diagnosis_pct_of_diagnoses), backgroundColor: PURPLE, borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw}% (${late[c.dataIndex].late_diagnoses} people)` } } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true, title: { display: true, text: "% of diagnoses" } } } } });
 
