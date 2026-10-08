@@ -177,6 +177,12 @@
       <div class="card"><h3>Encounters by health center</h3><div class="hint" id="hSites">Last 8 weeks · all service lines</div><div class="chart-box"><canvas id="cSites"></canvas></div></div>
       <div class="card"><h3>No-show rate by service line</h3><div class="hint">Target ≤ 15% · sorted highest first</div><div id="tNoShow"></div></div>
     </div>
+    <div class="card" style="margin-top:14px"><h3>Encounters by provider over time</h3><div class="hint" id="hProv">Weekly completed encounters for the busiest providers in the selected health centers · provider names withheld in the demo</div>
+      <div class="grid g2" style="margin-top:6px;grid-template-columns:1.3fr 1fr">
+        <div><div class="chart-box" style="height:300px"><canvas id="cProv"></canvas></div></div>
+        <div id="tProv"></div>
+      </div>
+    </div>
   </section>
 
   <section data-tab="quality" class="tabhide">
@@ -314,6 +320,21 @@ const PERIODS = { "8wk": { n: 8, l: "last 8 weeks", k: "8 wks" }, last: { n: 4, 
 let period = "8wk";
 const win = () => PERIODS[period].n;
 const weeksFn = () => WEEKS.slice(-win()), volThisFn = () => VOL_THIS.slice(-win()), volLastFn = () => VOL_LAST.slice(-win());
+// synthetic provider roster: 2–4 clinicians per site, labelled by role only (no names), with a fixed share of the site's volume
+let seed3 = 20261009; const rnd3 = () => { seed3 = (seed3 * 1664525 + 1013904223) % 4294967296; return seed3 / 4294967296; };
+const ROLES = ["NP", "MD", "PA", "NP", "RN"];
+const W_ALL = SITES.reduce((a, b) => a + b.w, 0);
+const PROVIDERS = [];
+SITES.forEach((site) => {
+  const n = site.w >= 1.1 ? 4 : site.w >= 0.7 ? 3 : 2;
+  const shares = Array.from({ length: n }, () => 0.6 + rnd3() * 0.8); const sum = shares.reduce((a, b) => a + b);
+  shares.forEach((sh, i) => {
+    const share = sh / sum, drift = (rnd3() - 0.5) * 0.3, leave = rnd3() < 0.12 ? 10 + Math.floor(rnd3() * 20) : -1; // one in eight has a multi-week gap (leave/vacancy)
+    const siteShare = site.w / W_ALL;
+    const series = (base) => base.map((v, w) => (leave >= 0 && w >= leave && w < leave + 4) ? 0 : Math.round(v * siteShare * share * (1 + drift * (w / base.length - 0.5)) * (1 + (rnd3() - 0.5) * 0.16)));
+    PROVIDERS.push({ id: `${site.id}-${i + 1}`, label: `${site.short} · ${ROLES[i]} ${i + 1}`, site: site.id, siteShort: site.short, role: ROLES[i], thisYr: series(VOL_THIS), lastYr: (() => { const f = 0.82 + rnd3() * 0.36; return series(VOL_LAST).map((x) => Math.round(x * f)); })() });
+  });
+});
 
 // ---------------------------------------------------------------- helpers
 const $ = (s) => document.querySelector(s);
@@ -401,6 +422,7 @@ function render() {
     $("#hSites").textContent = `${PERIODS[period].l[0].toUpperCase() + PERIODS[period].l.slice(1)} · ${v ? v.name : "all service lines"}`;
     chart("cSites", { type: "bar", data: { labels: selSites().map((s) => s.short), datasets: [{ data: SITES.map((s, i) => [s, siteVol[i]]).filter(([s]) => selSites().includes(s)).map(([, x]) => Math.round(x * (v ? 1 / SERVICES.length * 1.6 : 1))), backgroundColor: INK, borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true } } } });
     table($("#tNoShow"), SERVICES.slice().sort((a, b) => b.noshow - a.noshow).map((s) => [s.name, s.noshow, `${s.noshow}%`]), ["Service line", "", "No-show"], 1, 30);
+    renderProviders(v);
   }
   if (active === "quality") {
     kpi($("#kQuality"), [
@@ -463,6 +485,21 @@ function watchouts() {
   return out.sort((a, b) => b.sev - a.sev);
 }
 function scopeLabel() { const v = SERVICES.find((x) => x.id === $("#selService").value); return (siteName === "All health centers" ? "all FCBOH health centers" : siteName) + (v ? ` · ${v.name}` : ""); }
+const PCOL = ["#14283a", "#0f766e", "#b7791f", "#6b5b95", "#2d7dd2", "#b4433a", "#5a8f3c", "#c2185b"];
+function renderProviders(v) {
+  const svcF = v ? 1 / SERVICES.length * 1.6 : 1, n = win();
+  const rows = PROVIDERS.filter((p) => selSites().some((s) => s.id === p.site)).map((p) => {
+    const t = p.thisYr.slice(-n).map((x) => Math.round(x * svcF)), l = p.lastYr.slice(-n).map((x) => Math.round(x * svcF));
+    const tot = t.reduce((a, b) => a + b), last = l.reduce((a, b) => a + b), active = t.filter((x) => x > 0).length;
+    return { ...p, t, tot, last, active, perWk: active ? Math.round(tot / active) : 0, gap: active < n };
+  }).sort((a, b) => b.tot - a.tot);
+  const top = rows.slice(0, 8);
+  $("#hProv").textContent = `Weekly completed encounters · ${PERIODS[period].l} · ${siteSel.length ? siteLabel() : "all health centers"}${v ? " · " + v.name : ""} · top ${top.length} of ${rows.length} providers · names withheld in the demo`;
+  chart("cProv", { type: "line", data: { labels: weeksFn(), datasets: top.map((p, i) => ({ label: p.label, data: p.t, borderColor: PCOL[i % PCOL.length], backgroundColor: PCOL[i % PCOL.length], borderWidth: 1.8, tension: .3, pointRadius: n > 13 ? 0 : 2 })) },
+    options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { autoSkip: true, maxTicksLimit: 10 } }, y: { ...quiet, beginAtZero: true } } } });
+  const mx = Math.max(...rows.map((r) => r.tot), 1);
+  $("#tProv").innerHTML = `<table><thead><tr><th>Provider</th><th></th><th class="num" style="text-align:right">Encounters</th><th class="num" style="text-align:right">vs. LY</th><th class="num" style="text-align:right">per week</th></tr></thead><tbody>${rows.map((r) => { const d = r.last ? Math.round((r.tot - r.last) / r.last * 100) : 0; return `<tr><td>${r.label}${r.gap ? ' <span style="color:var(--warn);font-size:11px">· gap</span>' : ""}</td><td style="width:110px"><div class="bar"><i style="width:${Math.round(r.tot / mx * 100)}%"></i></div></td><td class="num" style="text-align:right">${r.tot.toLocaleString()}</td><td class="num" style="text-align:right;color:${d >= 0 ? "var(--good)" : "var(--bad)"}">${d >= 0 ? "+" : ""}${d}%</td><td class="num" style="text-align:right">${r.perWk}</td></tr>`; }).join("")}</tbody></table>`;
+}
 function renderAI() {
   const tot = volThisFn().reduce((a, b) => a + b), last = volLastFn().reduce((a, b) => a + b), w = watchouts(), t0 = timely[0];
   let txt = `Encounters at <b>${scopeLabel()}</b> are <b>${((tot - last) / last * 100).toFixed(1)}% above</b> the same period last year (${PERIODS[period].l}). `;
