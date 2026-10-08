@@ -173,7 +173,7 @@
       <div class="card"><h3>Third-next-available appointment, by service</h3><div class="hint">Days · target ≤ 7 for clinical services, ≤ 3 for STI/HIV testing</div><div class="chart-box"><canvas id="cTNA"></canvas></div></div>
     </div>
     <div class="grid g2">
-      <div class="card"><h3>Encounters by health center</h3><div class="hint">Last month · all service lines</div><div class="chart-box"><canvas id="cSites"></canvas></div></div>
+      <div class="card"><h3>Encounters by health center</h3><div class="hint" id="hSites">Last 8 weeks · all service lines</div><div class="chart-box"><canvas id="cSites"></canvas></div></div>
       <div class="card"><h3>No-show rate by service line</h3><div class="hint">Target ≤ 15% · sorted highest first</div><div id="tNoShow"></div></div>
     </div>
   </section>
@@ -397,6 +397,7 @@ function render() {
     $("#hVolume").textContent = `Encounters by week — ${PERIODS[period].l}`;
     chart("cVolume", { type: "line", data: { labels: weeksFn(), datasets: [{ label: "2026", data: volThisFn().map(sc), borderColor: TEAL, backgroundColor: TEAL, tension: .3, pointRadius: 3 }, { label: "2025", data: volLastFn().map(sc), borderColor: GRAY, backgroundColor: GRAY, borderDash: [4, 4], tension: .3, pointRadius: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: quiet, y: { ...quiet, beginAtZero: true } } } });
     chart("cTNA", { type: "bar", data: { labels: SERVICES.map((s) => s.name.split(" (")[0].split(" /")[0]), datasets: [{ data: SERVICES.map((s) => s.tna), backgroundColor: SERVICES.map((s) => s.tna <= (s.id === "sti" || s.id === "hiv" ? 3 : 7) ? TEAL : s.tna <= 10 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ...quiet, beginAtZero: true, title: { display: true, text: "days" } }, y: { grid: { display: false }, border: { display: false }, ticks: { autoSkip: false } } } } });
+    $("#hSites").textContent = `${PERIODS[period].l[0].toUpperCase() + PERIODS[period].l.slice(1)} · ${v ? v.name : "all service lines"}`;
     chart("cSites", { type: "bar", data: { labels: selSites().map((s) => s.short), datasets: [{ data: SITES.map((s, i) => [s, siteVol[i]]).filter(([s]) => selSites().includes(s)).map(([, x]) => Math.round(x * (v ? 1 / SERVICES.length * 1.6 : 1))), backgroundColor: INK, borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true } } } });
     table($("#tNoShow"), SERVICES.slice().sort((a, b) => b.noshow - a.noshow).map((s) => [s.name, s.noshow, `${s.noshow}%`]), ["Service line", "", "No-show"], 1, 30);
   }
