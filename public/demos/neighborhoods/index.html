@@ -336,6 +336,9 @@
 
   // ---------- Map ----------
   const map = L.map('map',{zoomSnap:.5, preferCanvas:false});
+  // Safety net against tooltips left open by a missed mouseout (seen on trackpads): close every open tooltip on zoom, pan or when the cursor leaves the map
+  const closeAllTooltips=()=>{ map.eachLayer((l)=>{ if(l.isTooltipOpen && l.isTooltipOpen() && !(l.getTooltip() && l.getTooltip().options.permanent)) l.closeTooltip(); }); };
+  map.on('zoomstart movestart mouseout',closeAllTooltips);
   map.fitBounds(FULTON_BOUNDS,{padding:[8,8]});
   // Quiet basemap: Esri World Light Gray (no API key). Place-name labels sit in a pane above the tracts.
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',{
@@ -395,8 +398,9 @@
       onEachFeature:(f,lyr)=>{
         const id=f.properties.GEOID; idx.set(id,lyr);
         lyr.bindTooltip(()=>tooltipHtml(id,vintage),{sticky:true,className:'tt',direction:'top',opacity:1});
-        lyr.on('mouseover',()=>{ if(id!==S.selectedId){ lyr.setStyle({weight:2,color:'#14283a'}); } lyr.bringToFront(); if(S.selectedLayer) S.selectedLayer.bringToFront(); });
-        lyr.on('mouseout',()=>{ lyr.setStyle(styleFor(id)); });
+        // bringToFront() moves the SVG path in the DOM, which can swallow Leaflet's own mouseout, so tooltips are closed explicitly
+        lyr.on('mouseover',()=>{ layer.eachLayer((o)=>{ if(o!==lyr && o.isTooltipOpen && o.isTooltipOpen()) o.closeTooltip(); }); if(id!==S.selectedId){ lyr.setStyle({weight:2,color:'#14283a'}); } lyr.bringToFront(); if(S.selectedLayer) S.selectedLayer.bringToFront(); });
+        lyr.on('mouseout',()=>{ lyr.setStyle(styleFor(id)); lyr.closeTooltip(); });
         lyr.on('click',()=>selectTract(id,lyr,vintage));
       }
     });
