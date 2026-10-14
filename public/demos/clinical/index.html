@@ -372,7 +372,7 @@ SITES.forEach((site) => {
     const siteShare = site.w / W_ALL;
     const series = (base) => base.map((v, w) => (leave >= 0 && w >= leave && w < leave + 4) ? 0 : Math.round(v * siteShare * share * (1 + drift * (w / base.length - 0.5)) * (1 + (rnd3() - 0.5) * 0.16)));
     const full = NAMES[PROVIDERS.length % NAMES.length];
-    const mixN = 3 + Math.floor(rnd3() * 3), mix = SERVICES.map((sv) => [sv, rnd3()]).sort((a, b) => b[1] - a[1]).slice(0, mixN).map(([sv, r]) => [sv, r + 0.4]);
+    const mixN = 3 + Math.floor(rnd3() * 3), mix = SERVICES.filter((sv) => sv.id !== "wic").map((sv) => [sv, rnd3()]).sort((a, b) => b[1] - a[1]).slice(0, mixN).map(([sv, r]) => [sv, r + 0.4]);
     const mixSum = mix.reduce((a, b) => a + b[1], 0);
     PROVIDERS.push({ id: `${site.id}-${i + 1}`, label: prettyName(full, ROLES[i]), full: `${full}, ${ROLES[i] === "PA" ? "PA-C" : ROLES[i]}`, site: site.id, siteShort: site.short, role: ROLES[i], noshow: Math.round(16 + (rnd3() - 0.5) * 12), tna: Math.round(7 + (rnd3() - 0.5) * 8), qoff: measures.map(() => Math.round((rnd3() - 0.5) * 16)), mix: mix.map(([sv, r]) => [sv, r / mixSum]), thisYr: series(VOL_THIS), lastYr: (() => { const f = 0.82 + rnd3() * 0.36; return series(VOL_LAST).map((x) => Math.round(x * f)); })() });
   });
