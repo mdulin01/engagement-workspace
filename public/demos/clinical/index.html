@@ -13,7 +13,7 @@
     --brand:#14283a; --brand-2:#1f3b52; --accent:#0f766e; --accent-soft:#e3f1ee; --gold:#b7791f;
     --paper:#f6f4ef; --line:#e4ded3; --ink:#1e293b; --muted:#64748b;
     --good:#0f766e; --warn:#b7791f; --bad:#b4433a;
-    --d-access:#1f3b52; --d-quality:#0f766e; --d-programs:#6b5b95; --d-experience:#b7791f;
+    --d-access:#1f3b52; --d-quality:#0f766e; --d-programs:#6b5b95; --d-experience:#b7791f; --d-women:#9d4e7a;
     --shadow:0 1px 2px rgb(20 40 58 / .04),0 8px 24px -12px rgb(20 40 58 / .08);
     --shadow-lg:0 12px 40px rgb(20 40 58 / .18);
   }
@@ -74,7 +74,10 @@
 
   .domains-head{max-width:1520px;margin:18px auto 2px;padding:0 26px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
   .domains-head span{font-weight:500;text-transform:none;letter-spacing:0;color:var(--accent)}
-  .domains{max-width:1520px;margin:8px auto 0;padding:0 26px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .domains{max-width:1520px;margin:8px auto 0;padding:0 26px;display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  .tag{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:999px;background:#f1ecee;color:var(--d-women)}
+  .tag.over{background:#fbe9e7;color:var(--bad)}
+  .tag.ok{background:var(--accent-soft);color:var(--accent)}
   .dchip{position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:13px 15px 12px;cursor:pointer;border-top:4px solid var(--line);transition:transform .12s,box-shadow .12s}
   .dchip:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
   .dchip.active{box-shadow:0 0 0 2px var(--brand) inset,var(--shadow-lg);transform:translateY(-2px)}
@@ -177,6 +180,10 @@
       <div class="card"><h3>Encounters by health center</h3><div class="hint" id="hSites">Last 8 weeks · all service lines</div><div class="chart-box"><canvas id="cSites"></canvas></div></div>
       <div class="card"><h3>No-show rate by service line</h3><div class="hint">Target ≤ 15% · sorted highest first</div><div id="tNoShow"></div></div>
     </div>
+    <div class="grid g2">
+      <div class="card"><h3>HIV tests by week</h3><div class="hint" id="hHivT">Tests performed at the selected health centers vs. the same weeks last year</div><div class="chart-box"><canvas id="cHivT"></canvas></div></div>
+      <div class="card"><h3>HIV tests by health center</h3><div class="hint">Period total, change vs. last year, and positivity · a falling count with steady positivity means fewer people reached, not fewer infections</div><div id="tHivT"></div></div>
+    </div>
     <div class="card" style="margin-top:14px"><h3>Encounters by provider over time</h3><div class="hint" id="hProv">Weekly completed encounters for the busiest providers in the selected health centers · provider names withheld in the demo</div>
       <div class="grid g2" style="margin-top:6px;grid-template-columns:1.3fr 1fr">
         <div><div class="chart-box" style="height:300px"><canvas id="cProv"></canvas></div></div>
@@ -204,6 +211,19 @@
       <div class="card"><h3>New HIV diagnoses: steps completed within 7 days</h3><div class="hint">Last 6 months · 38 new diagnoses across FCBOH sites · Rapid Entry standard</div><div class="chart-box"><canvas id="cCascade"></canvas></div><div class="hint" style="margin-top:8px">Each step is a count of people, so the gap between bars is a worklist: 7 people not yet on ART and 12 without partner elicitation.</div></div>
     </div>
     <div class="card" style="margin-top:14px"><h3>Time-to-action detail</h3><div class="hint">Median time, share within target, 6-month trend and the clients currently outside the window · each row would open a client-level worklist in a live system</div><div id="tTimely"></div></div>
+  </section>
+
+  <section data-tab="women" class="tabhide">
+    <div class="sec">Women's health <span class="note">— cervical cancer screening and family planning, with follow-up tracked to closure</span></div>
+    <div class="kpis" id="kWomen"></div>
+    <div class="grid g2">
+      <div class="card"><h3>Abnormal cervical screening results: steps to closure</h3><div class="hint">Last 6 months · each bar is a count of women, so the drop between bars is a worklist</div><div class="chart-box"><canvas id="cPapCascade"></canvas></div><div class="hint" id="hPapCascade" style="margin-top:8px"></div></div>
+      <div class="card"><h3>Follow-up by result category</h3><div class="hint">Target windows follow ASCCP risk-based management; the local windows shown are illustrative and would be set by FCBOH clinical leadership</div><div id="tPapCat"></div></div>
+    </div>
+    <div class="grid g2">
+      <div class="card"><h3>Worklist: abnormal results outside the follow-up window</h3><div class="hint" id="hPapWork">Top of the list · high-grade results first, then oldest · synthetic clients · in a live system each row opens the chart and logs the outreach attempt</div><div id="tPapWork"></div></div>
+      <div class="card"><h3>Family planning follow-up</h3><div class="hint">Clients with a due date in the period and whether the visit happened on time</div><div id="tFP"></div><div class="chart-box" style="height:170px;margin-top:10px"><canvas id="cFPTrend"></canvas></div></div>
+    </div>
   </section>
 
   <section data-tab="programs" class="tabhide">
@@ -295,6 +315,9 @@ const timely = [
   { m: "Positive chlamydia / gonorrhea → client notified", goal: "≤ 3 days", med: 2.1, unit: "days", pct: 84, tp: 95, trend: [78, 80, 81, 83, 83, 84], open: 23, svc: "sti" },
   { m: "Positive chlamydia / gonorrhea → treated", goal: "≤ 7 days", med: 4, unit: "days", pct: 86, tp: 95, trend: [80, 82, 83, 85, 85, 86], open: 19, svc: "sti" },
   { m: "Positive TB test → treatment started", goal: "≤ 7 days", med: 5, unit: "days", pct: 83, tp: 90, trend: [79, 80, 82, 81, 83, 83], open: 2, svc: "tb" },
+  { m: "Abnormal cervical result → client notified", goal: "≤ 14 days", med: 6, unit: "days", pct: 95, tp: 98, trend: [90, 91, 93, 93, 94, 95], open: 3, svc: "bcc" },
+  { m: "HSIL / ASC-H / AGC → colposcopy completed", goal: "≤ 30 days", med: 24, unit: "days", pct: 73, tp: 95, trend: [60, 63, 66, 69, 71, 73], open: 7, svc: "bcc" },
+  { m: "LSIL / ASC-US HPV+ → follow-up completed", goal: "≤ 90 days", med: 61, unit: "days", pct: 69, tp: 90, trend: [58, 60, 63, 65, 67, 69], open: 44, svc: "bcc" },
   { m: "Lab specimen → result in chart", goal: "≤ 72 hours", med: 41, unit: "hours", pct: 96, tp: 95, trend: [91, 92, 93, 94, 95, 96], open: 12 },
   { m: "Reportable result → SendSS report filed", goal: "≤ 7 days (Georgia rule)", med: 2, unit: "days", pct: 94, tp: 100, trend: [90, 91, 92, 93, 94, 94], open: 6 },
 ];
@@ -356,6 +379,46 @@ function table(el, rows, cols, barIdx, max) {
   el.innerHTML = `<table><thead><tr>${cols.map((c) => `<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => i === barIdx ? `<td style="width:38%"><div class="bar"><i style="width:${Math.min(100, c / max * 100)}%"></i></div></td>` : `<td class="${typeof c === "number" ? "num" : ""}">${typeof c === "number" ? c.toLocaleString() : c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
 }
 
+// HIV testing volume by site: weekly series for this year and last, with this year running lower (the pattern leadership flagged)
+let seed4 = 20261014; const rnd4 = () => { seed4 = (seed4 * 1664525 + 1013904223) % 4294967296; return seed4 / 4294967296; };
+const HIV_SITES = SITES.filter((s) => s.id !== "northfulton" && s.id !== "chr"); // WIC-only and rehab sites do not test
+const HIV_TESTS = HIV_SITES.map((site, i) => {
+  const base = 46 * site.w, decline = [0.78, 0.9, 0.84, 0.95, 0.72, 0.88][i] || 0.85, posRate = 0.008 + rnd4() * 0.007;
+  const ly = MON.map((_, w) => Math.round(base * season(w) * (1 + (rnd4() - 0.5) * 0.3)));
+  const ty = ly.map((v, w) => Math.round(v * (1 - (1 - decline) * Math.min(1, w / 20)) * (1 + (rnd4() - 0.5) * 0.3)));
+  return { site, ly, ty, posRate };
+});
+// Abnormal cervical screening results and follow-up (last 6 months)
+const PAP_CASCADE = [["Abnormal result", 214], ["Client notified ≤ 14 d", 203], ["Follow-up plan documented", 181], ["Follow-up completed in window", 152], ["Result closed in chart", 139]];
+const PAP_CAT = [
+  { cat: "HSIL / ASC-H", win: "colposcopy ≤ 30 days", n: 27, pct: 74, tp: 95, over: 5 },
+  { cat: "AGC", win: "colposcopy + endometrial sampling ≤ 30 days", n: 6, pct: 67, tp: 95, over: 2 },
+  { cat: "LSIL", win: "colposcopy or repeat ≤ 90 days", n: 58, pct: 69, tp: 90, over: 14 },
+  { cat: "ASC-US, HPV positive", win: "colposcopy ≤ 90 days", n: 81, pct: 73, tp: 90, over: 17 },
+  { cat: "HPV 16/18 positive, cytology normal", win: "colposcopy ≤ 90 days", n: 42, pct: 60, tp: 90, over: 13 },
+];
+const PAP_WORK = [
+  ["C-2417", "adamsville", "HSIL", 41, "2 calls, no answer", "Colposcopy not scheduled"],
+  ["C-1180", "collegepark", "HSIL", 38, "Letter sent", "Colposcopy not scheduled"],
+  ["C-3302", "north", "AGC", 36, "Reached, declined appt", "Needs clinician call"],
+  ["C-0931", "neighborhood", "ASC-H", 33, "1 call, no answer", "Colposcopy not scheduled"],
+  ["C-2765", "adamsville", "LSIL", 118, "No contact logged", "Not yet notified"],
+  ["C-1604", "parkplace", "ASC-US HPV+", 112, "Reached, appt missed", "Reschedule"],
+  ["C-0288", "collegepark", "HPV 16+", 104, "2 calls, no answer", "Colposcopy not scheduled"],
+  ["C-3519", "oakhill", "LSIL", 97, "Letter sent", "Awaiting response"],
+  ["C-1947", "north", "ASC-US HPV+", 95, "Wrong number on file", "Address verification"],
+  ["C-2250", "neighborhood", "LSIL", 93, "Reached, scheduled", "Appt Oct 21"],
+];
+const FP_FOLLOWUP = [
+  { m: "DMPA injection due (11–13 weeks)", due: 486, ontime: 79, tp: 85, over: 61 },
+  { m: "Implant or IUD check (4–6 weeks after placement)", due: 138, ontime: 71, tp: 85, over: 24 },
+  { m: "Postpartum visit (≤ 12 weeks)", due: 94, ontime: 66, tp: 80, over: 19 },
+  { m: "Pill or patch refill before supply runs out", due: 611, ontime: 82, tp: 90, over: 70 },
+  { m: "Positive pregnancy test → options counseling documented", due: 73, ontime: 88, tp: 95, over: 4 },
+];
+const FP_TREND = [70, 72, 73, 75, 77, 78];
+const CERV_SCREEN = { pct: 66, tp: 75, trend: [61, 62, 63, 64, 65, 66] };
+
 // ---------------------------------------------------------------- controls
 let siteSel = []; // empty = all health centers
 const selSites = () => siteSel.length ? SITES.filter((s) => siteSel.includes(s.id)) : SITES;
@@ -391,6 +454,7 @@ function onFilter() {
 const DOMAINS = [
   { id: "access", l: "Access & volume", icon: "A", color: "var(--d-access)", v: () => Math.round(volThisFn().reduce((a, b) => a + b) * scale).toLocaleString(), d: () => `encounters · ${PERIODS[period].l}` },
   { id: "quality", l: "Quality & care gaps", icon: "Q", color: "var(--d-quality)", v: () => `${atTarget} of ${measures.length}`, d: `measures at target · ART ≤ 7 days: ${timely[0].pct}%` },
+  { id: "women", l: "Women's health", icon: "W", color: "var(--d-women)", v: () => `${PAP_CAT.reduce((a, c) => a + c.over, 0)}`, d: "abnormal cervical results overdue for follow-up" },
   { id: "programs", l: "Program outcomes", icon: "P", color: "var(--d-programs)", v: () => "88%", d: "Rapid Entry within 7 days (goal 90%)" },
   { id: "experience", l: "Client experience", icon: "E", color: "var(--d-experience)", v: () => "+44", d: "net promoter, September" },
 ];
@@ -415,6 +479,7 @@ function render() {
       { l: "No-show rate", v: ns, u: "%", c: pctClass(ns, 15, true), t: "target ≤ 15%" },
       { l: "Same-day STI/HIV slots used", v: 84, u: "%", c: "good", t: "of slots offered" },
       { l: "Unique clients (YTD)", v: sc(41280).toLocaleString(), c: "good", t: "+6% vs. last year" },
+      (() => { const h = hivTotals(); return { l: `HIV tests (${PERIODS[period].k})`, v: h.ty.toLocaleString(), c: h.d <= -5 ? "bad" : h.d < 0 ? "warn" : "good", t: `${h.d > 0 ? "+" : ""}${h.d}% vs. last year · ${h.pos}% positive` }; })(),
     ]);
     $("#hVolume").textContent = `Encounters by week — ${PERIODS[period].l}`;
     chart("cVolume", { type: "line", data: { labels: weeksFn(), datasets: [{ label: "2026", data: volThisFn().map(sc), borderColor: TEAL, backgroundColor: TEAL, tension: .3, pointRadius: 3 }, { label: "2025", data: volLastFn().map(sc), borderColor: GRAY, backgroundColor: GRAY, borderDash: [4, 4], tension: .3, pointRadius: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: quiet, y: { ...quiet, beginAtZero: true } } } });
@@ -423,6 +488,7 @@ function render() {
     chart("cSites", { type: "bar", data: { labels: selSites().map((s) => s.short), datasets: [{ data: SITES.map((s, i) => [s, siteVol[i]]).filter(([s]) => selSites().includes(s)).map(([, x]) => Math.round(x * (v ? 1 / SERVICES.length * 1.6 : 1))), backgroundColor: INK, borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true } } } });
     table($("#tNoShow"), SERVICES.slice().sort((a, b) => b.noshow - a.noshow).map((s) => [s.name, s.noshow, `${s.noshow}%`]), ["Service line", "", "No-show"], 1, 30);
     renderProviders(v);
+    renderHivTests(v);
   }
   if (active === "quality") {
     kpi($("#kQuality"), [
@@ -448,6 +514,7 @@ function render() {
     chart("cClosure", { type: "bar", data: { labels: clos.map(([s]) => s.short), datasets: [{ data: closV, backgroundColor: closV.map((c) => c >= 95 ? TEAL : c >= 90 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, min: 70, max: 100 } } } });
     table($("#tDocs"), docs.map((d) => [d[0], d[1], `${d[1]}%`]), ["Field", "", "Complete"], 1, 100);
   }
+  if (active === "women") renderWomen();
   if (active === "programs") {
     kpi($("#kPrograms"), [
       { l: "Rapid Entry ≤ 7 days", v: 88, u: "%", c: "warn", t: "goal 90% · best month this year" },
@@ -481,11 +548,51 @@ function watchouts() {
   timely.filter((t) => t.pct < t.tp).sort((a, b) => (a.pct / a.tp) - (b.pct / b.tp)).slice(0, 3).forEach((t) => out.push({ sev: t.pct < t.tp * 0.85 ? 2 : 1, dom: "Timeliness", txt: `${t.m} within ${t.goal.split(",")[0].replace("≤ ", "")}: ${t.pct}% (goal ${t.tp}%), ${t.open} clients outside the window`, area: "quality" }));
   SERVICES.filter((s) => s.tna > 10).forEach((s) => out.push({ sev: 1, dom: "Access", txt: `third-next-available ${s.tna} days for ${s.name.split(" (")[0].toLowerCase()} with a ${s.noshow}% no-show rate`, area: "access" }));
   out.push({ sev: 1, dom: "Quality", txt: `${measures.length - atTarget} of ${measures.length} care measures below target; largest gap ${gaps[0][0].toLowerCase()} (${gaps[0][1].toLocaleString()} clients)`, area: "quality" });
+  const hi = PAP_CAT.filter((c) => /HSIL|AGC/.test(c.cat)).reduce((a, c) => a + c.over, 0);
+  out.push({ sev: 2, dom: "Women's health", txt: `${hi} women with a high-grade cervical result (HSIL, ASC-H, AGC) are past the 30-day colposcopy window and ${PAP_CAT.reduce((a, c) => a + c.over, 0)} abnormal results are overdue overall`, area: "women" });
+  { const h = hivTotals(); if (h.d < 0) out.push({ sev: h.d <= -10 ? 2 : 1, dom: "Testing", txt: `HIV tests are ${Math.abs(h.d)}% below the same period last year (${h.ty.toLocaleString()} vs. ${h.ly.toLocaleString()}) with positivity steady at ${h.pos}%, so fewer people are being reached`, area: "access" }); }
   out.push({ sev: 1, dom: "Data", txt: `SOGI recorded on 58% of charts, which limits HIV and STI reporting`, area: "quality" });
   return out.sort((a, b) => b.sev - a.sev);
 }
 function scopeLabel() { const v = SERVICES.find((x) => x.id === $("#selService").value); return (siteName === "All health centers" ? "all FCBOH health centers" : siteName) + (v ? ` · ${v.name}` : ""); }
 const PCOL = ["#14283a", "#0f766e", "#b7791f", "#6b5b95", "#2d7dd2", "#b4433a", "#5a8f3c", "#c2185b"];
+function hivTotals() {
+  const n = win(), rows = HIV_TESTS.filter((h) => selSites().includes(h.site));
+  const ty = rows.reduce((a, h) => a + h.ty.slice(-n).reduce((x, y) => x + y, 0), 0), ly = rows.reduce((a, h) => a + h.ly.slice(-n).reduce((x, y) => x + y, 0), 0);
+  const posN = rows.reduce((a, h) => a + h.ty.slice(-n).reduce((x, y) => x + y, 0) * h.posRate, 0);
+  return { ty, ly, d: ly ? Math.round((ty - ly) / ly * 100) : 0, pos: ty ? (posN / ty * 100).toFixed(1) : "0.0" };
+}
+function renderHivTests(v) {
+  const n = win(), rows = HIV_TESTS.filter((h) => selSites().includes(h.site));
+  const sumW = (k) => weeksFn().map((_, i) => rows.reduce((a, h) => a + h[k].slice(-n)[i], 0));
+  $("#hHivT").textContent = `${PERIODS[period].l[0].toUpperCase() + PERIODS[period].l.slice(1)} · ${siteSel.length ? siteLabel() : "all testing sites"} vs. the same weeks last year${v && v.id !== "hiv" && v.id !== "sti" ? " · HIV tests are counted across service lines" : ""}`;
+  chart("cHivT", { type: "line", data: { labels: weeksFn(), datasets: [{ label: "2026", data: sumW("ty"), borderColor: INK, backgroundColor: INK, tension: .3, pointRadius: n > 13 ? 0 : 3 }, { label: "2025", data: sumW("ly"), borderColor: GRAY, backgroundColor: GRAY, borderDash: [4, 4], tension: .3, pointRadius: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { autoSkip: true, maxTicksLimit: 10 } }, y: { ...quiet, beginAtZero: true } } } });
+  const per = rows.map((h) => { const ty = h.ty.slice(-n).reduce((a, b) => a + b, 0), ly = h.ly.slice(-n).reduce((a, b) => a + b, 0); return { s: h.site, ty, ly, d: Math.round((ty - ly) / ly * 100), pos: (h.posRate * 100).toFixed(1), posN: Math.round(ty * h.posRate) }; }).sort((a, b) => b.ty - a.ty);
+  const mx = Math.max(...per.map((r) => r.ty), 1);
+  $("#tHivT").innerHTML = `<table><thead><tr><th>Health center</th><th></th><th class="num" style="text-align:right">Tests</th><th class="num" style="text-align:right">vs. LY</th><th class="num" style="text-align:right">Positive</th><th class="num" style="text-align:right">Positivity</th></tr></thead><tbody>${per.map((r) => `<tr><td>${r.s.short}</td><td style="width:110px"><div class="bar"><i style="width:${Math.round(r.ty / mx * 100)}%"></i></div></td><td class="num" style="text-align:right">${r.ty.toLocaleString()}</td><td class="num" style="text-align:right;color:${r.d <= -5 ? "var(--bad)" : r.d < 0 ? "var(--warn)" : "var(--good)"}">${r.d > 0 ? "+" : ""}${r.d}%</td><td class="num" style="text-align:right">${r.posN}</td><td class="num" style="text-align:right">${r.pos}%</td></tr>`).join("")}</tbody></table>`;
+}
+function renderWomen() {
+  const sc = (v) => Math.round(v * scale);
+  const tN = timely.find((t) => t.svc === "bcc" && /notified/.test(t.m)), tH = timely.find((t) => /HSIL/.test(t.m)), tL = timely.find((t) => /LSIL/.test(t.m));
+  const overdue = PAP_CAT.reduce((a, c) => a + c.over, 0), fpOver = FP_FOLLOWUP.reduce((a, c) => a + c.over, 0);
+  kpi($("#kWomen"), [
+    { l: "Cervical screening up to date", v: CERV_SCREEN.pct, u: "%", c: pctClass(CERV_SCREEN.pct, CERV_SCREEN.tp), t: `eligible women 21–65 · target ${CERV_SCREEN.tp}%` },
+    { l: "Abnormal results (6 mo)", v: sc(PAP_CASCADE[0][1]), c: "good", t: `${sc(PAP_CASCADE[4][1])} closed in chart` },
+    { l: "Notified ≤ 14 days", v: tN.pct, u: "%", c: pctClass(tN.pct, tN.tp), t: `median ${tN.med} days · goal ${tN.tp}%` },
+    { l: "High-grade → colposcopy ≤ 30 d", v: tH.pct, u: "%", c: pctClass(tH.pct, tH.tp), t: `median ${tH.med} days · goal ${tH.tp}%` },
+    { l: "Overdue for follow-up now", v: sc(overdue), c: "bad", t: "abnormal results · worklist below" },
+    { l: "Family planning follow-up on time", v: FP_TREND.at(-1), u: "%", c: pctClass(FP_TREND.at(-1), 85), t: `${sc(fpOver)} overdue · goal 85%` },
+  ]);
+  const c0 = PAP_CASCADE[0][1];
+  chart("cPapCascade", { type: "bar", data: { labels: PAP_CASCADE.map((c) => c[0]), datasets: [{ data: PAP_CASCADE.map((c) => sc(c[1])), backgroundColor: PAP_CASCADE.map((c, i) => i === 0 ? INK : c[1] / c0 >= 0.9 ? TEAL : c[1] / c0 >= 0.75 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw} women` } } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 11 } } }, y: { ...quiet, beginAtZero: true } } } });
+  $("#hPapCascade").textContent = `${sc(PAP_CASCADE[0][1] - PAP_CASCADE[1][1])} women not yet notified, ${sc(PAP_CASCADE[1][1] - PAP_CASCADE[2][1])} notified without a documented plan, and ${sc(PAP_CASCADE[2][1] - PAP_CASCADE[3][1])} with a plan but no completed follow-up. Each is a worklist, not a statistic.`;
+  $("#tPapCat").innerHTML = `<table><thead><tr><th>Result</th><th>Local window</th><th class="num" style="text-align:right">Women</th><th class="num" style="text-align:right">In window</th><th class="num" style="text-align:right">Goal</th><th class="num" style="text-align:right">Overdue now</th></tr></thead><tbody>${PAP_CAT.map((c) => `<tr><td><b>${c.cat}</b></td><td style="color:var(--muted)">${c.win}</td><td class="num" style="text-align:right">${sc(c.n)}</td><td class="num ${pctClass(c.pct, c.tp)}" style="text-align:right"><b>${c.pct}%</b></td><td class="num" style="text-align:right">${c.tp}%</td><td class="num" style="text-align:right;color:var(--bad)"><b>${sc(c.over)}</b></td></tr>`).join("")}</tbody></table>`;
+  const work = PAP_WORK.filter((w) => selSites().some((s) => s.id === w[1])).sort((a, b) => { const hi = (r) => /HSIL|ASC-H|AGC/.test(r[2]) ? 0 : 1; return hi(a) - hi(b) || b[3] - a[3]; });
+  $("#hPapWork").textContent = `Showing ${Math.min(work.length, 10)} of ${sc(overdue)} overdue · high-grade results first, then oldest · synthetic clients · in a live system each row opens the chart and logs the outreach attempt`;
+  $("#tPapWork").innerHTML = work.length ? `<table><thead><tr><th>Client</th><th>Site</th><th>Result</th><th class="num" style="text-align:right">Days since result</th><th>Last outreach</th><th>Next step</th></tr></thead><tbody>${work.map((w) => { const hi = /HSIL|ASC-H|AGC/.test(w[2]), site = SITES.find((s) => s.id === w[1]); return `<tr><td class="num">${w[0]} <span class="tag">synthetic</span></td><td>${site.short}</td><td><b>${w[2]}</b>${hi ? ' <span class="tag over">high grade</span>' : ""}</td><td class="num" style="text-align:right;color:${hi && w[3] > 30 || w[3] > 90 ? "var(--bad)" : "inherit"}"><b>${w[3]}</b></td><td style="color:var(--muted)">${w[4]}</td><td>${w[5]}</td></tr>`; }).join("")}</tbody></table>` : `<div class="hint">No overdue abnormal results at the selected health centers.</div>`;
+  $("#tFP").innerHTML = `<table><thead><tr><th>Follow-up</th><th class="num" style="text-align:right">Due</th><th class="num" style="text-align:right">On time</th><th class="num" style="text-align:right">Goal</th><th class="num" style="text-align:right">Overdue</th></tr></thead><tbody>${FP_FOLLOWUP.map((f) => `<tr><td>${f.m}</td><td class="num" style="text-align:right">${sc(f.due)}</td><td class="num ${pctClass(f.ontime, f.tp)}" style="text-align:right"><b>${f.ontime}%</b></td><td class="num" style="text-align:right">${f.tp}%</td><td class="num" style="text-align:right;color:var(--bad)"><b>${sc(f.over)}</b></td></tr>`).join("")}</tbody></table>`;
+  chart("cFPTrend", { type: "line", data: { labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep"], datasets: [{ label: "FP follow-up on time %", data: FP_TREND, borderColor: TEAL, backgroundColor: TEAL, tension: .3, pointRadius: 3 }, { label: "Cervical screening up to date %", data: CERV_SCREEN.trend, borderColor: "#9d4e7a", backgroundColor: "#9d4e7a", tension: .3, pointRadius: 3 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, min: 50, max: 100 } } } });
+}
 function renderProviders(v) {
   const svcF = v ? 1 / SERVICES.length * 1.6 : 1, n = win();
   const rows = PROVIDERS.filter((p) => selSites().some((s) => s.id === p.site)).map((p) => {
@@ -507,7 +614,7 @@ function renderAI() {
   txt += `Top watch-outs: ${w.slice(0, 2).map((f) => `${f.txt} <span class="ai-link" data-area="${f.area}">[review]</span>`).join("; and ")}.`;
   const ai = $("#aiInsight"); ai.innerHTML = txt;
   ai.querySelectorAll(".ai-link").forEach((l) => l.onclick = () => openArea(l.dataset.area));
-  const chips = ["What should clinical leadership focus on this month?", "Where are we slow from a positive result to action?", "Which care gaps are largest?", "Draft a huddle note for the STI clinic"];
+  const chips = ["What should clinical leadership focus on this month?", "Who has an abnormal Pap without follow-up?", "Why are HIV tests down?", "Where are we slow from a positive result to action?", "Which care gaps are largest?", "Draft a huddle note for the STI clinic"];
   const cc = $("#aiChips"); cc.innerHTML = chips.map((c) => `<span class="ai-chip">${c}</span>`).join("");
   cc.querySelectorAll(".ai-chip").forEach((el) => el.onclick = () => { $("#aiInput").value = el.textContent; askAI(el.textContent); });
 }
@@ -517,7 +624,13 @@ function askAI(q) {
   const list = (items) => `<ul>${items.map((i) => `<li>${i}</li>`).join("")}</ul>`;
   const link = (area, label) => `<span class="ai-link" data-area="${area}">${label}</span>`;
   let html = "";
-  if (/(focus|priorit|month|week|today|important|first|leadership)/.test(ql)) {
+  if (/(pap|cervical|colpo|abnormal|hsil|lsil|ascus|asc-us|hpv|family planning|contracep|dmpa|iud|implant|postpartum|women)/.test(ql)) {
+    const work = PAP_WORK.filter((w) => selSites().some((s) => s.id === w[1])), hi = work.filter((w) => /HSIL|ASC-H|AGC/.test(w[2]));
+    html = `<h5>Abnormal cervical results without follow-up — ${who}</h5><b>${Math.round(PAP_CAT.reduce((a, c) => a + c.over, 0) * scale)}</b> women are outside their follow-up window, <b>${PAP_CAT.filter((c) => /HSIL|AGC/.test(c.cat)).reduce((a, c) => a + c.over, 0)}</b> with a high-grade result past 30 days; the worklist shows the ${work.length} most urgent. Of ${PAP_CASCADE[0][1]} abnormal results in six months, ${PAP_CASCADE[4][1]} are closed in the chart.` + list([`<b>Today:</b> clinician call for the ${hi.length} high-grade results — ${link("women", "open worklist")}`, `<b>This week:</b> ${work.filter((w) => /No contact|Not yet/.test(w[4] + w[5])).length} women have no outreach logged at all; start there`, `<b>Fix the leak:</b> ${PAP_CASCADE[1][1] - PAP_CASCADE[2][1]} women were notified but have no documented plan — a required field at result review would close that gap`, `Family planning: ${FP_FOLLOWUP.reduce((a, f) => a + f.over, 0)} follow-ups overdue, mostly DMPA and refills — ${link("women", "open")}`]);
+  } else if (/(hiv test|tests? down|testing|fewer tests|test volume)/.test(ql)) {
+    const h = hivTotals(), per = HIV_TESTS.filter((x) => selSites().includes(x.site)).map((x) => { const n = win(); const ty = x.ty.slice(-n).reduce((a, b) => a + b, 0), ly = x.ly.slice(-n).reduce((a, b) => a + b, 0); return { s: x.site.short, d: Math.round((ty - ly) / ly * 100) }; }).sort((a, b) => a.d - b.d);
+    html = `<h5>HIV testing volume — ${who}</h5><b>${h.ty.toLocaleString()}</b> tests in ${PERIODS[period].l}, <b>${h.d}%</b> vs. the same weeks last year, positivity ${h.pos}%. Positivity has not risen, so the decline is reach, not a change in who is tested. Largest drops:` + list(per.slice(0, 3).map((x) => `<b>${x.s}</b>: ${x.d}% — ${link("access", "open")}`)) + `<p style="margin-top:8px">Questions the data cannot answer yet: were same-day STI/HIV slots cut, did outreach testing move off-site, did a rapid-test kit supply issue occur? Those need a staffing and supply feed (Deliverable 2), and a county benchmark needs Georgia DPH testing data — see the HIV demo's Compare tab.</p>`;
+  } else if (/(focus|priorit|month|week|today|important|first|leadership)/.test(ql)) {
     html = `<h5>Focus this month — ${who}</h5>Ranked by effect on transmission and access:` + list(w.slice(0, 4).map((f) => `<b>${f.dom}:</b> ${f.txt} — ${link(f.area, "open worklist")}`));
   } else if (/(slow|time|timel|delay|positive|result|action|art|syphilis|chlamydia|gonorr|sti|hiv|notif|contact|partner|dis\b)/.test(ql)) {
     const slow = timely.slice().sort((a, b) => (a.pct / a.tp) - (b.pct / b.tp)).slice(0, 4);
