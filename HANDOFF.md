@@ -56,7 +56,13 @@ Needs global `pptxgenjs`, `react`, `react-dom`, `react-icons`, `sharp`. Images u
 - FCBOH Engagement Workspace Plan: https://claude.ai/code/artifact/b07c9b00-16f5-495e-afbe-a8bfafea67ab
 - FCBOH Data Modernization Endpoint (the source for the deck): https://claude.ai/code/artifact/d71970fe-79b7-4156-8e58-e6fe8317bd2e
 
-## State as of 2026-10-08
+## State as of 2026-10-14
+
+- Demos updated live during and after the Oct 8 kickoff, all on `main` and deployed: clinical dashboard has a multi-select health-center picker, a reporting period that drives the weekly series, encounters by provider with a provider filter and drill-down (fictional roster in `NAMES`), HIV tests by site, and a Women's health domain (abnormal cervical result follow-up cascade, category table, worklist, family planning follow-up). HIV demo has a Compare tab (`demos/data/ahead_compare.json`: AHEAD indicators for Fulton, DeKalb, Cobb, Gwinnett, Georgia; fetch is `areaId` 1031/779/608/1185/11). Neighborhoods map closes tract tooltips explicitly. A shared nav strip (`demos/nav.js`) sits on every demo page.
+- The briefing deck Mike presents is edited by hand from the 12-slide version (six screenshot and findings slides added after "What governed data makes possible"); `tools/deck/build.js` was not updated and now lags the presented deck.
+- Kickoff findings and the Oct 8 stakeholder roster are in `src/config/seeds.json` (Admin → Data seeds). Rashaud Senior and Jonathan Ong are confirmed in the revised proposal (Oct 9).
+
+## State as of 2026-10-08 (historical)
 
 - Commits `90c6af3` (demos) and `124eaff` (clinical demo AI bar + timeliness) are local on Mike's Mac and **not pushed**. First action: `git push`, then confirm the Vercel deploy serves `/demos/`.
 - `.git/stale-locks/` holds lock files moved aside by a sandboxed git; safe to delete.
