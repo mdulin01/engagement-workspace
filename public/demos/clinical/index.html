@@ -75,6 +75,7 @@
   .domains-head{max-width:1520px;margin:18px auto 2px;padding:0 26px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
   .domains-head span{font-weight:500;text-transform:none;letter-spacing:0;color:var(--accent)}
   .domains{max-width:1520px;margin:8px auto 0;padding:0 26px;display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  tr[data-pid]{cursor:pointer} tr[data-pid]:hover td{background:var(--paper)} tr.sel td{background:var(--accent-soft)}
   .tag{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:999px;background:#f1ecee;color:var(--d-women)}
   .tag.over{background:#fbe9e7;color:var(--bad)}
   .tag.ok{background:var(--accent-soft);color:var(--accent)}
@@ -139,6 +140,9 @@
   <div class="ctrl"><label>Service line</label>
     <select id="selService"></select>
   </div>
+  <div class="ctrl"><label>Provider <span style="opacity:.7;text-transform:none;letter-spacing:0">(fictional roster)</span></label>
+    <select id="selProv"></select>
+  </div>
   <div class="ctrl"><label>Reporting period</label>
     <select id="selPeriod">
       <option value="8wk" selected>Last 8 weeks</option>
@@ -183,6 +187,15 @@
     <div class="grid g2">
       <div class="card"><h3>HIV tests by week</h3><div class="hint" id="hHivT">Tests performed at the selected health centers vs. the same weeks last year</div><div class="chart-box"><canvas id="cHivT"></canvas></div></div>
       <div class="card"><h3>HIV tests by health center</h3><div class="hint">Period total, change vs. last year, and positivity · a falling count with steady positivity means fewer people reached, not fewer infections</div><div id="tHivT"></div></div>
+    </div>
+    <div class="card" id="provDrill" style="margin-top:14px;border-color:var(--accent)" hidden>
+      <h3 id="hDrill">Provider drill-down</h3><div class="hint" id="hDrillSub"></div>
+      <div class="kpis" id="kDrill" style="margin-top:10px"></div>
+      <div class="grid g3">
+        <div><h3 style="font-size:13px">Weekly encounters vs. last year</h3><div class="chart-box" style="height:220px"><canvas id="cDrillVol"></canvas></div></div>
+        <div><h3 style="font-size:13px">Service mix in the period</h3><div class="chart-box" style="height:220px"><canvas id="cDrillMix"></canvas></div></div>
+        <div><h3 style="font-size:13px">Quality snapshot vs. health center</h3><div class="hint">Provider rate minus site rate, percentage points</div><div id="tDrillQ"></div></div>
+      </div>
     </div>
     <div class="card" style="margin-top:14px"><h3>Encounters by provider over time</h3><div class="hint" id="hProv">Weekly completed encounters for the busiest providers in the selected health centers · provider names withheld in the demo</div>
       <div class="grid g2" style="margin-top:6px;grid-template-columns:1.3fr 1fr">
@@ -346,6 +359,9 @@ const weeksFn = () => WEEKS.slice(-win()), volThisFn = () => VOL_THIS.slice(-win
 // synthetic provider roster: 2–4 clinicians per site, labelled by role only (no names), with a fixed share of the site's volume
 let seed3 = 20261009; const rnd3 = () => { seed3 = (seed3 * 1664525 + 1013904223) % 4294967296; return seed3 / 4294967296; };
 const ROLES = ["NP", "MD", "PA", "NP", "RN"];
+// fictional names for the demo roster; any resemblance to real FCBOH staff is coincidental
+const NAMES = ["Imani Okonkwo", "Rafael Esquivel", "Priya Venkataraman", "Danielle Hartwell", "Marcus Leblanc", "Yusuf Adeyemi", "Carmen Villanueva", "Theo Brandvold", "Aaliyah Mensah", "Nikolai Petrov", "Sofia Marchetti", "Devon Whitfield", "Mei-Ling Zhao", "Gabriel Santoro", "Nadia Haddad", "Elijah Thornbury", "Rosalind Achebe", "Kwame Asante", "Isabela Furtado", "Hana Yoshida", "Omar Benali", "Lucia Cardenas", "Jamal Kirkland", "Anika Sørensen", "Tobias Reinholt"];
+const prettyName = (full, role) => `${full.split(" ")[0][0]}. ${full.split(" ").slice(1).join(" ")}, ${role === "PA" ? "PA-C" : role}`;
 const W_ALL = SITES.reduce((a, b) => a + b.w, 0);
 const PROVIDERS = [];
 SITES.forEach((site) => {
@@ -355,7 +371,10 @@ SITES.forEach((site) => {
     const share = sh / sum, drift = (rnd3() - 0.5) * 0.3, leave = rnd3() < 0.12 ? 10 + Math.floor(rnd3() * 20) : -1; // one in eight has a multi-week gap (leave/vacancy)
     const siteShare = site.w / W_ALL;
     const series = (base) => base.map((v, w) => (leave >= 0 && w >= leave && w < leave + 4) ? 0 : Math.round(v * siteShare * share * (1 + drift * (w / base.length - 0.5)) * (1 + (rnd3() - 0.5) * 0.16)));
-    PROVIDERS.push({ id: `${site.id}-${i + 1}`, label: `${site.short} · ${ROLES[i]} ${i + 1}`, site: site.id, siteShort: site.short, role: ROLES[i], thisYr: series(VOL_THIS), lastYr: (() => { const f = 0.82 + rnd3() * 0.36; return series(VOL_LAST).map((x) => Math.round(x * f)); })() });
+    const full = NAMES[PROVIDERS.length % NAMES.length];
+    const mixN = 3 + Math.floor(rnd3() * 3), mix = SERVICES.map((sv) => [sv, rnd3()]).sort((a, b) => b[1] - a[1]).slice(0, mixN).map(([sv, r]) => [sv, r + 0.4]);
+    const mixSum = mix.reduce((a, b) => a + b[1], 0);
+    PROVIDERS.push({ id: `${site.id}-${i + 1}`, label: prettyName(full, ROLES[i]), full: `${full}, ${ROLES[i] === "PA" ? "PA-C" : ROLES[i]}`, site: site.id, siteShort: site.short, role: ROLES[i], noshow: Math.round(16 + (rnd3() - 0.5) * 12), tna: Math.round(7 + (rnd3() - 0.5) * 8), qoff: measures.map(() => Math.round((rnd3() - 0.5) * 16)), mix: mix.map(([sv, r]) => [sv, r / mixSum]), thisYr: series(VOL_THIS), lastYr: (() => { const f = 0.82 + rnd3() * 0.36; return series(VOL_LAST).map((x) => Math.round(x * f)); })() });
   });
 });
 
@@ -435,20 +454,30 @@ $("#mselBtn").addEventListener("click", (e) => { e.stopPropagation(); $("#mselPo
 $("#mselPop").addEventListener("click", (e) => e.stopPropagation());
 document.addEventListener("click", () => $("#mselPop").classList.remove("open"));
 $("#selService").innerHTML = `<option value="all">All service lines</option>` + SERVICES.map((s) => `<option value="${s.id}">${s.name}</option>`).join("");
-let scale = 1, siteName = "All health centers";
+let scale = 1, siteName = "All health centers", provSel = "";
+const selProv = () => PROVIDERS.find((p) => p.id === provSel) || null;
+const provShare = (p) => p.thisYr.reduce((a, b) => a + b, 0) / PROVIDERS.reduce((a, q) => a + q.thisYr.reduce((x, y) => x + y, 0), 0);
+function buildProvSelect() {
+  const ss = selSites(), el = $("#selProv");
+  if (provSel && !ss.some((s) => s.id === selProv().site)) provSel = "";
+  el.innerHTML = `<option value="">All providers</option>` + ss.map((s) => `<optgroup label="${s.short}">${PROVIDERS.filter((p) => p.site === s.id).map((p) => `<option value="${p.id}">${p.full}</option>`).join("")}</optgroup>`).join("");
+  el.value = provSel;
+}
 function onFilter() {
   const svc = $("#selService").value, v = SERVICES.find((x) => x.id === svc), ss = selSites();
   period = $("#selPeriod").value;
   const wAll = SITES.reduce((a, b) => a + b.w, 0), wSel = ss.reduce((a, b) => a + b.w, 0);
-  scale = (siteSel.length ? wSel / wAll : 1) * (v ? 1 / SERVICES.length * 1.6 : 1);
-  siteName = siteLabel();
-  $("#mselBtn").textContent = siteName;
+  provSel = $("#selProv").value; buildProvSelect(); const pr = selProv();
+  scale = (pr ? provShare(pr) : siteSel.length ? wSel / wAll : 1) * (v ? 1 / SERVICES.length * 1.6 : 1);
+  $("#mselBtn").textContent = siteLabel();
+  siteName = pr ? `${pr.full} (${pr.siteShort})` : siteLabel();
   $("#whoName").textContent = v ? `${siteName} · ${v.name}` : siteName;
-  $("#whoSub").textContent = `${siteSel.length ? `${ss.length} of ${SITES.length}` : SITES.length} sites · ${v ? "1 of " : ""}${SERVICES.length} service lines · ${PERIODS[period].l}`;
+  $("#whoSub").textContent = pr ? `1 provider · ${SITES.find((s) => s.id === pr.site).name} · ${PERIODS[period].l}` : `${siteSel.length ? `${ss.length} of ${SITES.length}` : SITES.length} sites · ${v ? "1 of " : ""}${SERVICES.length} service lines · ${PERIODS[period].l}`;
   renderDomains();
   render();
 }
-["#selService", "#selPeriod"].forEach((q) => $(q).addEventListener("change", onFilter));
+buildProvSelect();
+["#selService", "#selPeriod", "#selProv"].forEach((q) => $(q).addEventListener("change", onFilter));
 
 // ---------------------------------------------------------------- domains
 const DOMAINS = [
@@ -469,7 +498,7 @@ function render() {
   const sc = (v) => Math.round(v * scale);
   const tot = volThisFn().reduce((a, b) => a + b), last = volLastFn().reduce((a, b) => a + b);
   const svc = $("#selService").value; const v = SERVICES.find((x) => x.id === svc);
-  const tna = v ? v.tna : 7, ns = v ? v.noshow : 16;
+  const prK = selProv(); const tna = prK ? prK.tna : v ? v.tna : 7, ns = prK ? prK.noshow : v ? v.noshow : 16;
   renderAI();
 
   if (active === "access") {
@@ -489,10 +518,11 @@ function render() {
     table($("#tNoShow"), SERVICES.slice().sort((a, b) => b.noshow - a.noshow).map((s) => [s.name, s.noshow, `${s.noshow}%`]), ["Service line", "", "No-show"], 1, 30);
     renderProviders(v);
     renderHivTests(v);
+    renderDrill(v);
   }
   if (active === "quality") {
     kpi($("#kQuality"), [
-      { l: "Measures at target", v: atTarget, u: `of ${measures.length}`, c: "warn", t: `${measures.length - atTarget} below target` },
+      (() => { const prQ = selProv(), at = prQ ? measures.filter((m, i) => m[1] + prQ.qoff[i] >= m[2]).length : atTarget; return { l: "Measures at target", v: at, u: `of ${measures.length}`, c: "warn", t: `${measures.length - at} below target${prQ ? " · this provider" : ""}` }; })(),
       { l: "Open care gaps", v: sc(gaps.reduce((a, b) => a + b[1], 0)).toLocaleString(), c: "warn", t: "clients due or overdue" },
       { l: "Charts closed ≤ 72 h", v: 93, u: "%", c: "warn", t: "target ≥ 95%" },
       { l: "SOGI documented", v: 58, u: "%", c: "bad", t: "needed for HIV and STI reporting" },
@@ -508,7 +538,8 @@ function render() {
     chart("cTimely", { type: "bar", data: { labels: timely.map((t) => t.m), datasets: [{ label: "Within window", data: timely.map((t) => t.pct), backgroundColor: timely.map((t) => t.pct >= t.tp ? TEAL : t.pct >= t.tp * 0.92 ? INK : "#b4433a"), borderRadius: 4 }, { label: "Target", data: timely.map((t) => t.tp), type: "line", borderColor: GOLD, backgroundColor: GOLD, pointStyle: "line", pointRadius: 10, pointBorderWidth: 3, showLine: false }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { position: "bottom" }, tooltip: { callbacks: { afterLabel: (c) => c.datasetIndex === 0 ? `goal ${timely[c.dataIndex].goal} · median ${timely[c.dataIndex].med} ${timely[c.dataIndex].unit}` : "" } } }, scales: { x: { ...quiet, min: 0, max: 100 }, y: { grid: { display: false }, border: { display: false }, ticks: { autoSkip: false, font: { size: 11 } } } } } });
     chart("cCascade", { type: "bar", data: { labels: cascade.map((c) => c[0]), datasets: [{ data: cascade.map((c) => c[1]), backgroundColor: cascade.map((c, i) => i === 0 ? INK : c[1] / cascade[0][1] >= 0.9 ? TEAL : c[1] / cascade[0][1] >= 0.8 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.raw} people · ${Math.round(c.raw / cascade[0][1] * 100)}%` } } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, beginAtZero: true, title: { display: true, text: "people" } } } } });
     $("#tTimely").innerHTML = `<table><thead><tr><th>Measure</th><th>Target window</th><th>Median</th><th>Within window</th><th>Goal</th><th>6-month trend</th><th>Outside window now</th></tr></thead><tbody>${timely.map((t) => { const cls = pctClass(t.pct, t.tp); return `<tr><td>${t.m}</td><td>${t.goal}</td><td class="num">${t.med} ${t.unit}</td><td class="num ${cls}"><b>${t.pct}%</b></td><td class="num">${t.tp}%</td><td class="num" style="color:var(--muted)">${t.trend[0]}% → ${t.trend[t.trend.length - 1]}% <span class="${t.trend[5] > t.trend[0] ? "good" : "bad"}">${t.trend[5] > t.trend[0] ? "▲" : "▼"}</span></td><td class="num">${sc(t.open) || t.open} <span style="color:var(--muted);font-size:11px">clients</span></td></tr>`; }).join("")}</tbody></table>`;
-    chart("cMeasures", { type: "bar", data: { labels: measures.map((m) => m[0]), datasets: [{ label: "Performance", data: measures.map((m) => m[1]), backgroundColor: measures.map((m) => m[1] >= m[2] ? TEAL : INK), borderRadius: 4 }, { label: "Target", data: measures.map((m) => m[2]), type: "line", borderColor: GOLD, backgroundColor: GOLD, pointStyle: "line", pointRadius: 10, pointBorderWidth: 3, showLine: false }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { ...quiet, min: 0, max: 100 }, y: { grid: { display: false }, border: { display: false } } } } });
+    const prQ = selProv(), M = measures.map((m, i) => prQ ? [m[0], Math.max(0, Math.min(100, m[1] + prQ.qoff[i])), m[2]] : m);
+    chart("cMeasures", { type: "bar", data: { labels: M.map((m) => m[0]), datasets: [{ label: "Performance", data: M.map((m) => m[1]), backgroundColor: M.map((m) => m[1] >= m[2] ? TEAL : INK), borderRadius: 4 }, { label: "Target", data: measures.map((m) => m[2]), type: "line", borderColor: GOLD, backgroundColor: GOLD, pointStyle: "line", pointRadius: 10, pointBorderWidth: 3, showLine: false }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { ...quiet, min: 0, max: 100 }, y: { grid: { display: false }, border: { display: false } } } } });
     table($("#tGaps"), gaps.map((g) => [g[0], sc(g[1]), sc(g[1])]), ["Measure", "", "Clients"], 1, 1500);
     const clos = SITES.slice(0, 6).map((s, i) => [s, closure[i]]).filter(([s]) => selSites().includes(s)); const closV = clos.map(([, c]) => c);
     chart("cClosure", { type: "bar", data: { labels: clos.map(([s]) => s.short), datasets: [{ data: closV, backgroundColor: closV.map((c) => c >= 95 ? TEAL : c >= 90 ? GOLD : "#b4433a"), borderRadius: 4 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, border: { display: false } }, y: { ...quiet, min: 70, max: 100 } } } });
@@ -571,6 +602,28 @@ function renderHivTests(v) {
   const mx = Math.max(...per.map((r) => r.ty), 1);
   $("#tHivT").innerHTML = `<table><thead><tr><th>Health center</th><th></th><th class="num" style="text-align:right">Tests</th><th class="num" style="text-align:right">vs. LY</th><th class="num" style="text-align:right">Positive</th><th class="num" style="text-align:right">Positivity</th></tr></thead><tbody>${per.map((r) => `<tr><td>${r.s.short}</td><td style="width:110px"><div class="bar"><i style="width:${Math.round(r.ty / mx * 100)}%"></i></div></td><td class="num" style="text-align:right">${r.ty.toLocaleString()}</td><td class="num" style="text-align:right;color:${r.d <= -5 ? "var(--bad)" : r.d < 0 ? "var(--warn)" : "var(--good)"}">${r.d > 0 ? "+" : ""}${r.d}%</td><td class="num" style="text-align:right">${r.posN}</td><td class="num" style="text-align:right">${r.pos}%</td></tr>`).join("")}</tbody></table>`;
 }
+function renderDrill(v) {
+  const pr = selProv(), card = $("#provDrill");
+  card.hidden = !pr; if (!pr) return;
+  const n = win(), svcF = v ? 1 / SERVICES.length * 1.6 : 1, site = SITES.find((s) => s.id === pr.site);
+  const t = pr.thisYr.slice(-n).map((x) => Math.round(x * svcF)), l = pr.lastYr.slice(-n).map((x) => Math.round(x * svcF));
+  const tot = t.reduce((a, b) => a + b), last = l.reduce((a, b) => a + b), active = t.filter((x) => x > 0).length, d = last ? Math.round((tot - last) / last * 100) : 0;
+  const siteRows = PROVIDERS.filter((q) => q.site === pr.site), siteTot = siteRows.reduce((a, q) => a + q.thisYr.slice(-n).reduce((x, y) => x + y, 0), 0);
+  const ht = HIV_TESTS.find((h) => h.site.id === pr.site), hivN = ht ? Math.round(ht.ty.slice(-n).reduce((a, b) => a + b, 0) * (tot / Math.max(siteTot, 1)) / svcF) : null;
+  $("#hDrill").textContent = `${pr.full} — ${site.name}`;
+  $("#hDrillSub").textContent = `${PERIODS[period].l} · ${Math.round(tot / Math.max(siteTot, 1) * 100)}% of the site's encounters · fictional provider, synthetic data`;
+  kpi($("#kDrill"), [
+    { l: `Encounters (${PERIODS[period].k})`, v: tot.toLocaleString(), c: d >= 0 ? "good" : "warn", t: `${d >= 0 ? "+" : ""}${d}% vs. last year` },
+    { l: "Per active week", v: active ? Math.round(tot / active) : 0, c: "good", t: active < n ? `${n - active} weeks with no visits` : `${active} weeks active` },
+    { l: "No-show rate", v: pr.noshow, u: "%", c: pctClass(pr.noshow, 15, true), t: "target ≤ 15%" },
+    { l: "Third-next-available", v: pr.tna, u: "days", c: pctClass(pr.tna, 7, true), t: "target ≤ 7 days" },
+    hivN != null ? { l: "HIV tests", v: hivN.toLocaleString(), c: "good", t: "attributed by encounter share" } : { l: "HIV tests", v: "—", c: "warn", t: "site does not test" },
+  ]);
+  chart("cDrillVol", { type: "line", data: { labels: weeksFn(), datasets: [{ label: "2026", data: t, borderColor: TEAL, backgroundColor: TEAL, tension: .3, pointRadius: n > 13 ? 0 : 3 }, { label: "2025", data: l, borderColor: GRAY, backgroundColor: GRAY, borderDash: [4, 4], tension: .3, pointRadius: 0 }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { autoSkip: true, maxTicksLimit: 8 } }, y: { ...quiet, beginAtZero: true } } } });
+  chart("cDrillMix", { type: "bar", data: { labels: pr.mix.map(([sv]) => sv.name.split(" (")[0].split(" /")[0]), datasets: [{ data: pr.mix.map(([, sh]) => Math.round(tot * sh)), backgroundColor: INK, borderRadius: 4 }] }, options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ...quiet, beginAtZero: true }, y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 11 } } } } } });
+  const q = measures.map((m, i) => [m[0], Math.max(0, Math.min(100, m[1] + pr.qoff[i])), m[1], m[2]]).sort((a, b) => (a[1] - a[2]) - (b[1] - b[2]));
+  $("#tDrillQ").innerHTML = `<table><thead><tr><th>Measure</th><th class="num" style="text-align:right">Provider</th><th class="num" style="text-align:right">Site</th><th class="num" style="text-align:right">Δ</th></tr></thead><tbody>${q.map(([m, pv, sv, tp]) => `<tr><td style="font-size:12px">${m}</td><td class="num ${pctClass(pv, tp)}" style="text-align:right"><b>${pv}%</b></td><td class="num" style="text-align:right">${sv}%</td><td class="num" style="text-align:right;color:${pv - sv >= 0 ? "var(--good)" : "var(--bad)"}">${pv - sv >= 0 ? "+" : ""}${pv - sv}</td></tr>`).join("")}</tbody></table>`;
+}
 function renderWomen() {
   const sc = (v) => Math.round(v * scale);
   const tN = timely.find((t) => t.svc === "bcc" && /notified/.test(t.m)), tH = timely.find((t) => /HSIL/.test(t.m)), tL = timely.find((t) => /LSIL/.test(t.m));
@@ -605,7 +658,8 @@ function renderProviders(v) {
   chart("cProv", { type: "line", data: { labels: weeksFn(), datasets: top.map((p, i) => ({ label: p.label, data: p.t, borderColor: PCOL[i % PCOL.length], backgroundColor: PCOL[i % PCOL.length], borderWidth: 1.8, tension: .3, pointRadius: n > 13 ? 0 : 2 })) },
     options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, plugins: { legend: { position: "bottom", labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { autoSkip: true, maxTicksLimit: 10 } }, y: { ...quiet, beginAtZero: true } } } });
   const mx = Math.max(...rows.map((r) => r.tot), 1);
-  $("#tProv").innerHTML = `<table><thead><tr><th>Provider</th><th></th><th class="num" style="text-align:right">Encounters</th><th class="num" style="text-align:right">vs. LY</th><th class="num" style="text-align:right">per week</th></tr></thead><tbody>${rows.map((r) => { const d = r.last ? Math.round((r.tot - r.last) / r.last * 100) : 0; return `<tr><td>${r.label}${r.gap ? ' <span style="color:var(--warn);font-size:11px">· gap</span>' : ""}</td><td style="width:110px"><div class="bar"><i style="width:${Math.round(r.tot / mx * 100)}%"></i></div></td><td class="num" style="text-align:right">${r.tot.toLocaleString()}</td><td class="num" style="text-align:right;color:${d >= 0 ? "var(--good)" : "var(--bad)"}">${d >= 0 ? "+" : ""}${d}%</td><td class="num" style="text-align:right">${r.perWk}</td></tr>`; }).join("")}</tbody></table>`;
+  $("#tProv").innerHTML = `<table><thead><tr><th>Provider</th><th></th><th class="num" style="text-align:right">Encounters</th><th class="num" style="text-align:right">vs. LY</th><th class="num" style="text-align:right">per week</th></tr></thead><tbody>${rows.map((r) => { const d = r.last ? Math.round((r.tot - r.last) / r.last * 100) : 0; return `<tr data-pid="${r.id}" class="${r.id === provSel ? "sel" : ""}"><td>${r.full}${r.gap ? ' <span style="color:var(--warn);font-size:11px">· gap</span>' : ""}</td><td style="width:110px"><div class="bar"><i style="width:${Math.round(r.tot / mx * 100)}%"></i></div></td><td class="num" style="text-align:right">${r.tot.toLocaleString()}</td><td class="num" style="text-align:right;color:${d >= 0 ? "var(--good)" : "var(--bad)"}">${d >= 0 ? "+" : ""}${d}%</td><td class="num" style="text-align:right">${r.perWk}</td></tr>`; }).join("")}</tbody></table>`;
+  $("#tProv").querySelectorAll("tr[data-pid]").forEach((tr) => tr.onclick = () => { $("#selProv").value = tr.dataset.pid === provSel ? "" : tr.dataset.pid; onFilter(); if (tr.dataset.pid !== provSel) return; $("#provDrill").scrollIntoView({ behavior: "smooth", block: "start" }); });
 }
 function renderAI() {
   const tot = volThisFn().reduce((a, b) => a + b), last = volLastFn().reduce((a, b) => a + b), w = watchouts(), t0 = timely[0];
